@@ -1,0 +1,22 @@
+# wpilib files
+networktables.json
+simgui*
+__pycache__/
+
+# virtual environment & vscode
+.venv/
+.vscode
+
+# emacs
+*~
+\#*
+.\#*
+
+# misc
+*.o
+*.exe
+*.log
+
+# tempory, during code-refactoring
+inputs.py
+*.md
