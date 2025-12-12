@@ -1,6 +1,6 @@
 import wpilib
 
-from mb.controls import Ctrlr
+from mb.inputs import Inputs
 from mb.LEDSignals import LEDSignals
 from mb.subsystem import Subsystem
 from mb.swerveDrive import SwerveDrive
@@ -13,12 +13,9 @@ class Robot(wpilib.TimedRobot):
     def robotInit(self) -> None:
         self.table: NetworkTableInstance = NetworkTableInstance.getDefault().getTable("telemetry")
 
-        self.driveCtrlr: Ctrlr = Ctrlr(0)
-        self.mechCtrlr: Ctrlr = Ctrlr(1)
-        self.buttonPanel = wpilib.Joystick(4)
-
-        self.ledSignals: LEDSignals = LEDSignals(0)
+        self.inputs: Inputs = Inputs()
         self.swerveDrive: SwerveDrive = SwerveDrive()
+        self.ledSignals: LEDSignals = LEDSignals()
         self.time: TimeData = TimeData()
 
         self.subsystems: List[Subsystem] = [
@@ -37,6 +34,9 @@ class Robot(wpilib.TimedRobot):
     def teleopPeriodic(self) -> None:
         self.ledSignals.periodic()
         self.swerveDrive.periodic()
+        self.inputs.periodic()
+
+        self.swerveDrive.drive(self.inputs.fieldSpeeds)
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()
