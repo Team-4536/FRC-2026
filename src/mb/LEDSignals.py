@@ -1,4 +1,4 @@
-from subsystem import Subsystem
+from mb.subsystem import Subsystem
 from wpilib import CAN
 
 

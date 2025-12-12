@@ -1,13 +1,12 @@
-import math
 import wpilib
 
-from LEDSignals import LEDSignals
+from mb.controls import Ctrlr
+from mb.LEDSignals import LEDSignals
+from mb.subsystem import Subsystem
+from mb.swerveDrive import SwerveDrive
+from mb.utils import TimeData
 from ntcore import NetworkTableInstance
-from subsystem import Subsystem
-from swerveDrive import SwerveDrive
 from typing import List
-from utils import CircularScalar, Scalar, TimeData, lerp, wrapAngle
-from controls import Ctrlr
 
 
 class Robot(wpilib.TimedRobot):
@@ -21,10 +20,6 @@ class Robot(wpilib.TimedRobot):
         self.ledSignals: LEDSignals = LEDSignals(0)
         self.swerveDrive: SwerveDrive = SwerveDrive()
         self.time: TimeData = TimeData()
-        self.linScalar: Scalar = Scalar()
-        self.cirScalar: CircularScalar = CircularScalar()
-
-        self.state: int = 0
 
         self.subsystems: List[Subsystem] = [
             self.ledSignals,
@@ -40,21 +35,8 @@ class Robot(wpilib.TimedRobot):
             s.init()
 
     def teleopPeriodic(self) -> None:
-        self.state = (
-            1
-            if self.driveCtrlr.getAButtonPressed()
-            else (
-                2
-                if self.driveCtrlr.getBButtonPressed()
-                else 3 if self.driveCtrlr.getYButtonPressed() else self.state
-            )
-        )
-
         self.ledSignals.periodic()
-        self.swerveDrive.periodic(
-            # *self.cirScalar(self.driveCtrlr.getLeftX(), -self.driveCtrlr.getLeftY()),
-            # self.linScalar(self.driveCtrlr.getRightX()),
-        )
+        self.swerveDrive.periodic()
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()

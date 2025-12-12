@@ -1,7 +1,7 @@
 import math
 
 from math import pi, tau
-from subsystem import Subsystem
+from mb.subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
 
