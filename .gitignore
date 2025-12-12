@@ -18,5 +18,4 @@ __pycache__/
 *.log
 
 # tempory, during code-refactoring
-inputs.py
 *.md
