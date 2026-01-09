@@ -1,20 +1,7 @@
-import math
-
-from math import pi, tau
+from math import atan2, copysign, cos, hypot, sin
 from subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
-
-
-def lerp(a: float, b: float, t: float) -> float:  # unused
-    return a + (b - a) * t
-
-
-def wrapAngle(a: float) -> float:
-    a -= pi
-    a %= tau
-    a += pi
-    return a
 
 
 class TimeData(Subsystem):
@@ -53,7 +40,7 @@ class Scalar:
             return 0
         else:
             delta = abs(input) - self.deadzone
-            sign = math.copysign(1, input)
+            sign = copysign(1, input)
             return sign * (delta / (1 - self.deadzone)) ** self.exponent
 
     def setDeadzone(self, deadzone: float) -> None:
@@ -76,13 +63,13 @@ class CircularScalar:
         elif x == 0 and not y == 0:
             self.scalar.scale(y)
 
-        mag = math.hypot(x, y)
+        mag = hypot(x, y)
         mag = self.scalar.scale(mag)
 
-        angle = math.atan2(y, x)
+        angle = atan2(y, x)
 
-        x = mag * math.cos(angle)
-        y = mag * math.sin(angle)
+        x = mag * cos(angle)
+        y = mag * sin(angle)
 
         return x, y
 

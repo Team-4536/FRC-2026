@@ -6,7 +6,7 @@ from rev import ClosedLoopConfig, ClosedLoopSlot, MAXMotionConfig, SparkMaxConfi
 from subsystem import Subsystem
 from typing import List
 from utils import TimeData
-from wpilib import TimedRobot
+from wpilib import run, TimedRobot
 
 
 class Robot(TimedRobot):
@@ -105,4 +105,4 @@ class Robot(TimedRobot):
 
 
 if __name__ == "__main__":
-    wpilib.run(Robot)
+    run(Robot)
