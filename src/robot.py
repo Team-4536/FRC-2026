@@ -1,5 +1,3 @@
-import wpilib
-
 from drive import SwerveDrive
 from inputs import Inputs
 from LEDSignals import LEDSignals
@@ -8,26 +6,23 @@ from rev import ClosedLoopConfig, ClosedLoopSlot, MAXMotionConfig, SparkMaxConfi
 from subsystem import Subsystem
 from typing import List
 from utils import TimeData
+from wpilib import TimedRobot
 
 
-class Robot(wpilib.TimedRobot):
+class Robot(TimedRobot):
     def robotInit(self) -> None:
         self.table: NetworkTableInstance = NetworkTableInstance.getDefault().getTable("telemetry")
 
         self.inputs: Inputs = Inputs()
         self.swerveDrive: SwerveDrive = SwerveDrive.symmetricDrive(
-            frontLeftDriveDev=2,
-            frontLeftAzimuthDev=1,
-            frontLeftEncoderDev=21,
-            frontRightDriveDev=4,
-            frontRightAzimuthDev=3,
-            frontRightEncoderDev=22,
-            backLeftDriveDev=6,
-            backLeftAzimuthDev=5,
-            backLeftEncoderDev=23,
-            backRightDriveDev=8,
-            backRightAzimuthDev=7,
-            backRightEncoderDev=24,
+            frontLeftDriveID=2,
+            frontLeftAzimuthID=1,
+            frontRightDriveID=4,
+            frontRightAzimuthID=3,
+            backLeftDriveID=6,
+            backLeftAzimuthID=5,
+            backRightDriveID=8,
+            backRightAzimuthID=7,
             driveGearing=6.12,
             azimuthGearing=21.4,
             xPos=1,  # DEFINETLY INCORRECT

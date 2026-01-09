@@ -1,5 +1,4 @@
-from rev import SparkMax, SparkMaxConfig
-from wpimath.units import radians
+from rev import SparkAbsoluteEncoder, SparkMax, SparkMaxConfig, SparkRelativeEncoder
 from wpimath.units import revolutions_per_minute as RPM
 
 
@@ -29,5 +28,8 @@ class RevMotor:
             ctrl=SparkMax.ControlType.kMAXMotionPositionControl,
         )
 
-    def getEncoder(self) -> None:
+    def getEncoder(self) -> SparkRelativeEncoder:
         return self._ctrlr.getEncoder()
+
+    def getAbsoluteEncoder(self) -> SparkAbsoluteEncoder:
+        return self._ctrlr.getAbsoluteEncoder()

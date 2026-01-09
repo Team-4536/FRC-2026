@@ -1,6 +1,7 @@
 from math import tau as TAU
 from motor import RevMotor
 from navx import AHRS
+from rev import SparkMax
 from subsystem import Subsystem
 from typing import NamedTuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
@@ -22,7 +23,6 @@ class SwerveModule:
         driveGearing: float,
         azimuthMotor: RevMotor,
         azimuthGearing: float,
-        absoluteAzimuth: float,
         position: Translation2d = Translation2d(0, 0),
     ) -> None:
         self._driveMotor = driveMotor
@@ -30,9 +30,8 @@ class SwerveModule:
         self._azimuthMotor = azimuthMotor
         self._azimuthGearing = azimuthGearing
         self._position = position
-        self.absoluteAzimuth = absoluteAzimuth
 
-        self._azimuth = Rotation2d(self.absoluteAzimuth)
+        self.absoluteAzimuth = self.azimuthMotor.getAbsoluteEncoder().getPosition()
 
         self.driveEncoder = self._driveMotor.getEncoder()
         self.azimuthEncoder = self._azimuthMotor.getEncoder()
@@ -81,7 +80,6 @@ class SwerveModule:
         self.driveMotor.setVelocity(motorRPM)
 
     def setAzimuth(self, angle: Rotation2d) -> None:
-        self._azimuth = angle
         pos = self._azimuthGearing * radiansToRotations(angle.radians())
         self.azimuthMotor.setPosition(pos)
 
@@ -175,18 +173,14 @@ class SwerveDrive(Subsystem):
     def symmetricDrive(
         cls,
         *,
-        frontLeftDriveDev: int,
-        frontLeftAzimuthDev: int,
-        frontLeftEncoderDev: int,
-        frontRightDriveDev: int,
-        frontRightAzimuthDev: int,
-        frontRightEncoderDev: int,
-        backLeftDriveDev: int,
-        backLeftAzimuthDev: int,
-        backLeftEncoderDev: int,
-        backRightDriveDev: int,
-        backRightAzimuthDev: int,
-        backRightEncoderDev: int,
+        frontLeftDriveID: int,
+        frontLeftAzimuthID: int,
+        frontRightDriveID: int,
+        frontRightAzimuthID: int,
+        backLeftDriveID: int,
+        backLeftAzimuthID: int,
+        backRightDriveID: int,
+        backRightAzimuthID: int,
         xPos: int,
         yPos: int,
         driveGearing: float = 1,
@@ -199,13 +193,12 @@ class SwerveDrive(Subsystem):
                     azimuthMotor=RevMotor(id=azimuth),
                     driveGearing=driveGearing,
                     azimuthGearing=azimuthGearing,
-                    absoluteAzimuth=encoder,
                 )
-                for drive, azimuth, encoder in [
-                    (frontLeftDriveDev, frontLeftAzimuthDev, frontLeftEncoderDev),
-                    (frontRightDriveDev, frontRightAzimuthDev, frontRightEncoderDev),
-                    (backLeftDriveDev, backLeftAzimuthDev, backLeftEncoderDev),
-                    (backRightDriveDev, backRightAzimuthDev, backRightEncoderDev),
+                for drive, azimuth in [
+                    (frontLeftDriveID, frontLeftAzimuthID),
+                    (frontRightDriveID, frontRightAzimuthID),
+                    (backLeftDriveID, backLeftAzimuthID),
+                    (backRightDriveID, backRightAzimuthID),
                 ]
             )
         )

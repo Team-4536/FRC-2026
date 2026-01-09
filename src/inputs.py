@@ -29,7 +29,7 @@ class Inputs(Subsystem):
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
-        # self.periodic()
+        self.periodic()
 
     def periodic(self) -> None:
         x: float = self._scalar.scale(0 - self._driveCtrl.getRightX())
