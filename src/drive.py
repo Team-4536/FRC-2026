@@ -1,9 +1,10 @@
+from __future__ import annotations
 from math import tau as TAU
 from motor import RevMotor
 from navx import AHRS
-from rev import SparkMax
+from rev import SparkBaseConfig
 from subsystem import Subsystem
-from typing import NamedTuple
+from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
     ChassisSpeeds,
@@ -52,24 +53,24 @@ class SwerveModule:
         return SwerveModulePosition(driveDistance, azimuthRotation)
 
     @property
-    def driveMotor(self):
+    def driveMotor(self) -> RevMotor:
         return self._driveMotor
 
-    def configureDriveMotor(self, *, config) -> None:
+    def configureDriveMotor(self, *, config: SparkBaseConfig) -> None:
         self._driveMotor.configure(config=config)
 
     @property
-    def azimuthMotor(self):
+    def azimuthMotor(self) -> RevMotor:
         return self._azimuthMotor
 
-    def configureAzimuthMotor(self, *, config) -> None:
+    def configureAzimuthMotor(self, *, config: SparkBaseConfig) -> None:
         self._azimuthMotor.configure(config=config)
 
     @property
-    def position(self):
+    def position(self) -> Translation2d:
         return self._position
 
-    def setPosition(self, x, y) -> None:
+    def setPosition(self, x: float, y: float) -> None:
         self._position = Translation2d(x, y)
 
     def setDrive(self, velocity: MPS) -> None:
@@ -97,8 +98,9 @@ class SwerveModules(NamedTuple):
         self.backRight.setPosition(-x, -y)
 
     @property
-    def positions(self) -> tuple:
-        return tuple(m.position for m in self)
+    def positions(self) -> Tuple[Translation2d, Translation2d, Translation2d, Translation2d]:
+        print(tuple(m.position for m in self))
+        return tuple(m.position for m in self)  # MYPY IS ANGRY ):
 
 
 class SwerveDrive(Subsystem):
@@ -161,11 +163,11 @@ class SwerveDrive(Subsystem):
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
 
-    def configureDriveMotors(self, *, config):
+    def configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
         for module in self._modules:
             module.configureDriveMotor(config=config)
 
-    def configureAzimuthMotors(self, *, config):
+    def configureAzimuthMotors(self, *, config: SparkBaseConfig) -> None:
         for module in self._modules:
             module.configureAzimuthMotor(config=config)
 
@@ -185,12 +187,12 @@ class SwerveDrive(Subsystem):
         yPos: int,
         driveGearing: float = 1,
         azimuthGearing: float = 1,
-    ):
+    ) -> SwerveDrive:
         modules = SwerveModules(
             *(
                 SwerveModule(
-                    driveMotor=RevMotor(id=drive),
-                    azimuthMotor=RevMotor(id=azimuth),
+                    driveMotor=RevMotor(deviceID=drive),
+                    azimuthMotor=RevMotor(deviceID=azimuth),
                     driveGearing=driveGearing,
                     azimuthGearing=azimuthGearing,
                 )

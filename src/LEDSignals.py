@@ -1,12 +1,13 @@
 from subsystem import Subsystem
+from typing import Optional, List
+from warnings import warn
 from wpilib import CAN
 
 
 class LEDSignals(Subsystem):
-    def __init__(self, deviceId: int) -> None:
-        self.API_ID = 0
-
-        self.can: CAN = CAN(deviceId)
+    def __init__(self, deviceID: int) -> None:
+        self.apiID = 0
+        self.can = CAN(deviceID)
 
     def init(self) -> None:
         pass
@@ -16,27 +17,22 @@ class LEDSignals(Subsystem):
 
     def update(
         self,
-        b1: bytearray = None,
-        b2: bytearray = None,
-        b3: bytearray = None,
-        b4: bytearray = None,
-        b5: bytearray = None,
-        b6: bytearray = None,
-        b7: bytearray = None,
-        b8: bytearray = None,
+        b1: Optional[int] = None,
+        b2: Optional[int] = None,
+        b3: Optional[int] = None,
+        b4: Optional[int] = None,
+        b5: Optional[int] = None,
+        b6: Optional[int] = None,
+        b7: Optional[int] = None,
+        b8: Optional[int] = None,
     ) -> None:
-        byteArray = bytearray(8)
-        bytes = [b1, b2, b3, b4, b5, b6, b7, b8]
-
-        for i, byte in enumerate(bytes):
-            if byte:
-                byteArray[i] = byte
+        bytes = [b for b in [b1, b2, b3, b4, b5, b6, b7, b8] if b is not None]
 
         try:
-            self.can.writePacket(byteArray, self.API_ID)
-
-        except Exception as e:
-            pass
+            byteArray = bytearray(bytes)
+            self.can.writePacket(byteArray, self.apiID)
+        except (ValueError, Exception) as e:
+            warn(f"Error: {e}")
 
     def disable(self) -> None:
-        self.update(b8=bytearray())  # example
+        self.update(b8=bytearray())  # EXAMPLE

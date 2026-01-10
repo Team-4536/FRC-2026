@@ -1,6 +1,7 @@
 from controls import Ctrlr
 from math import pi as PI
 from subsystem import Subsystem
+from typing import Optional
 from utils import Scalar
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
@@ -25,7 +26,7 @@ class Inputs(Subsystem):
         self._scalar: Scalar = Scalar()
         self._fieldSpeeds: ChassisSpeeds = ChassisSpeeds(vx=0, vy=0, omega=0)
 
-    def init(self, drivePort: int = None, mechPort: int = None) -> None:
+    def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
@@ -44,5 +45,5 @@ class Inputs(Subsystem):
         self._fieldSpeeds = ChassisSpeeds(vx, vy, omega)
 
     @property
-    def fieldSpeeds(self):
+    def fieldSpeeds(self) -> ChassisSpeeds:
         return self._fieldSpeeds

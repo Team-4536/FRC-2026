@@ -1,26 +1,27 @@
 from pyfrc.physics.core import PhysicsEngine as PhysicsEngineBase
+from pyfrc.physics.core import PhysicsInterface
 from robot import Robot
 from wpimath.geometry import Rotation2d, Transform2d
 from wpimath.kinematics import ChassisSpeeds
 
 
 class PhysicsEngine(PhysicsEngineBase):
-    def __init__(self, controller, robot: Robot):
+    def __init__(self, controller: PhysicsInterface, robot: Robot) -> None:
         super().__init__(controller)
 
-        self.ctl = controller
+        self.ctrlr = controller
         self.robot = robot
 
-        self.ctl.move_robot(Transform2d(x=1, y=3, rotation=Rotation2d(0)))
+        self.ctrlr.move_robot(Transform2d(x=1, y=3, rotation=Rotation2d(0)))
 
-    def update_sim(self, now: float, tm_diff: float):
+    def update_sim(self, now: float, tm_diff: float) -> None:
         fieldSpeeds = self.robot.inputs.fieldSpeeds
-        pose = self.ctl.get_pose()
+        pose = self.ctrlr.get_pose()
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             fieldRelativeSpeeds=fieldSpeeds, robotAngle=pose.rotation()
         )
 
-        self.ctl.drive(
+        self.ctrlr.drive(
             ChassisSpeeds.discretize(continuousSpeeds=chassisSpeeds, dt=tm_diff),
             tm_diff,
         )

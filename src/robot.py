@@ -1,8 +1,8 @@
 from drive import SwerveDrive
 from inputs import Inputs
 from LEDSignals import LEDSignals
-from ntcore import NetworkTableInstance
-from rev import ClosedLoopConfig, ClosedLoopSlot, MAXMotionConfig, SparkMaxConfig
+from motor import RevMotor
+from ntcore import NetworkTable, NetworkTableInstance
 from subsystem import Subsystem
 from typing import List
 from utils import TimeData
@@ -11,7 +11,7 @@ from wpilib import run, TimedRobot
 
 class Robot(TimedRobot):
     def robotInit(self) -> None:
-        self.table: NetworkTableInstance = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.table: NetworkTable = NetworkTableInstance.getDefault().getTable("telemetry")
 
         self.inputs: Inputs = Inputs()
         self.swerveDrive: SwerveDrive = SwerveDrive.symmetricDrive(
@@ -28,11 +28,11 @@ class Robot(TimedRobot):
             xPos=1,  # DEFINETLY INCORRECT
             yPos=1,
         )
-        self.ledSignals: LEDSignals = LEDSignals(deviceId=0)
+        self.ledSignals: LEDSignals = LEDSignals(deviceID=0)
         self.time: TimeData = TimeData()
 
-        self.swerveDrive.configureDriveMotors(config=self.configDrive)
-        self.swerveDrive.configureAzimuthMotors(config=self.configAzimuth)
+        self.swerveDrive.configureDriveMotors(config=RevMotor.driveConfig)
+        self.swerveDrive.configureAzimuthMotors(config=RevMotor.azimuthConfig)
 
         self.subsystems: List[Subsystem] = [
             self.ledSignals,
@@ -59,49 +59,6 @@ class Robot(TimedRobot):
     def disabledPeriodic(self) -> None:
         for s in self.subsystems:
             s.disable()
-
-    @property
-    def configDrive(self):
-        return (
-            SparkMaxConfig()
-            .smartCurrentLimit(40)
-            .disableFollowerMode()
-            .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-            .apply(
-                ClosedLoopConfig()
-                .pidf(0.00019, 0, 0, 0.00002)
-                .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-                .outputRange(-1.0, 1.0, ClosedLoopSlot.kSlot0)
-                .apply(
-                    MAXMotionConfig()
-                    .maxVelocity(2000, ClosedLoopSlot.kSlot0)
-                    .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
-                    .allowedClosedLoopError(1)
-                )
-            )
-        )
-
-    @property
-    def configAzimuth(self):
-        return (
-            SparkMaxConfig()
-            .smartCurrentLimit(40)
-            .inverted(True)
-            .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-            .apply(
-                ClosedLoopConfig()
-                .pidf(0.15, 0, 0, 0)
-                .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-                .outputRange(-1.0, 1.0, ClosedLoopSlot.kSlot0)
-                .positionWrappingEnabled(False)
-                .apply(
-                    MAXMotionConfig()
-                    .maxVelocity(5000, ClosedLoopSlot.kSlot0)
-                    .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
-                    .allowedClosedLoopError(0.2)
-                )
-            )
-        )
 
 
 if __name__ == "__main__":

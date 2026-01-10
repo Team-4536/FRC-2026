@@ -11,8 +11,8 @@ class TimeData(Subsystem):
     def init(self) -> None:
         time = getTime()
 
-        self.dt = 0
-        self.timeSinceInit = 0
+        self.dt: float = 0
+        self.timeSinceInit: float = 0
         self.prevTime = time
         self.initTime = time
 
@@ -31,40 +31,69 @@ class TimeData(Subsystem):
 
 
 class Scalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1) -> None:
+    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
         self.deadzone = deadzone
-        self.exponent = exponent
+        self._exponent = exponent
+        self._magnitude = magnitude
 
     def scale(self, input: float) -> float:
         if abs(input) <= self.deadzone:
             return 0
         else:
             delta = abs(input) - self.deadzone
-            sign = copysign(1, input)
-            return sign * (delta / (1 - self.deadzone)) ** self.exponent
-
-    def setDeadzone(self, deadzone: float) -> None:
-        self.deadzone = deadzone
-
-    def setExponent(self, exponent: float) -> None:
-        self.exponent = exponent
+            sign = self._magnitude * copysign(1, input)
+            return sign * (delta / self._scale) ** self.exponent
 
     def __call__(self, input: float) -> float:
         return self.scale(input)
 
+    @property
+    def deadzone(self) -> float:
+        return self._deadzone
+
+    @deadzone.setter
+    def deadzone(self, deadzone: float) -> None:
+        self._deadzone = abs(deadzone)
+        self._scale = 1 - deadzone
+
+    def setDeadzone(self, deadzone: float) -> None:
+        self.deadzone = deadzone
+
+    @property
+    def exponent(self) -> float:
+        return self._exponent
+
+    @exponent.setter
+    def exponent(self, exponent: float) -> None:
+        self._exponent = abs(exponent)
+
+    def setExponent(self, exponent: float) -> None:
+        self.exponent = exponent
+
+    @property
+    def magnitude(self) -> float:
+        return self._magnitude
+
+    @magnitude.setter
+    def magnitude(self, magnitude: float) -> None:
+        self._magnitude = abs(magnitude)
+
+    def setMagnitude(self, magnitude: float) -> None:
+        self.magnitude = magnitude
+
 
 class CircularScalar:
-    def __init__(self, deadzone: float = 0.1, exponent: int = 1) -> None:
-        self.scalar = Scalar(deadzone, exponent)
+    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+        self.linearScalar = Scalar(deadzone, exponent, magnitude)
 
-    def scale(self, x: float, y: float) -> Tuple[float, float]:
+    def scale(self, *, x: float, y: float) -> Tuple[float, float]:
         if y == 0 and not x == 0:
-            self.scalar.scale(x)
+            return self.linearScalar(x), y
         elif x == 0 and not y == 0:
-            self.scalar.scale(y)
+            return x, self.linearScalar(y)
 
         mag = hypot(x, y)
-        mag = self.scalar.scale(mag)
+        mag = self.linearScalar(mag)
 
         angle = atan2(y, x)
 
@@ -73,11 +102,26 @@ class CircularScalar:
 
         return x, y
 
+    def __call__(self, *, x: float, y: float) -> Tuple[float, float]:
+        return self.scale(x=x, y=y)
+
+    @property
+    def deadzone(self) -> float:
+        return self.linearScalar.deadzone
+
     def setDeadzone(self, deadzone: float) -> None:
-        self.scalar.setDeadzone(deadzone)
+        self.linearScalar.setDeadzone(deadzone)
+
+    @property
+    def exponent(self) -> float:
+        return self.linearScalar.deadzone
 
     def setExponent(self, exponent: float) -> None:
-        self.scalar.setExponent(exponent)
+        self.linearScalar.setExponent(exponent)
 
-    def __call__(self, x: float, y: float) -> Tuple[float, float]:
-        return self.scale(x, y)
+    @property
+    def magnitude(self) -> float:
+        return self.linearScalar.magnitude
+
+    def setMagnitude(self, magnitude: float) -> None:
+        self.linearScalar.setMagnitude(magnitude)
