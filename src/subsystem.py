@@ -1,3 +1,5 @@
+from desiredState import DesiredState
+from typing import Optional
 from warnings import warn
 
 
@@ -5,7 +7,7 @@ class Subsystem:
     def init(self) -> None:
         warn("init method required")
 
-    def periodic(self) -> None:
+    def periodic(self, ds: DesiredState) -> None:
         warn("periodic method required")
 
     def disable(self) -> None:

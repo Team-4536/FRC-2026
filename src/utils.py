@@ -1,3 +1,4 @@
+from desiredState import DesiredState
 from math import atan2, copysign, cos, hypot, sin
 from subsystem import Subsystem
 from typing import Tuple
@@ -16,7 +17,7 @@ class TimeData(Subsystem):
         self.prevTime = time
         self.initTime = time
 
-    def periodic(self) -> None:
+    def periodic(self, ds: DesiredState) -> None:
         time = getTime()
 
         self.dt = time - self.prevTime

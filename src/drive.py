@@ -1,4 +1,5 @@
 from __future__ import annotations
+from desiredState import DesiredState
 from math import tau as TAU
 from motor import RevMotor
 from navx import AHRS
@@ -128,7 +129,7 @@ class SwerveDrive(Subsystem):
             m.azimuthEncoder.setPosition(m.absoluteAzimuth * m._azimuthGearing)
 
     # TO DO: Eventually replace fieldSpeeds argument with DesiredState object so that it will not be an override error (;
-    def periodic(self, fieldSpeeds: ChassisSpeeds) -> None:  # type: ignore[override]
+    def periodic(self, ds: DesiredState) -> None:
         self.pose = self._odometry.update(
             self._gyro.getRotation2d(),
             (
@@ -139,7 +140,7 @@ class SwerveDrive(Subsystem):
             ),
         )
 
-        self.drive(fieldSpeeds)
+        self.drive(fieldSpeeds=ds.fieldSpeeds)
 
     def disable(self) -> None:
         pass
@@ -184,18 +185,18 @@ class SwerveDrive(Subsystem):
     def symmetricDrive(
         cls,
         *,
-        frontLeftDriveID: int,
-        frontLeftAzimuthID: int,
-        frontRightDriveID: int,
-        frontRightAzimuthID: int,
-        backLeftDriveID: int,
-        backLeftAzimuthID: int,
-        backRightDriveID: int,
-        backRightAzimuthID: int,
-        xPos: int,
-        yPos: int,
+        flDriveID: int,
+        flAzimuthID: int,
+        frDriveID: int,
+        frAzimuthID: int,
+        blDriveID: int,
+        blAzimuthID: int,
+        brDriveID: int,
+        brAzimuthID: int,
         driveGearing: float = 1,
         azimuthGearing: float = 1,
+        xPos: int,
+        yPos: int,
     ) -> SwerveDrive:
         modules = SwerveModules(
             *(
@@ -206,10 +207,10 @@ class SwerveDrive(Subsystem):
                     azimuthGearing=azimuthGearing,
                 )
                 for drive, azimuth in [
-                    (frontLeftDriveID, frontLeftAzimuthID),
-                    (frontRightDriveID, frontRightAzimuthID),
-                    (backLeftDriveID, backLeftAzimuthID),
-                    (backRightDriveID, backRightAzimuthID),
+                    (flDriveID, flAzimuthID),
+                    (frDriveID, frAzimuthID),
+                    (blDriveID, blAzimuthID),
+                    (brDriveID, brAzimuthID),
                 ]
             )
         )

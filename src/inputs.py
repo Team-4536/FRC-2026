@@ -1,4 +1,5 @@
 from controls import Ctrlr
+from desiredState import DesiredState
 from math import pi as PI
 from subsystem import Subsystem
 from typing import Optional
@@ -24,15 +25,17 @@ class Inputs(Subsystem):
         self._maxAngularVelocity = maxAngularVelocity
 
         self._scalar: Scalar = Scalar()
-        self._fieldSpeeds: ChassisSpeeds = ChassisSpeeds(vx=0, vy=0, omega=0)
+
+        self.desiredState = DesiredState(fieldSpeeds=ChassisSpeeds())
 
     def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
-        self.periodic()
+    def periodic(self, ds: DesiredState) -> None:
+        self.desiredState.fieldSpeeds = self._calculateDrive()
 
-    def periodic(self) -> None:
+    def _calculateDrive(self) -> ChassisSpeeds:
         x: float = self._scalar.scale(0 - self._driveCtrl.getLeftY())
         y: float = self._scalar.scale(0 - self._driveCtrl.getLeftX())
 
@@ -42,8 +45,4 @@ class Inputs(Subsystem):
         rot: float = self._scalar.scale(0 - self._driveCtrl.getRightX())
         omega: RPS = rot * self._maxAngularVelocity
 
-        self._fieldSpeeds = ChassisSpeeds(vx, vy, omega)
-
-    @property
-    def fieldSpeeds(self) -> ChassisSpeeds:
-        return self._fieldSpeeds
+        return ChassisSpeeds(vx, vy, omega)

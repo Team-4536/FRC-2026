@@ -1,19 +1,8 @@
 # wpilib files
+__pycache__/
 networktables.json
 simgui*
-__pycache__/
 
-# virtual environment & vscode
-uv.lock
+# virtual environment & uv
 .venv/
-.vscode
-
-# emacs
-*~
-\#*
-.\#*
-
-# misc
-*.o
-*.exe
-*.log
+uv.lock
