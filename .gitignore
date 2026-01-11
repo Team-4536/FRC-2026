@@ -4,6 +4,7 @@ simgui*
 __pycache__/
 
 # virtual environment & vscode
+uv.lock
 .venv/
 .vscode
 
