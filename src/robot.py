@@ -21,8 +21,9 @@ class Subsystems(NamedTuple):
             s.init()
 
     def periodic(self):
+        ds = self.desiredState
         for s in self._s:
-            s.periodic(self.desiredState)
+            s.periodic(ds)
 
     def disable(self):
         for s in self:
