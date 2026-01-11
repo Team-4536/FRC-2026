@@ -42,7 +42,7 @@ class Scalar:
         else:
             delta = abs(input) - self.deadzone
             sign = self._magnitude * copysign(1, input)
-            return sign * (delta / self._scale) ** self.exponent
+            return float(sign * (delta / self._scale) ** self.exponent)
 
     def __call__(self, input: float) -> float:
         return self.scale(input)

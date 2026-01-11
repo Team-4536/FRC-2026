@@ -73,7 +73,7 @@ class RevMotor:
             .pidf(0.15, 0, 0, 0)
             .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1.0, 1.0, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(5000, ClosedLoopSlot.kSlot0)

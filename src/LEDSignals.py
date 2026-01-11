@@ -35,4 +35,4 @@ class LEDSignals(Subsystem):
             warn(f"Error: {e}")
 
     def disable(self) -> None:
-        self.update(b8=bytearray())  # EXAMPLE
+        self.update(b8=0)  # EXAMPLE

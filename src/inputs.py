@@ -13,7 +13,7 @@ class Inputs(Subsystem):
         self,
         drivePort: int = 0,
         mechPort: int = 1,
-        maxVelocity: MPS = 8,
+        maxVelocity: MPS = 6,
         maxAngularVelocity: RPS = PI,
     ) -> None:
         super().__init__()
@@ -33,13 +33,13 @@ class Inputs(Subsystem):
         self.periodic()
 
     def periodic(self) -> None:
-        x: float = self._scalar.scale(0 - self._driveCtrl.getRightX())
-        y: float = self._scalar.scale(0 - self._driveCtrl.getRightY())
+        x: float = self._scalar.scale(0 - self._driveCtrl.getLeftY())
+        y: float = self._scalar.scale(0 - self._driveCtrl.getLeftX())
 
         vx: MPS = x * self._maxVelocity
         vy: MPS = y * self._maxVelocity
 
-        rot: float = self._scalar.scale(self._driveCtrl.getLeftX())
+        rot: float = self._scalar.scale(0 - self._driveCtrl.getRightX())
         omega: RPS = rot * self._maxAngularVelocity
 
         self._fieldSpeeds = ChassisSpeeds(vx, vy, omega)

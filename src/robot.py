@@ -25,7 +25,7 @@ class Robot(TimedRobot):
             backRightAzimuthID=7,
             driveGearing=6.12,
             azimuthGearing=21.4,
-            xPos=1,  # DEFINETLY INCORRECT
+            xPos=1,
             yPos=1,
         )
         self.ledSignals: LEDSignals = LEDSignals(deviceID=0)
@@ -62,4 +62,4 @@ class Robot(TimedRobot):
 
 
 if __name__ == "__main__":
-    run(Robot)
+    run(Robot)  # type: ignore

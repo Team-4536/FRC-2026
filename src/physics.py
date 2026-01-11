@@ -16,7 +16,7 @@ class PhysicsEngine(PhysicsEngineBase):
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         fieldSpeeds = self.robot.inputs.fieldSpeeds
-        pose = self.ctrlr.get_pose()
+        pose = self.ctrlr.get_pose()  # type: ignore
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             fieldRelativeSpeeds=fieldSpeeds, robotAngle=pose.rotation()
         )
