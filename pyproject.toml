@@ -3,7 +3,7 @@ name = "FRC-2025"
 version = "1.0"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-    "robotpy[navx,rev,phoenix6,pathplannerlib]==2025.3.2.2",
+    "robotpy[navx,pathplannerlib,phoenix6,rev]==2025.3.2.2",
     "photonlibpy",
 ]
 
