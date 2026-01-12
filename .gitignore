@@ -1,2 +1,6 @@
 **/__pycache__/
 *~
+.venv/
+networktables.json
+simgui.json
+simgui-*
