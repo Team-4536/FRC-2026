@@ -1,6 +1,6 @@
 from math import atan2, copysign, cos, hypot, sin
-from subsystem import Subsystem
-from subsystems.desiredState import DesiredState
+from mb.desiredState import DesiredState
+from mb.subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
 from wpimath.units import seconds
