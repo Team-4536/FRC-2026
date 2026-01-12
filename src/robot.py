@@ -1,52 +1,16 @@
-from desiredState import DesiredState
-from drive import SwerveDrive
-from inputs import Inputs
-from LEDSignals import LEDSignals
-from motor import RevMotor
-from ntcore import NetworkTable, NetworkTableInstance
-from subsystem import Subsystem
+from subsystems.desiredState import DesiredState
+from subsystems.inputs import Inputs
+from subsystems.LEDSignals import LEDSignals
+from subsystems.motor import RevMotor
+from subsystems.subsystem import Subsystem
+from subsystems.swerveDrive import SwerveDrive
+from subsystems.utils import TimeData
 from typing import List, NamedTuple
-from utils import TimeData
-from wpilib import run, TimedRobot
-
-
-class Subsystems(NamedTuple):
-    inputs: Inputs
-    ledSignals: LEDSignals
-    swerveDrive: SwerveDrive
-    time: TimeData
-
-    def init(self):
-        for s in self:
-            s.init()
-
-    def periodic(self):
-        ds = self.desiredState
-        for s in self._s:
-            s.periodic(ds)
-
-    def disable(self):
-        for s in self:
-            s.disable()
-
-    @property
-    def _s(self) -> List[Subsystem]:
-        return [
-            self.ledSignals,
-            self.swerveDrive,
-            self.time,
-        ]
-
-    @property
-    def desiredState(self) -> DesiredState:
-        self.inputs.periodic(self.inputs.desiredState)
-        return self.inputs.desiredState
+from wpilib import TimedRobot
 
 
 class Robot(TimedRobot):
     def robotInit(self) -> None:
-        self.table: NetworkTable = NetworkTableInstance.getDefault().getTable("telemetry")
-
         self.subsystems: Subsystems = Subsystems(
             inputs=Inputs(),
             ledSignals=LEDSignals(deviceID=0),
@@ -87,5 +51,39 @@ class Robot(TimedRobot):
         self.subsystems.disable()
 
 
-if __name__ == "__main__":
-    run(Robot)  # type: ignore
+class Subsystems(NamedTuple):
+    inputs: Inputs
+    ledSignals: LEDSignals
+    swerveDrive: SwerveDrive
+    time: TimeData
+
+    def init(self) -> None:
+        for s in self:
+            s.init()
+
+    def periodic(self) -> None:
+        ds = self.desiredState
+        for s in self._dependant:
+            s.periodic(ds)
+        self.publish()
+
+    def disable(self) -> None:
+        for s in self:
+            s.disabled()
+
+    def publish(self) -> None:
+        for s in self:
+            s.publish()
+
+    @property
+    def _dependant(self) -> List[Subsystem]:
+        return [
+            self.ledSignals,
+            self.swerveDrive,
+            self.time,
+        ]
+
+    @property
+    def desiredState(self) -> DesiredState:
+        self.inputs.periodic(self.inputs.desiredState)
+        return self.inputs.desiredState

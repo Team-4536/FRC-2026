@@ -1,19 +1,25 @@
-from desiredState import DesiredState
 from math import atan2, copysign, cos, hypot, sin
 from subsystem import Subsystem
+from subsystems.desiredState import DesiredState
 from typing import Tuple
 from wpilib import getTime
+from wpimath.units import seconds
 
 
 class TimeData(Subsystem):
     def __init__(self) -> None:
-        self.init()
+        super().__init__()
+
+        self.dt: seconds = 0
+        self.timeSinceInit: seconds = 0
+        self.prevTime: seconds = 0
+        self.initTime: seconds = 0
 
     def init(self) -> None:
-        time = getTime()
+        time: seconds = getTime()
 
-        self.dt: float = 0
-        self.timeSinceInit: float = 0
+        self.dt = 0
+        self.timeSinceInit = 0
         self.prevTime = time
         self.initTime = time
 
@@ -24,11 +30,17 @@ class TimeData(Subsystem):
         self.timeSinceInit = time - self.initTime
         self.prevTime = time
 
-    def disable(self) -> None:
+    def disabled(self) -> None:
         time = getTime()
 
         self.dt = 0
         self.timeSinceInit = time - self.initTime
+
+        self.publish()
+
+    def publish(self) -> None:
+        self.publishDouble("delta_time", self.dt)
+        self.publishDouble("time_since_init", self.timeSinceInit)
 
 
 class Scalar:

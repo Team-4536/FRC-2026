@@ -1,9 +1,9 @@
-from controls import Ctrlr
-from desiredState import DesiredState
 from math import pi as PI
 from subsystem import Subsystem
+from subsystems.desiredState import DesiredState
+from subsystems.utils import Scalar
 from typing import Optional
-from utils import Scalar
+from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
@@ -34,6 +34,12 @@ class Inputs(Subsystem):
 
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
+
+    def disabled(self) -> None:
+        pass
+
+    def publish(self) -> None:
+        pass
 
     def _calculateDrive(self) -> ChassisSpeeds:
         x: float = self._scalar.scale(0 - self._driveCtrl.getLeftY())

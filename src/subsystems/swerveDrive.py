@@ -1,10 +1,10 @@
 from __future__ import annotations
-from desiredState import DesiredState
 from math import tau as TAU
-from motor import RevMotor
 from navx import AHRS
 from rev import SparkBaseConfig
 from subsystem import Subsystem
+from subsystems.desiredState import DesiredState
+from subsystems.motor import RevMotor
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
@@ -26,19 +26,18 @@ class SwerveModule:
         driveGearing: float,
         azimuthMotor: RevMotor,
         azimuthGearing: float,
-        position: Translation2d = Translation2d(0, 0),
     ) -> None:
         self._driveMotor = driveMotor
         self._driveGearing = driveGearing
         self._azimuthMotor = azimuthMotor
         self._azimuthGearing = azimuthGearing
-        self._position = position
+        self._position = Translation2d(0, 0)
 
         self.absoluteAzimuth = self.azimuthMotor.getAbsoluteEncoder().getPosition()
 
         self.driveEncoder = self._driveMotor.getEncoder()
         self.azimuthEncoder = self._azimuthMotor.getEncoder()
-        self.azimuthEncoder.setPosition(self.absoluteAzimuth * self._azimuthGearing)
+        self.azimuthEncoder.setPosition(self.absoluteAzimuth)
 
         wheelDiam: meters = 0.1016
         self._wheelCircumferance: meters = wheelDiam * TAU
@@ -100,13 +99,22 @@ class SwerveModules(NamedTuple):
         self.backRight.setPosition(-x, -y)
 
     @property
-    # TO DO: Fix mypy being angry
     def positions(self) -> Tuple[Translation2d, Translation2d, Translation2d, Translation2d]:
-        return tuple(m.position for m in self)  # type: ignore
+        return tuple(m.position for m in self)  # type: ignore[return-value]
+
+    @property
+    def modulePositions(
+        self,
+    ) -> Tuple[
+        SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition
+    ]:
+        return tuple(m.modulePosition for m in self)  # type: ignore[return-value]
 
 
 class SwerveDrive(Subsystem):
     def __init__(self, modules: SwerveModules) -> None:
+        super().__init__()
+
         self._initPos = Pose2d()
         self._modules = modules
         self._kinematics = SwerveDrive4Kinematics(*modules.positions)
@@ -114,35 +122,27 @@ class SwerveDrive(Subsystem):
         self._odometry = SwerveDrive4Odometry(
             self._kinematics,
             self._gyro.getRotation2d(),
-            (
-                self._modules.frontLeft.modulePosition,
-                self._modules.frontRight.modulePosition,
-                self._modules.backLeft.modulePosition,
-                self._modules.backRight.modulePosition,
-            ),
+            self._modules.modulePositions,
             self._initPos,
         )
 
     def init(self) -> None:
-        for m in self._modules:
-            m.driveEncoder.setPosition(0)
-            m.azimuthEncoder.setPosition(m.absoluteAzimuth * m._azimuthGearing)
+        for module in self._modules:
+            module.driveEncoder.setPosition(0)
+            module.azimuthEncoder.setPosition(module.absoluteAzimuth * module._azimuthGearing)
 
-    # TO DO: Eventually replace fieldSpeeds argument with DesiredState object so that it will not be an override error (;
     def periodic(self, ds: DesiredState) -> None:
         self.pose = self._odometry.update(
             self._gyro.getRotation2d(),
-            (
-                self._modules.frontLeft.modulePosition,
-                self._modules.frontRight.modulePosition,
-                self._modules.backLeft.modulePosition,
-                self._modules.backRight.modulePosition,
-            ),
+            self._modules.modulePositions,
         )
 
         self.drive(fieldSpeeds=ds.fieldSpeeds)
 
-    def disable(self) -> None:
+    def disabled(self) -> None:
+        pass
+
+    def publish(self) -> None:
         pass
 
     @property
@@ -154,14 +154,13 @@ class SwerveDrive(Subsystem):
         return self._kinematics
 
     def drive(self, fieldSpeeds: ChassisSpeeds) -> None:
-        moduleStates = self._kinematics.toSwerveModuleStates(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                fieldSpeeds.vx,
-                fieldSpeeds.vy,
-                fieldSpeeds.omega,
-                Rotation2d.fromDegrees(-self._gyro.getAngle()),
-            )
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            fieldSpeeds.vx,
+            fieldSpeeds.vy,
+            fieldSpeeds.omega,
+            Rotation2d.fromDegrees(-self._gyro.getAngle()),
         )
+        moduleStates = self._kinematics.toSwerveModuleStates(chassisSpeeds)
 
         moduleStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             moduleStates=moduleStates,

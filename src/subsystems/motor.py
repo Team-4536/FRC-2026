@@ -8,8 +8,8 @@ from rev import (
     SparkMaxConfig,
     SparkRelativeEncoder,
 )
-from wpimath.units import revolutions_per_minute as RPM
 from wpimath.units import radians
+from wpimath.units import revolutions_per_minute as RPM
 
 
 class RevMotor:
@@ -53,7 +53,7 @@ class RevMotor:
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00002)
             .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-            .outputRange(-1.0, 1.0, ClosedLoopSlot.kSlot0)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(2000, ClosedLoopSlot.kSlot0)
@@ -65,20 +65,22 @@ class RevMotor:
 
     azimuthConfig: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(30)
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.15, 0, 0, 0)
+            .pidf(0.6, 0, 0.01, 0)
             .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-            .outputRange(-1.0, 1.0, ClosedLoopSlot.kSlot0)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(True)
+            .positionWrappingMinInput(0)
+            .positionWrappingMaxInput(1)
             .apply(
                 MAXMotionConfig()
-                .maxVelocity(5000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.2)
+                .maxVelocity(9000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(40000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.01)
             )
         )
     )

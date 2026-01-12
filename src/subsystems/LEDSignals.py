@@ -1,12 +1,14 @@
-from desiredState import DesiredState
 from subsystem import Subsystem
-from typing import Optional, List
+from subsystems.desiredState import DesiredState
+from typing import Optional
 from warnings import warn
 from wpilib import CAN
 
 
 class LEDSignals(Subsystem):
     def __init__(self, deviceID: int) -> None:
+        super().__init__()
+
         self.apiID = 0
         self.can = CAN(deviceID)
 
@@ -14,6 +16,9 @@ class LEDSignals(Subsystem):
         pass
 
     def periodic(self, ds: DesiredState) -> None:
+        pass
+
+    def publish(self) -> None:
         pass
 
     def update(
@@ -35,5 +40,5 @@ class LEDSignals(Subsystem):
         except (ValueError, Exception) as e:
             warn(f"Error: {e}")
 
-    def disable(self) -> None:
+    def disabled(self) -> None:
         self.update(b8=0)  # EXAMPLE
