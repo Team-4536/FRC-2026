@@ -10,7 +10,7 @@ class NetworkTablesMixin:
         else:
             instance = f"{self.__class__.__name__}/{instance}"
 
-        self.table = NetworkTableInstance.getDefault().getTable(instance)
+        self.table = NetworkTableInstance.getDefault().getTable(f"telemetry/{instance}")
         self._ntPersist: Dict[str, object] = {}
 
     def _publish(

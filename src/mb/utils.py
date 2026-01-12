@@ -49,16 +49,16 @@ class Scalar:
         self._exponent = exponent
         self._magnitude = magnitude
 
-    def scale(self, input: float) -> float:
-        if abs(input) <= self.deadzone:
+    def scale(self, x: float) -> float:
+        if abs(x) <= self.deadzone:
             return 0
         else:
-            delta = abs(input) - self.deadzone
-            sign = self._magnitude * copysign(1, input)
+            delta = abs(x) - self.deadzone
+            sign = self._magnitude * copysign(1, x)
             return float(sign * (delta / self._scale) ** self.exponent)
 
-    def __call__(self, input: float) -> float:
-        return self.scale(input)
+    def __call__(self, x: float) -> float:
+        return self.scale(x)
 
     @property
     def deadzone(self) -> float:

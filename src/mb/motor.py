@@ -23,7 +23,7 @@ class RevMotor:
             persistMode=SparkMax.PersistMode.kPersistParameters,
         )
 
-    def stop(self) -> None:
+    def stopMotor(self) -> None:
         self._ctrlr.set(0)
 
     def setVelocity(self, rpm: RPM) -> None:
@@ -65,22 +65,20 @@ class RevMotor:
 
     azimuthConfig: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(30)
+        .smartCurrentLimit(40)
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.6, 0, 0.01, 0)
+            .pidf(0.15, 0, 0, 0)
             .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
-            .positionWrappingMinInput(0)
-            .positionWrappingMaxInput(1)
+            .positionWrappingEnabled(False)
             .apply(
                 MAXMotionConfig()
-                .maxVelocity(9000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(40000, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.01)
+                .maxVelocity(5000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.2)
             )
         )
     )

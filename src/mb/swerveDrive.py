@@ -85,6 +85,10 @@ class SwerveModule:
         pos = self._azimuthGearing * radiansToRotations(angle.radians())
         self.azimuthMotor.setPosition(pos)
 
+    def stopModule(self) -> None:
+        self.driveMotor.stopMotor()
+        self.azimuthMotor.stopMotor()
+
 
 class SwerveModules(NamedTuple):
     frontLeft: SwerveModule
@@ -97,6 +101,10 @@ class SwerveModules(NamedTuple):
         self.frontRight.setPosition(x, -y)
         self.backLeft.setPosition(-x, y)
         self.backRight.setPosition(-x, -y)
+
+    def stopModules(self) -> None:
+        for m in self:
+            m.stopModule()
 
     @property
     def positions(self) -> Tuple[Translation2d, Translation2d, Translation2d, Translation2d]:
@@ -140,7 +148,7 @@ class SwerveDrive(Subsystem):
         self.drive(fieldSpeeds=ds.fieldSpeeds)
 
     def disabled(self) -> None:
-        pass
+        self._modules.stopModules()
 
     def publish(self) -> None:
         pass
@@ -171,6 +179,8 @@ class SwerveDrive(Subsystem):
             state.optimize(module.modulePosition.angle)
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
+
+        self.publishSwerve("swerve_states", moduleStates)
 
     def configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
         for module in self._modules:
