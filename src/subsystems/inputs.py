@@ -14,7 +14,7 @@ class Inputs(Subsystem):
         self,
         drivePort: int = 0,
         mechPort: int = 1,
-        maxVelocity: MPS = 5,
+        maxVelocity: MPS = 8,
         maxAngularVelocity: RPS = TAU,
     ) -> None:
         super().__init__()
@@ -25,7 +25,9 @@ class Inputs(Subsystem):
         self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
-        self.desiredState = DesiredState(fieldSpeeds=ChassisSpeeds())
+        self.desiredState = DesiredState(
+            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity
+        )
 
     def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
@@ -35,7 +37,7 @@ class Inputs(Subsystem):
         self.desiredState.fieldSpeeds = self._calculateDrive()
 
     def disabled(self) -> None:
-        pass
+        self.desiredState.fieldSpeeds = ChassisSpeeds()
 
     def publish(self) -> None:
         self.desiredState.publish()

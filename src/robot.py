@@ -42,6 +42,12 @@ class Robot(TimedRobot):
     def robotPeriodic(self) -> None:
         self.subsystems.time.periodic(self.subsystems.desiredState)
 
+    def autonomousInit(self) -> None:
+        self.init()
+
+    def autonomousPeriodic(self) -> None:
+        pass
+
     def teleopInit(self) -> None:
         self.init()
 
@@ -50,6 +56,9 @@ class Robot(TimedRobot):
 
     def teleopPeriodic(self) -> None:
         self.subsystems.periodic()
+
+    def teleopExit(self) -> None:
+        self.disabledInit()
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()

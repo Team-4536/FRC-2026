@@ -2,6 +2,7 @@ from __future__ import annotations
 from math import tau as TAU
 from navx import AHRS
 from phoenix6.hardware import CANcoder
+from phoenix6.units import rotation
 from rev import SparkBaseConfig
 from subsystems.desiredState import DesiredState
 from subsystems.motor import RevMotor
@@ -14,9 +15,8 @@ from wpimath.kinematics import (
     SwerveDrive4Odometry,
     SwerveModulePosition,
 )
-from wpimath.units import meters
 from wpimath.units import meters_per_second as MPS
-from wpimath.units import radiansToRotations
+from wpimath.units import meters, radiansToRotations
 
 
 class SwerveModule:
@@ -44,15 +44,23 @@ class SwerveModule:
         self._wheelCircumferance: meters = wheelDiam * TAU
 
     @property
-    def modulePosition(self) -> SwerveModulePosition:
-        driveDistance = (
-            self._driveEncoder.getPosition() * self._wheelCircumferance / self._driveGearing
-        )
-        azimuthRotation = Rotation2d.fromRotations(
-            self._azimuthEncoder.getPosition() / self._azimuthGearing
-        )
+    def _driveDistance(self) -> meters:
+        return self._driveEncoder.getPosition() * self._wheelCircumferance / self._driveGearing
 
-        return SwerveModulePosition(driveDistance, azimuthRotation)
+    @property
+    def _azimuthRotation(self) -> rotation:
+        return self._azimuthEncoder.getPosition() / self._azimuthGearing
+
+    @property
+    def absoluteAzimuthRotation(self) -> rotation:
+        return self._azimuthAbsoluteEncoder.get_absolute_position().value * self._azimuthGearing
+
+    @property
+    def modulePosition(self) -> SwerveModulePosition:
+        return SwerveModulePosition(
+            distance=self._driveDistance,
+            angle=Rotation2d.fromRotations(self._azimuthRotation),
+        )
 
     @property
     def driveMotor(self) -> RevMotor:
@@ -138,10 +146,7 @@ class SwerveDrive(Subsystem):
     def init(self) -> None:
         for module in self._modules:
             module._driveEncoder.setPosition(0)
-            module._azimuthEncoder.setPosition(
-                module._azimuthAbsoluteEncoder.get_absolute_position().value
-                * module._azimuthGearing
-            )
+            module._azimuthEncoder.setPosition(module.absoluteAzimuthRotation)
 
     def periodic(self, ds: DesiredState) -> None:
         self.pose = self._odometry.update(
@@ -149,7 +154,7 @@ class SwerveDrive(Subsystem):
             self._modules.modulePositions,
         )  # UNUSED
 
-        self.drive(fieldSpeeds=ds.fieldSpeeds)
+        self.drive(fieldSpeeds=ds.fieldSpeeds, attainableMaxSpeed=ds.abtainableMaxSpeed)
 
     def disabled(self) -> None:
         self._modules.stopModules()
@@ -165,7 +170,7 @@ class SwerveDrive(Subsystem):
     def kinematics(self) -> SwerveDrive4Kinematics:
         return self._kinematics
 
-    def drive(self, fieldSpeeds: ChassisSpeeds) -> None:
+    def drive(self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: MPS) -> None:
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             fieldSpeeds.vx,
             fieldSpeeds.vy,
@@ -176,7 +181,7 @@ class SwerveDrive(Subsystem):
 
         moduleStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             moduleStates=moduleStates,
-            attainableMaxSpeed=5,
+            attainableMaxSpeed=attainableMaxSpeed,
         )
 
         self.publishDouble("gyro_angle", self._gyro.getAngle(), "debug")
