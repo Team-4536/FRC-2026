@@ -19,12 +19,7 @@ class LEDSignals(Subsystem):
         pass
 
     def periodic(self, ds: DesiredState) -> None:
-        b1: int = int(ds.fieldSpeeds.vx * 256 / 6)
-        self.publishDouble(f"_", float(ds.fieldSpeeds.vx))
-        b2: int = int(ds.fieldSpeeds.vy * 256 / 6)
-        self.publishDouble(f"_", float(ds.fieldSpeeds.vy))
-
-        self.update(b1=b1, b2=b2)
+        pass
 
     def disabled(self) -> None:
         self.update(b8=0)  # EXAMPLE
@@ -55,9 +50,9 @@ class LEDSignals(Subsystem):
 
             for i, b in enumerate(bytes):
                 if rawBytes[i] is not None:
-                    self.publishInt(f"byte_{i + 1}", b)
+                    self.publishInteger(f"byte_{i + 1}", b)
                 else:
-                    self.publishInt(f"byte_{i + 1}", -1)
+                    self.publishInteger(f"byte_{i + 1}", -1)
         except (ValueError, Exception) as e:
             warn(f"Error: {e}")
             self.publishString("CAN_WRITE_PACKET_STATUS", str(e))

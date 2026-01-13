@@ -1,4 +1,4 @@
-from math import pi as PI
+from math import tau as TAU
 from subsystems.desiredState import DesiredState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, Scalar
@@ -15,7 +15,7 @@ class Inputs(Subsystem):
         drivePort: int = 0,
         mechPort: int = 1,
         maxVelocity: MPS = 5,
-        maxAngularVelocity: RPS = PI,
+        maxAngularVelocity: RPS = TAU,
     ) -> None:
         super().__init__()
 
