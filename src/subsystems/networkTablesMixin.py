@@ -60,19 +60,21 @@ class NetworkTablesMixin:
             name = "/".join((*subtables, name))
 
         topic = topicFn(name)
-
-        if isinstance(topic, StringTopic):
-            default = default if isinstance(default, str) else ""
-        elif isinstance(topic, IntegerTopic):
-            default = default if isinstance(default, int) else 0
-        elif isinstance(topic, DoubleTopic):
-            default = default if isinstance(default, float) else 0
-        elif isinstance(topic, BooleanTopic):
-            default = default if isinstance(default, bool) else False
-
+        value = default
         if topic.exists():
-            return topic.getEntry(default).get()
-        return default
+            if isinstance(topic, StringTopic):
+                default = default if isinstance(default, str) else ""
+                value = topic.getEntry(default).get()
+            elif isinstance(topic, IntegerTopic):
+                default = default if isinstance(default, int) else 0
+                value = topic.getEntry(default).get()
+            elif isinstance(topic, DoubleTopic):
+                default = default if isinstance(default, float) else 0
+                value = topic.getEntry(default).get()
+            elif isinstance(topic, BooleanTopic):
+                default = default if isinstance(default, bool) else False
+                value = topic.getEntry(default).get()
+        return value
 
     def getString(self, name: str, *subtables: str, default: Optional[str] = None) -> Optional[str]:
         val = self._get(name, self.table.getStringTopic, *subtables, default=default)
