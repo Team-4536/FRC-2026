@@ -9,31 +9,13 @@ from wpilib import TimedRobot
 
 class Robot(TimedRobot):
     def init(self) -> None:
-        self.subsystems.swerveDrive.configureDriveMotors(config=RevMotor.driveConfig)
-        self.subsystems.swerveDrive.configureAzimuthMotors(config=RevMotor.azimuthConfig)
+        pass
 
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
             inputs=Inputs(),
             ledSignals=LEDSignals(deviceID=0),
-            swerveDrive=SwerveDrive.symmetricDrive(
-                frontLeftDriveID=2,
-                frontRightDriveID=4,
-                backLeftDriveID=6,
-                backRightDriveID=8,
-                frontLeftAzimuthID=1,
-                frontRightAzimuthID=3,
-                backLeftAzimuthID=5,
-                backRightAzimuthID=7,
-                frontLeftEncoderID=21,
-                frontRightEncoderID=22,
-                backLeftEncoderID=23,
-                backRightEncoderID=24,
-                driveGearing=6.12,
-                azimuthGearing=21.4,
-                xPos=1,
-                yPos=1,
-            ),
+            swerveDrive=SwerveDrive(),
             time=TimeData(),
         )
 
@@ -50,9 +32,7 @@ class Robot(TimedRobot):
 
     def teleopInit(self) -> None:
         self.init()
-
-        for s in self.subsystems:
-            s.init()
+        self.subsystems.init()
 
     def teleopPeriodic(self) -> None:
         self.subsystems.periodic()
@@ -62,8 +42,6 @@ class Robot(TimedRobot):
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()
-        self.subsystems.swerveDrive.configureDriveMotors(config=RevMotor.driveDisabledConfig)
-        self.subsystems.swerveDrive.configureAzimuthMotors(config=RevMotor.azimuthDisabledConfig)
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disable()
