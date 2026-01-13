@@ -1,7 +1,7 @@
 from math import pi as PI
-from mb.desiredState import DesiredState
-from mb.subsystem import Subsystem
-from mb.utils import CircularScalar, Scalar
+from subsystems.desiredState import DesiredState
+from subsystems.subsystem import Subsystem
+from subsystems.utils import CircularScalar, Scalar
 from typing import Optional
 from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
@@ -26,7 +26,6 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(fieldSpeeds=ChassisSpeeds())
-        self.desiredState.init()
 
     def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl

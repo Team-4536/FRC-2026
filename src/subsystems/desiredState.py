@@ -1,0 +1,20 @@
+from dataclasses import dataclass
+from subsystems.networkTablesMixin import NetworkTablesMixin
+from wpimath.kinematics import ChassisSpeeds
+
+
+@dataclass
+class DesiredState(NetworkTablesMixin):
+    fieldSpeeds: ChassisSpeeds
+
+    def __post_init__(self) -> None:
+        super().__init__()
+
+    def publish(self) -> None:
+        vx = float(self.fieldSpeeds.vx)
+        vy = float(self.fieldSpeeds.vy)
+        omega = float(self.fieldSpeeds.omega)
+
+        self.publishDouble("vx", vx, "FieldSpeeds")
+        self.publishDouble("vy", vy, "FieldSpeeds")
+        self.publishDouble("omega", omega, "FieldSpeeds")

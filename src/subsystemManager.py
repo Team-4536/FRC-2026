@@ -1,13 +1,13 @@
-from mb.desiredState import DesiredState
-from mb.inputs import Inputs
-from mb.LEDSignals import LEDSignals
-from mb.subsystem import Subsystem
-from mb.swerveDrive import SwerveDrive
-from mb.utils import TimeData
+from subsystems.desiredState import DesiredState
+from subsystems.inputs import Inputs
+from subsystems.LEDSignals import LEDSignals
+from subsystems.subsystem import Subsystem
+from subsystems.swerveDrive import SwerveDrive
+from subsystems.utils import TimeData
 from typing import List, NamedTuple
 
 
-class Subsystems(NamedTuple):
+class SubsystemManager(NamedTuple):
     inputs: Inputs
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive

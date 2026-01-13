@@ -1,10 +1,11 @@
 from __future__ import annotations
 from math import tau as TAU
-from mb.desiredState import DesiredState
-from mb.motor import RevMotor
-from mb.subsystem import Subsystem
 from navx import AHRS
+from phoenix6.hardware import CANcoder
 from rev import SparkBaseConfig
+from subsystems.desiredState import DesiredState
+from subsystems.motor import RevMotor
+from subsystems.subsystem import Subsystem
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
@@ -23,21 +24,21 @@ class SwerveModule:
         self,
         *,
         driveMotor: RevMotor,
-        driveGearing: float,
         azimuthMotor: RevMotor,
+        azimuthEncoder: CANcoder,
+        driveGearing: float,
         azimuthGearing: float,
     ) -> None:
         self._driveMotor = driveMotor
-        self._driveGearing = driveGearing
         self._azimuthMotor = azimuthMotor
+
+        self._driveEncoder = self._driveMotor.getEncoder()
+        self._azimuthEncoder = self._azimuthMotor.getEncoder()
+        self._azimuthAbsoluteEncoder = azimuthEncoder
+
+        self._driveGearing = driveGearing
         self._azimuthGearing = azimuthGearing
         self._position = Translation2d(0, 0)
-
-        self.absoluteAzimuth = self.azimuthMotor.getAbsoluteEncoder().getPosition()
-
-        self.driveEncoder = self._driveMotor.getEncoder()
-        self.azimuthEncoder = self._azimuthMotor.getEncoder()
-        self.azimuthEncoder.setPosition(self.absoluteAzimuth)
 
         wheelDiam: meters = 0.1016
         self._wheelCircumferance: meters = wheelDiam * TAU
@@ -45,10 +46,10 @@ class SwerveModule:
     @property
     def modulePosition(self) -> SwerveModulePosition:
         driveDistance = (
-            self.driveEncoder.getPosition() * self._wheelCircumferance / self._driveGearing
+            self._driveEncoder.getPosition() * self._wheelCircumferance / self._driveGearing
         )
         azimuthRotation = Rotation2d.fromRotations(
-            self.azimuthEncoder.getPosition() / self._azimuthGearing
+            self._azimuthEncoder.getPosition() / self._azimuthGearing
         )
 
         return SwerveModulePosition(driveDistance, azimuthRotation)
@@ -126,7 +127,7 @@ class SwerveDrive(Subsystem):
         self._initPos = Pose2d()
         self._modules = modules
         self._kinematics = SwerveDrive4Kinematics(*modules.positions)
-        self._gyro = AHRS(AHRS.NavXComType.kUSB1)
+        self._gyro = AHRS(AHRS.NavXComType.kMXP_SPI)
         self._odometry = SwerveDrive4Odometry(
             self._kinematics,
             self._gyro.getRotation2d(),
@@ -136,14 +137,17 @@ class SwerveDrive(Subsystem):
 
     def init(self) -> None:
         for module in self._modules:
-            module.driveEncoder.setPosition(0)
-            module.azimuthEncoder.setPosition(module.absoluteAzimuth * module._azimuthGearing)
+            module._driveEncoder.setPosition(0)
+            module._azimuthEncoder.setPosition(
+                module._azimuthAbsoluteEncoder.get_absolute_position().value
+                * module._azimuthGearing
+            )
 
     def periodic(self, ds: DesiredState) -> None:
         self.pose = self._odometry.update(
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
-        )
+        )  # UNUSED
 
         self.drive(fieldSpeeds=ds.fieldSpeeds)
 
@@ -166,7 +170,7 @@ class SwerveDrive(Subsystem):
             fieldSpeeds.vx,
             fieldSpeeds.vy,
             fieldSpeeds.omega,
-            Rotation2d.fromDegrees(-self._gyro.getAngle()),
+            -self._gyro.getRotation2d(),
         )
         moduleStates = self._kinematics.toSwerveModuleStates(chassisSpeeds)
 
@@ -175,10 +179,15 @@ class SwerveDrive(Subsystem):
             attainableMaxSpeed=5,
         )
 
+        self.publishDouble("gyro_angle", self._gyro.getAngle(), "debug")
+        self.publishDouble("unoptimized_angle", moduleStates[0].angle.degrees(), "debug")
+
         for module, state in zip(self._modules, moduleStates):
             state.optimize(module.modulePosition.angle)
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
+
+        self.publishDouble("optimized_angle", moduleStates[0].angle.degrees(), "debug")
 
         self.publishSwerve("swerve_states", moduleStates)
 
@@ -194,14 +203,18 @@ class SwerveDrive(Subsystem):
     def symmetricDrive(
         cls,
         *,
-        flDriveID: int,
-        flAzimuthID: int,
-        frDriveID: int,
-        frAzimuthID: int,
-        blDriveID: int,
-        blAzimuthID: int,
-        brDriveID: int,
-        brAzimuthID: int,
+        frontLeftDriveID: int,
+        frontLeftAzimuthID: int,
+        frontLeftEncoderID: int,
+        frontRightDriveID: int,
+        frontRightAzimuthID: int,
+        frontRightEncoderID: int,
+        backLeftDriveID: int,
+        backLeftAzimuthID: int,
+        backLeftEncoderID: int,
+        backRightDriveID: int,
+        backRightAzimuthID: int,
+        backRightEncoderID: int,
         driveGearing: float = 1,
         azimuthGearing: float = 1,
         xPos: int,
@@ -212,14 +225,15 @@ class SwerveDrive(Subsystem):
                 SwerveModule(
                     driveMotor=RevMotor(deviceID=drive),
                     azimuthMotor=RevMotor(deviceID=azimuth),
+                    azimuthEncoder=CANcoder(device_id=encoder),
                     driveGearing=driveGearing,
                     azimuthGearing=azimuthGearing,
                 )
-                for drive, azimuth in [
-                    (flDriveID, flAzimuthID),
-                    (frDriveID, frAzimuthID),
-                    (blDriveID, blAzimuthID),
-                    (brDriveID, brAzimuthID),
+                for drive, azimuth, encoder in [
+                    (frontLeftDriveID, frontLeftAzimuthID, frontLeftEncoderID),
+                    (frontRightDriveID, frontRightAzimuthID, frontRightEncoderID),
+                    (backLeftDriveID, backLeftAzimuthID, backLeftEncoderID),
+                    (backRightDriveID, backRightAzimuthID, backRightEncoderID),
                 ]
             )
         )

@@ -1,5 +1,5 @@
-from mb.desiredState import DesiredState
-from mb.subsystem import Subsystem
+from subsystems.desiredState import DesiredState
+from subsystems.subsystem import Subsystem
 from typing import List, Optional
 from warnings import warn
 from wpilib import CAN

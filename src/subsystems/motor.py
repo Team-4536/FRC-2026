@@ -2,7 +2,6 @@ from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     MAXMotionConfig,
-    SparkAbsoluteEncoder,
     SparkBaseConfig,
     SparkMax,
     SparkMaxConfig,
@@ -41,9 +40,6 @@ class RevMotor:
     def getEncoder(self) -> SparkRelativeEncoder:
         return self._ctrlr.getEncoder()
 
-    def getAbsoluteEncoder(self) -> SparkAbsoluteEncoder:
-        return self._ctrlr.getAbsoluteEncoder()
-
     driveConfig: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
@@ -81,4 +77,18 @@ class RevMotor:
                 .allowedClosedLoopError(0.2)
             )
         )
+    )
+
+    driveDisabledConfig: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
+    )
+
+    azimuthDisabledConfig: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40)
+        .inverted(True)
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
     )

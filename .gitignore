@@ -1,5 +1,6 @@
 # wpilib files
 __pycache__/
+ctre_sim/
 networktables.json
 simgui*
 
