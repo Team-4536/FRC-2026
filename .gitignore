@@ -1,4 +1,9 @@
-.venv/
+# wpilib files
+__pycache__/
+ctre_sim/
 networktables.json
-simgui.json
-simgui-*
+simgui*
+
+# virtual environment & uv
+.venv/
+uv.lock
