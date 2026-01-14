@@ -158,7 +158,7 @@ wheels = [
 ]
 
 [[package]]
-name = "frc-2025"
+name = "frc-2026"
 version = "1.0"
 source = { virtual = "." }
 dependencies = [

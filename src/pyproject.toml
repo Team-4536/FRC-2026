@@ -13,4 +13,4 @@ robotpy_version = "2025.3.2.2"
 robotpy_extras = ["navx", "rev", "phoenix6", "pathplannerlib"]
 
 # Other pip packages to install
-requires = ["numpy", "photonlibpy"]
+requires = ["numpy", "photonlibpy",]

@@ -25,10 +25,17 @@ class photonCameraClass:
         )
         self.camPoseEst = PhotonPoseEstimator(
             AprilTagFieldLayout.loadField(AprilTagField.k2025ReefscapeWelded),
-            PoseStrategy.LOWEST_AMBIGUITY,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             self.camera,
             kRobotToCam,
         )
+        # self.camPoseEst = PhotonPoseEstimator(
+        #     AprilTagFieldLayout.loadField(AprilTagField.kDefaultField),
+        #     kRobotToCam,
+        # )
+        # camEstPose = self.camPoseEst.estimateCoprocMultiTagPose()
+        # if camEstPose is None:
+        #         camEstPose = self.camPoseEst.estimateLowestAmbiguityPose(result)
         self.result = 0
         self.hasTargets = False
         self.target = 0
@@ -48,13 +55,15 @@ class photonCameraClass:
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
             self.photonTable.putNumber("ambiguity", self.ambiguity)
+            self.camEstPose = self.camPoseEst.update()
             if self.ambiguity < 0.04:
                 self.trustworthy = True
-                self.camEstPose = self.camPoseEst.update()
-                self.TFID = self.fiducialId
+                
+                
                 if self.camEstPose != None:
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
+                    self.robotZ = self.camEstPose.estimatedPose.Z()
                     self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
             else:
                 pass
