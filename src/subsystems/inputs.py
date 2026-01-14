@@ -29,7 +29,11 @@ class Inputs(Subsystem):
             fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity
         )
 
-    def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
+        self.revShooter = False
+
+    def init(
+        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
+    ) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
@@ -38,12 +42,15 @@ class Inputs(Subsystem):
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
+        self.revShooter = self._mechCtrl.getRightTriggerAxis() > 0.1
 
     def publish(self) -> None:
         self.desiredState.publish()
 
     def _calculateDrive(self) -> ChassisSpeeds:
-        vx, vy = self._circularScalar(x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX())
+        vx, vy = self._circularScalar(
+            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+        )
 
         omega: RPS = self._linearScalar(-self._driveCtrl.getRightX())
 
