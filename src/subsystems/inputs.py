@@ -42,7 +42,9 @@ class Inputs(Subsystem):
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
-        self.revShooter = self._mechCtrl.getRightTriggerAxis() > 0.1
+        self.revShooter = self._mechCtrl.getRightTriggerAxis()
+        self.shootShooter = self._mechCtrl.getRightBumper()
+        self
 
     def publish(self) -> None:
         self.desiredState.publish()
