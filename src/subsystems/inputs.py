@@ -26,8 +26,14 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity
+            fieldSpeeds=ChassisSpeeds(),
+            abtainableMaxSpeed=maxVelocity,
+            revShooter=0,
+            shootShooter=0,
         )
+
+        self.revShooter: float = 0
+        self.shootShooter: float = 0
 
         self.revShooter = False
 
@@ -40,11 +46,11 @@ class Inputs(Subsystem):
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
 
+        self.desiredState.revShooter = self._mechCtrl.getRightTriggerAxis()
+        self.desiredState.shootShooter = self._mechCtrl.getRightBumper()
+
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
-        self.revShooter = self._mechCtrl.getRightTriggerAxis()
-        self.shootShooter = self._mechCtrl.getRightBumper()
-        self
 
     def publish(self) -> None:
         self.desiredState.publish()

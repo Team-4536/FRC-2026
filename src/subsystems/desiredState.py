@@ -2,12 +2,15 @@ from dataclasses import dataclass
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
+from wpimath.units import revolutions_per_minute as RPM
 
 
 @dataclass
 class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
+    revShooter: RPM
+    shootShooter: RPM
 
     def __post_init__(self) -> None:
         super().__init__()
