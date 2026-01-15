@@ -3,7 +3,7 @@ from motor import RevMotor
 from inputs import Inputs as input
 
 
-class shooter(Subsystem):
+class Shooter(Subsystem):
 
     def __init__(
         self, _mechCtrl
