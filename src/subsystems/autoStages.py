@@ -24,12 +24,13 @@ def loadTrajectory(filename: str, flipped: bool) -> PathPlannerTrajectory:
     moduleConfig = ModuleConfig(
         wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
     )
-    moduleOffsets = [
-        Translation2d(-0.276225, 0.276225),
-        Translation2d(0.276225, 0.276225),
-        Translation2d(-0.276225, -0.276225),
-        Translation2d(0.276225, -0.276225),
-    ]
+
+    topLeft = Translation2d(-0.276225, 0.276225)
+    topRight = Translation2d(0.276225, 0.276225)
+    bottomLeft = Translation2d(-0.276225, -0.276225)
+    bottomRight = Translation2d(0.276225, -0.276225)
+
+    moduleOffsets = [topLeft, topRight, bottomLeft, bottomRight]
 
     robotConfig = RobotConfig(robotMassKG, robotMOI, moduleConfig, moduleOffsets)
 
