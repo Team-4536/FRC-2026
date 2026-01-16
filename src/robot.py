@@ -1,6 +1,7 @@
 from subsystemManager import SubsystemManager
 from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
+from subsystems.shooter import Shooter
 from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
@@ -17,6 +18,7 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
+            shooter=Shooter(),
         )
 
         self.init()
