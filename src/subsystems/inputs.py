@@ -18,6 +18,7 @@ class Inputs(Subsystem):
         maxAngularVelocity: RPS = TAU,
     ) -> None:
         super().__init__()
+        #self.turretSpeed: float = 0.0
 
         self._driveCtrl = Ctrlr(drivePort)
         self._mechCtrl = Ctrlr(mechPort)
@@ -26,15 +27,17 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity
+            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, turretSpeed=0
         )
 
     def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
+
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
+        self.desiredState.turretSpeed = self._linearScalar(self._mechCtrl.getLeftX() * 30) 
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()

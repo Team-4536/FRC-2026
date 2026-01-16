@@ -8,6 +8,7 @@ from wpimath.units import meters_per_second as MPS
 class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
+    turretSpeed: float
 
     def __post_init__(self) -> None:
         super().__init__()
