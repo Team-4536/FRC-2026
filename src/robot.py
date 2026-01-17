@@ -10,7 +10,9 @@ from wpilib import TimedRobot
 class Robot(TimedRobot):
     def init(self) -> None:
         self.subsystems.swerveDrive.configureDriveMotors(config=RevMotor.driveConfig)
-        self.subsystems.swerveDrive.configureAzimuthMotors(config=RevMotor.azimuthConfig)
+        self.subsystems.swerveDrive.configureAzimuthMotors(
+            config=RevMotor.azimuthConfig
+        )
 
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
@@ -62,8 +64,12 @@ class Robot(TimedRobot):
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()
-        self.subsystems.swerveDrive.configureDriveMotors(config=RevMotor.driveDisabledConfig)
-        self.subsystems.swerveDrive.configureAzimuthMotors(config=RevMotor.azimuthDisabledConfig)
+        self.subsystems.swerveDrive.configureDriveMotors(
+            config=RevMotor.driveDisabledConfig
+        )
+        self.subsystems.swerveDrive.configureAzimuthMotors(
+            config=RevMotor.azimuthDisabledConfig
+        )
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disable()

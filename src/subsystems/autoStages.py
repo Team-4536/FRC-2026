@@ -28,8 +28,8 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
     bottomRightWheelCords = Translation2d(0.276225, -0.276225)
 
-    robotMassKG = 0 # change later
-    robotMOI = 0 # change later
+    robotMassKG = 0  # change later
+    robotMOI = 0  # change later
     moduleConfig = ModuleConfig(
         wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
     )
