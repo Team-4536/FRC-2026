@@ -4,10 +4,12 @@ from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import ChassisSpeeds
+from desiredState import DesiredState
 import math
+import wpilib
 
 
-def loadTrajectory(filename: str, flipped: bool) -> PathPlannerTrajectory:
+def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     nominalVoltage = 12.0
     stallTorque = 2.6
@@ -31,15 +33,77 @@ def loadTrajectory(filename: str, flipped: bool) -> PathPlannerTrajectory:
     moduleConfig = ModuleConfig(
         wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
     )
-    moduleOffsets = [topLeftWheelCords, topRightWheelCords, bottomLeftWheelCords, bottomRightWheelCords]
+    moduleOffsets = [
+        topLeftWheelCords,
+        topRightWheelCords,
+        bottomLeftWheelCords,
+        bottomRightWheelCords,
+    ]
 
     robotConfig = RobotConfig(robotMassKG, robotMOI, moduleConfig, moduleOffsets)
 
     path = PathPlannerPath.fromPathFile(filename)
 
-    if flipped:
+    if isFlipped:
         path.flipPath
 
     startingRotation = path.getStartingHolonomicPose().getRotation()
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
+
+
+class AutoStages:
+    def __init__(self):
+        pass
+
+    def autoInit(self):
+        pass
+
+    def run(self):
+        pass
+
+    def isDone(self):
+        pass
+
+
+class FollowTrajectory(AutoStages):
+    def __init__(self, trajectoryName: str, isFlipped: bool):
+        self.trajectory = loadTrajectory(trajectoryName, isFlipped)
+        self.desiredState = DesiredState
+        self.isDone = False
+
+    def autoInit(self):
+        self.startTime = wpilib.getTime()
+
+    def run(self):
+
+        self.currentTime = wpilib.getTime() - self.startTime
+
+        self.targetState = self.trajectory.sample(self.currentTime)
+
+        self.desiredState.fieldSpeeds = self.targetState.fieldSpeeds
+
+        return self.desiredState
+
+    def isDone(self):
+        currXPos = 0  # update with odemetry later
+        currYPos = 0  # update with odemetry later
+        currRotation = 0  # update with odemetry later
+        endXPos = self.trajectory.getEndState.pose
+        endYPos = self.trajectory.getEndState.pose
+        endRotation = self.trajectory.getEndState.pose
+        posError = 0.3  # change later
+        rotationError = 0.3  # change later
+
+        if max(currXPos, endXPos) - min(currXPos, endXPos) > posError:
+            return False
+        if max(currYPos, endYPos) - min(currYPos, endYPos) > posError:
+            return False
+        if (
+            max(currRotation, endRotation) - min(currRotation, endRotation)
+            > rotationError
+        ):
+            return False
+
+        self.isDone = True
+        return True
