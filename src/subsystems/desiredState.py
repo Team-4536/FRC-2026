@@ -9,7 +9,8 @@ class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     turretSpeed: float
-
+    turretSetPoint: int
+    motorDesiredState: float
     def __post_init__(self) -> None:
         super().__init__()
 
