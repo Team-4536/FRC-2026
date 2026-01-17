@@ -9,16 +9,14 @@ from desiredState import DesiredState
 class Intake(Subsystem):
     def __init__(self):
         # Change from a 9
-        self.intakeMotor = SparkMax(9, SparkMax.MotorType.kBrushless)
+        self.intakeMotor = SparkMax(999999999, SparkMax.MotorType.kBrushless)
         self.intakeVoltage = 0
 
-    def periodic(self, ds):
+    def periodic(self):
         pass
 
-    def update(
-        self,
-    ):
-        if DesiredState.AButton == True:
+    def update(self, ds: DesiredState):
+        if ds.AButton():
             self.intakeVoltage = 1
         else:
             self.intakeVoltage = 0
