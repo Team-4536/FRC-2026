@@ -26,15 +26,18 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity
+            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, AButton=False
         )
 
-    def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
+    def init(
+        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
+    ) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
+        self.desiredState.AButton = self._mechCtrl.getAButton()
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
@@ -43,7 +46,9 @@ class Inputs(Subsystem):
         self.desiredState.publish()
 
     def _calculateDrive(self) -> ChassisSpeeds:
-        vx, vy = self._circularScalar(x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX())
+        vx, vy = self._circularScalar(
+            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+        )
 
         omega: RPS = self._linearScalar(-self._driveCtrl.getRightX())
 
