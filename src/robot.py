@@ -5,6 +5,7 @@ from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from wpilib import TimedRobot
+import wpilib
 
 
 class Robot(TimedRobot):

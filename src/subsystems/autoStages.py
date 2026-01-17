@@ -5,8 +5,13 @@ from wpimath.units import radians_per_second as RPS
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import ChassisSpeeds
 from desiredState import DesiredState
+from enum import Enum
 import math
 import wpilib
+
+
+class RobotAutos(Enum):
+    DO_NOTHING = "Do Nothing"
 
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
