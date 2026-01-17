@@ -7,8 +7,11 @@ from rev import (
     SparkMaxConfig,
     SparkRelativeEncoder,
 )
+from math import pi as PI
 from wpimath.units import radians
 from wpimath.units import revolutions_per_minute as RPM
+
+TURN_GEARING = 21.4
 
 
 class RevMotor:
@@ -69,7 +72,9 @@ class RevMotor:
             .pidf(0.15, 0, 0, 0)
             .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
+            .positionWrappingMaxInput(PI / TURN_GEARING)
+            .positionWrappingMinInput(-PI / TURN_GEARING)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(5000, ClosedLoopSlot.kSlot0)
