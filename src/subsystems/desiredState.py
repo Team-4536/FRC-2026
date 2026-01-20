@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from subsystems.networkTablesMixin import NetworkTablesMixin
+from networkTablesMixin import NetworkTablesMixin
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 
@@ -8,6 +8,7 @@ from wpimath.units import meters_per_second as MPS
 class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
+    on: bool = False 
 
     def __post_init__(self) -> None:
         super().__init__()

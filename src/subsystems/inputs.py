@@ -36,6 +36,8 @@ class Inputs(Subsystem):
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
 
+        
+
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
 

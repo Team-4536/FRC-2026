@@ -5,6 +5,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
+from subsystems.DexShooter import Shooter
 
 
 class SubsystemManager(NamedTuple):
@@ -12,6 +13,7 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    shooter: Shooter
 
     def init(self) -> None:
         for s in self:
@@ -37,6 +39,7 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
+            self.shooter,
         ]
 
     @property

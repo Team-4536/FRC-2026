@@ -5,6 +5,7 @@ from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from wpilib import TimedRobot
+from subsystems.DexShooter import Shooter
 
 
 class Robot(TimedRobot):
@@ -17,7 +18,9 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
+            shooter=Shooter()
         )
+        self.shooter = Shooter(self.subsystems.desiredState)
 
         self.init()
 
