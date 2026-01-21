@@ -2,7 +2,7 @@ from motor import RevMotor
 from inputs import Inputs
 from desiredState import DesiredState
 from phoenix6.hardware import CANcoder
-from wpimath.units import rotationsToRadians, degreesToRadians
+from wpimath.units import rotationsToRadians, degreesToRadians, rotationsToDegrees
 import math
 
 
@@ -14,18 +14,30 @@ class Turret():
     def __init__(self):
         self.turretMotor = RevMotor(12) #get right ID, motor for turning horizontally
         self.turretMotorVertical = RevMotor(17) #
-        self.turretEncoder = CANcoder(20) #get right ID, sensor for the horizontal motor
+        self.turretEncoder = self.turretMotor.getEncoder() #get right ID, sensor for the horizontal motor
         self.turretEncoderVertical = CANcoder(25) #sensor for the vertical motor
         self.gear= 12 #TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 
     def init(self):
         #self.turretPosition = rotationsToRadians(self.turretEncoder.get_absolute_position() * self.gear) #returns number of rotations in radians
-        pass
+        self.homed = False
 
     def periodic(self, desiredState: DesiredState, camRot):
         #camrot is in degrees
-        self.turretRotation = degreesToRadians(camRot % 360)
+        if self.homed == False:
+    
+            self.turretMotor.setVelocity(4)
+
+
+
+            if desiredState.limitA == True:
+                self.turretEncoder.setPosition(0)
+                self.homed = True
+                
+                
+        self.turretRotation = rotationsToDegrees(self.turretEncoder * self.gear)
         self.desiredRotation = desiredState.turretSetPoint #
+        
 
         if not self.desiredRotation == -1:
             rot = degreesToRadians(self.desiredRotation)

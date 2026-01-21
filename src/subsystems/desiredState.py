@@ -11,6 +11,9 @@ class DesiredState(NetworkTablesMixin):
     turretSpeed: float
     turretSetPoint: int
     motorDesiredState: float
+    limitA: bool
+    limitB: bool
+ 
     def __post_init__(self) -> None:
         super().__init__()
 
@@ -22,3 +25,4 @@ class DesiredState(NetworkTablesMixin):
         self.publishDouble("vx", vx, "FieldSpeeds")
         self.publishDouble("vy", vy, "FieldSpeeds")
         self.publishDouble("omega", omega, "FieldSpeeds")
+
