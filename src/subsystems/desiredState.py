@@ -11,6 +11,8 @@ class DesiredState(NetworkTablesMixin):
     turretSpeed: float
     turretSetPoint: int
     motorDesiredState: float
+    yaw: float
+
     def __post_init__(self) -> None:
         super().__init__()
 

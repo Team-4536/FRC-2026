@@ -7,6 +7,7 @@ from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
+from math import pi as PI
 
 
 class Inputs(Subsystem):
@@ -18,7 +19,7 @@ class Inputs(Subsystem):
         maxAngularVelocity: RPS = TAU,
     ) -> None:
         super().__init__()
-        #self.turretSpeed: float = 0.0
+        # self.turretSpeed: float = 0.0
 
         self._driveCtrl = Ctrlr(drivePort)
         self._mechCtrl = Ctrlr(mechPort)
@@ -27,19 +28,29 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, turretSpeed=0, turretSetPoint=-1, motorDesiredState= 0
+            fieldSpeeds=ChassisSpeeds(),
+            abtainableMaxSpeed=maxVelocity,
+            turretSpeed=0,
+            turretSetPoint=-1,
+            motorDesiredState=0,
         )
 
-    def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
+    def init(
+        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
+    ) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
-
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
-        self.desiredState.turretSpeed = self._linearScalar(self._mechCtrl.getLeftX() * 30)
+        self.desiredState.turretSpeed = self._linearScalar(
+            self._mechCtrl.getLeftX() * 30
+        )
         self.desiredState.turretSetPoint = self._mechCtrl.getPOV()
-        self.desiredState.motorDesiredState = self._linearScalar(self._mechCtrl.getRightY())
+        self.desiredState.motorDesiredState = self._linearScalar(
+            self._mechCtrl.getRightY()
+        )
+        self.desiredState.turretSetPoint = (3 * PI) / 2 / 2
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
@@ -48,7 +59,9 @@ class Inputs(Subsystem):
         self.desiredState.publish()
 
     def _calculateDrive(self) -> ChassisSpeeds:
-        vx, vy = self._circularScalar(x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX())
+        vx, vy = self._circularScalar(
+            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+        )
 
         omega: RPS = self._linearScalar(-self._driveCtrl.getRightX())
 

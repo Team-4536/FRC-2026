@@ -45,7 +45,11 @@ class SwerveModule:
 
     @property
     def _driveDistance(self) -> meters:
-        return self._driveEncoder.getPosition() * self._wheelCircumferance / self._driveGearing
+        return (
+            self._driveEncoder.getPosition()
+            * self._wheelCircumferance
+            / self._driveGearing
+        )
 
     @property
     def _azimuthRotation(self) -> rotation:
@@ -53,7 +57,10 @@ class SwerveModule:
 
     @property
     def absoluteAzimuthRotation(self) -> rotation:
-        return self._azimuthAbsoluteEncoder.get_absolute_position().value * self._azimuthGearing
+        return (
+            self._azimuthAbsoluteEncoder.get_absolute_position().value
+            * self._azimuthGearing
+        )
 
     @property
     def modulePosition(self) -> SwerveModulePosition:
@@ -116,14 +123,19 @@ class SwerveModules(NamedTuple):
             m.stopModule()
 
     @property
-    def positions(self) -> Tuple[Translation2d, Translation2d, Translation2d, Translation2d]:
+    def positions(
+        self,
+    ) -> Tuple[Translation2d, Translation2d, Translation2d, Translation2d]:
         return tuple(m.position for m in self)  # type: ignore[return-value]
 
     @property
     def modulePositions(
         self,
     ) -> Tuple[
-        SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition
+        SwerveModulePosition,
+        SwerveModulePosition,
+        SwerveModulePosition,
+        SwerveModulePosition,
     ]:
         return tuple(m.modulePosition for m in self)  # type: ignore[return-value]
 
@@ -153,7 +165,7 @@ class SwerveDrive(Subsystem):
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
         )  # UNUSED
-
+        ds.yaw = self.pose.rotation().radians()
         self.drive(fieldSpeeds=ds.fieldSpeeds, attainableMaxSpeed=ds.abtainableMaxSpeed)
 
     def disabled(self) -> None:
@@ -185,7 +197,9 @@ class SwerveDrive(Subsystem):
         )
 
         self.publishDouble("gyro_angle", self._gyro.getAngle(), "debug")
-        self.publishDouble("unoptimized_angle", moduleStates[0].angle.degrees(), "debug")
+        self.publishDouble(
+            "unoptimized_angle", moduleStates[0].angle.degrees(), "debug"
+        )
 
         for module, state in zip(self._modules, moduleStates):
             state.optimize(module.modulePosition.angle)
