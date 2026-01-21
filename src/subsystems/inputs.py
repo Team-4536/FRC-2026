@@ -30,7 +30,7 @@ class Inputs(Subsystem):
             fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, turretSpeed=0, turretSetPoint=-1, motorDesiredState= 0, limitA = False, limitB = False
         
         )
-        self.limitSwitch2 = DigitalInput(0) # we have to find the correct angle
+        self.limitSwitch2 = DigitalInput(10) # we have to find the correct angle
         self.limitSwitch1 = DigitalInput(0)
     def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
