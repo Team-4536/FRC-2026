@@ -7,7 +7,7 @@ from wpimath.units import meters_per_second as MPS
 @dataclass
 class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
-    abtainableMaxSpeed: MPS
+    abtainableMaxSpeed: MPS = 5
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -20,3 +20,8 @@ class DesiredState(NetworkTablesMixin):
         self.publishDouble("vx", vx, "FieldSpeeds")
         self.publishDouble("vy", vy, "FieldSpeeds")
         self.publishDouble("omega", omega, "FieldSpeeds")
+
+
+@dataclass
+class CurrentState(NetworkTablesMixin):
+    example: int = 0

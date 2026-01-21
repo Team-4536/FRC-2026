@@ -1,4 +1,4 @@
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import DesiredState, CurrentState
 from subsystems.subsystem import Subsystem
 from typing import List, Optional
 from warnings import warn
@@ -9,7 +9,7 @@ NONE: int = 255
 
 
 class LEDSignals(Subsystem):
-    def __init__(self, deviceID: int) -> None:
+    def __init__(self, *, deviceID: int) -> None:
         super().__init__()
 
         self.apiID = 0
@@ -18,7 +18,7 @@ class LEDSignals(Subsystem):
     def init(self) -> None:
         pass
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, desiredState: DesiredState, currentState: CurrentState) -> None:
         pass
 
     def disabled(self) -> None:

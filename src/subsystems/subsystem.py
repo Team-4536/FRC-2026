@@ -1,4 +1,4 @@
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import DesiredState, CurrentState
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Callable, Optional
 
@@ -14,7 +14,7 @@ class Subsystem(NetworkTablesMixin):
     def init(self) -> None:
         self._warn(self.init)
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, desiredState: DesiredState, currentState: CurrentState) -> None:
         self._warn(self.periodic)
 
     def disabled(self) -> None:

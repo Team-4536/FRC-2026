@@ -1,4 +1,4 @@
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import DesiredState, CurrentState
 from subsystems.subsystem import Subsystem
 
 
@@ -6,7 +6,7 @@ class SwerveDrive(Subsystem):
     def init(self) -> None:
         pass
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, desiredState: DesiredState, currentState: CurrentState) -> None:
         pass
 
     def disabled(self) -> None:
