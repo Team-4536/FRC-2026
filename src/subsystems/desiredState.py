@@ -13,6 +13,9 @@ class DesiredState(NetworkTablesMixin):
     motorDesiredState: float
     yaw: float
 
+    limitA: bool
+    limitB: bool
+
     def __post_init__(self) -> None:
         super().__init__()
 

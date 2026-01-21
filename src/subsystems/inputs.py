@@ -9,6 +9,8 @@ from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
 from math import pi as PI
 
+from wpilib import DigitalInput
+
 
 class Inputs(Subsystem):
     def __init__(
@@ -26,6 +28,9 @@ class Inputs(Subsystem):
 
         self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
+
+        self.limitSwitch1 = DigitalInput(10)
+        self.limitSwitch2 = DigitalInput(0)
 
         self.desiredState = DesiredState(
             fieldSpeeds=ChassisSpeeds(),
@@ -51,6 +56,11 @@ class Inputs(Subsystem):
             self._mechCtrl.getRightY()
         )
         self.desiredState.turretSetPoint = (3 * PI) / 2 / 2
+        self.desiredState.motorDesiredState = self._linearScalar(
+            self._mechCtrl.getRightY()
+        )
+        self.desiredState.limitA = self.limitSwitch2.get()
+        self.desiredState.limitB = self.limitSwitch1.get()
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()

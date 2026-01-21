@@ -2,7 +2,7 @@ from motor import RevMotor
 from inputs import Inputs
 from desiredState import DesiredState
 from phoenix6.hardware import CANcoder
-from wpimath.units import rotationsToRadians, degreesToRadians
+from wpimath.units import rotationsToRadians, degreesToRadians, rotationsToDegrees
 import math
 import navx
 import numpy as np
