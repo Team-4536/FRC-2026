@@ -7,7 +7,7 @@ from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
-
+from wpilib import DigitalInput 
 
 class Inputs(Subsystem):
     def __init__(
@@ -27,8 +27,12 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, turretSpeed=0, turretSetPoint=-1, motorDesiredState= 0
+            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, turretSpeed=0, turretSetPoint=-1, motorDesiredState= 0,  limitSwitchA= False, limitSwitchB= False   
         )
+        self.limitSwitchA = DigitalInput(0) # we need to find out what the chanel actually is
+
+        self.limitSwitchB = DigitalInput(270) # we need to find out what the chanel actually is 
+
 
     def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
@@ -40,6 +44,8 @@ class Inputs(Subsystem):
         self.desiredState.turretSpeed = self._linearScalar(self._mechCtrl.getLeftX() * 30)
         self.desiredState.turretSetPoint = self._mechCtrl.getPOV()
         self.desiredState.motorDesiredState = self._linearScalar(self._mechCtrl.getRightY())
+        self.desiredState.limitA = self.limitSwitchA.get()
+        self.desiredState.limitB = self.limitSwitchB.get()
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
