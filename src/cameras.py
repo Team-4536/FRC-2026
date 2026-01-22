@@ -13,7 +13,7 @@ import wpilib
 
 class photonCameraClass:
 
-    photonTable = NetworkTableInstance.getDefault()
+    
 
     def __init__(self, cameraName, camPitch, intCamX, intCamY, intCamZ):
         self.cameraNameReal = cameraName
@@ -24,18 +24,10 @@ class photonCameraClass:
             wpimath.geometry.Rotation3d.fromDegrees(0.0, 0.0, camPitch),
         )
         self.camPoseEst = PhotonPoseEstimator(
-            AprilTagFieldLayout.loadField(AprilTagField.k2025ReefscapeWelded),
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            self.camera,
+            AprilTagFieldLayout.loadField(AprilTagField.k2026RebuiltWelded),
             kRobotToCam,
         )
-        # self.camPoseEst = PhotonPoseEstimator(
-        #     AprilTagFieldLayout.loadField(AprilTagField.kDefaultField),
-        #     kRobotToCam,
-        # )
-        # camEstPose = self.camPoseEst.estimateCoprocMultiTagPose()
-        # if camEstPose is None:
-        #         camEstPose = self.camPoseEst.estimateLowestAmbiguityPose(result)
+       
         self.result = 0
         self.hasTargets = False
         self.target = 0
@@ -46,6 +38,7 @@ class photonCameraClass:
         self.robotAngle: float = 0
         self.trustworthy = False
     def update(self):
+        self.photonTable.putBoolean(self.cameraNameReal + " active", True)
         self.trustworthy = False
         self.camEstPose = None
         self.result = self.camera.getLatestResult()
@@ -54,7 +47,6 @@ class photonCameraClass:
             self.target = self.result.getTargets()
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
-            self.photonTable.putNumber("ambiguity", self.ambiguity)
             self.camEstPose = self.camPoseEst.update()
             if self.ambiguity < 0.04:
                 self.trustworthy = True
@@ -70,5 +62,6 @@ class photonCameraClass:
         else:
             self.ambiguity = 1
             self.fiducialId = -1
+    
       
 

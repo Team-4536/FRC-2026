@@ -3,10 +3,11 @@ name = "FRC-2026"
 version = "1.0"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-    "robotpy[navx,pathplannerlib,phoenix6,rev]==2025.3.2.2",
+    "robotpy[navx,pathplannerlib,phoenix6,rev]==2026.1.1",
     "photonlibpy",
 ]
 
 
 [tool.uv]
 python-preference = "managed"
+prerelease = "allow"
