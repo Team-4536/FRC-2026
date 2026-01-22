@@ -11,9 +11,25 @@ from rev import (
     LimitSwitchConfig,
 )
 import math
+from subsystemManager import SubsystemManager, Subsystems
+from subsystems.inputs import Inputs
+from subsystems.LEDSignals import LEDSignals
+from subsystems.swerveDrive import SwerveDrive
+from subsystems.utils import TimeData
+from wpilib import TimedRobot
+
+
 
 class Robot(wpilib.TimedRobot):
     def robotInit(self):
+        self.subsystems: SubsystemManager = SubsystemManager(
+            Subsystems(
+                inputs=Inputs(),
+                ledSignals=LEDSignals(deviceID=0),
+                swerveDrive=SwerveDrive(),
+                time=TimeData(),
+            )
+        )
         self.whereToAimRot = wpimath.geometry.Rotation3d
         self.whereToAim = wpimath.geometry.Pose3d(wpimath.geometry.Transform3d)
         
@@ -35,6 +51,7 @@ class Robot(wpilib.TimedRobot):
         self.turretMotor = SparkMax(3, SparkMax.MotorType.kBrushless)
         self.desiredAngle = 0
     def robotPeriodic(self):
+        self.subsystems.robotPeriodic()
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
         self.photonCameraMiddle.update()
@@ -94,9 +111,13 @@ class Robot(wpilib.TimedRobot):
         self.tempRot = 0
 
     def teleopInit(self):
-        pass
+        self.subsystems.init()
+
+        for s in self.subsystems:
+            s.init()
     def teleopPeriodic(self):
         self.turretMotor.stopMotor()
+        self.subsystems.teleopPeriodic()
         if(self.driveCtrlr.getLeftX() > 0.01 or self.driveCtrlr.getLeftX() < -0.01):
             self.turnVoltage = self.driveCtrlr.getLeftX() * 2
             self.turretMotor.setVoltage(self.turnVoltage)
@@ -105,3 +126,13 @@ class Robot(wpilib.TimedRobot):
                 self.turretMotor.setVoltage(-1)
             if(self.currRot < self.desiredAngle - 0.01):
                 self.turretMotor.setVoltage(1)
+    def autonomousInit(self) -> None:
+        self.autonomousPeriodic()
+
+    def autonomousPeriodic(self) -> None:
+        pass
+    def disabledInit(self) -> None:
+        self.disabledPeriodic()
+
+    def disabledPeriodic(self) -> None:
+        self.subsystems.disabled()

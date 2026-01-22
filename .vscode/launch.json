@@ -9,11 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "robotpy",
-            "args": [
-                "--main",
-                "src/robot.py",
-                "sim"
-            ],
+            "args": ["--main", "src/robot.py", "sim"],
             "console": "integratedTerminal",
             "justMyCode": true
         }
