@@ -1,12 +1,18 @@
 from motor import RevMotor
-from rev import SparkRelativeEncoder
+from rev import (
+    SparkRelativeEncoder,
+    SparkBaseConfig,
+    SparkMaxConfig,
+    ClosedLoopConfig,
+    MAXMotionConfig,
+    ClosedLoopSlot,
+)
 from inputs import Inputs
 from desiredState import DesiredState
 from phoenix6.hardware import CANcoder
 from wpimath.units import rotationsToRadians, degreesToRadians, rotationsToDegrees
 import math
 from math import tau as TAU
-import navx
 import numpy as np
 from wpimath.geometry import Pose3d
 
@@ -20,13 +26,35 @@ class Turret:
     # cancoder more like cantcoder
     def __init__(self):
         self.turretMotor = RevMotor(12)  # get right ID, motor for turning horizontally
+        self.turretMotorVertical = RevMotor(17)
+
+        horzConfig: SparkBaseConfig = (
+            SparkMaxConfig()
+            .smartCurrentLimit(40)
+            .inverted(True)
+            .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+            .apply(
+                ClosedLoopConfig()
+                .pidf(0.15, 0, 0, 0)
+                .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+                .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+                .positionWrappingEnabled(False)
+                .apply(
+                    MAXMotionConfig()
+                    .maxVelocity(5000, ClosedLoopSlot.kSlot0)
+                    .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
+                    .allowedClosedLoopError(0.2)
+                )
+            )
+        )
+
+        self.turretMotor.configure(horzConfig)
+
+        self.turretEncoder = self.turretMotor.getEncoder()
+        self.turretVertEncoder = self.turretMotorVertical.getEncoder()
+
         self.setPoint = 0  # in relation to the field
-        self.turretMotorVertical = RevMotor(17)  #
-        self.turretEncoder = CANcoder(
-            20
-        )  # get right ID, sensor for the horizontal motor
-        self.turretEncoderVertical = CANcoder(25)  # sensor for the vertical motor
-        self.feildRelativePos = 0
+
         self.odom = TurretOdometry()
 
     def periodic(self, ds: DesiredState):
