@@ -21,7 +21,6 @@ class Turret:
     def __init__(self):
         self.turretMotor = RevMotor(12)  # get right ID, motor for turning horizontally
         self.setPoint = 0  # in relation to the field
-        self.lastGyroPos = 0  # for calculating change
         self.turretMotorVertical = RevMotor(17)  #
         self.turretEncoder = CANcoder(
             20
@@ -32,12 +31,12 @@ class Turret:
 
     def periodic(self, ds: DesiredState):
         # camrot is in degrees
+        self.odom.updateWithEncoder(ds, self.turretEncoder)
         self.setPoint = ds.turretSetPoint
-
         self.targetPoint()
         self.maintainSetpoint(ds.yaw)  # these go last
         self.dontOverdoIt()
-        self.turretMotor.setPosition(self.setPoint * self.gear)
+        self.turretMotor.setPosition(self.setPoint * GEARING)
 
     def disabled(self):
         pass
