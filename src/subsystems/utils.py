@@ -1,5 +1,5 @@
-from math import atan2, copysign, cos, hypot, sin
-from subsystems.desiredState import DesiredState
+from math import atan2, copysign, cos, fmod, hypot, pi, sin
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
@@ -23,7 +23,7 @@ class TimeData(Subsystem):
         self.prevTime = time
         self.initTime = time
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, robotState: RobotState) -> None:
         time = getTime()
 
         self.dt = time - self.prevTime

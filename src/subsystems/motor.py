@@ -11,8 +11,6 @@ from math import pi as PI
 from wpimath.units import radians
 from wpimath.units import revolutions_per_minute as RPM
 
-TURN_GEARING = 21.4
-
 
 class RevMotor:
     def __init__(self, *, deviceID: int) -> None:
@@ -43,7 +41,11 @@ class RevMotor:
     def getEncoder(self) -> SparkRelativeEncoder:
         return self._ctrlr.getEncoder()
 
-    driveConfig: SparkBaseConfig = (
+    DRIVE_GEARiNG: float = 6.12
+
+    AZIMUTH_GEARING: float = 21.4
+
+    DRIVE_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
         .disableFollowerMode()
@@ -62,7 +64,7 @@ class RevMotor:
         )
     )
 
-    azimuthConfig: SparkBaseConfig = (
+    AZIMUTH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
         .inverted(True)
@@ -72,9 +74,9 @@ class RevMotor:
             .pidf(0.15, 0, 0, 0)
             .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
-            .positionWrappingMaxInput(PI / TURN_GEARING)
-            .positionWrappingMinInput(-PI / TURN_GEARING)
+            # .positionWrappingEnabled(True)
+            # .positionWrappingMinInput(-AZIMUTH_GEARING / 2)
+            # .positionWrappingMaxInput(AZIMUTH_GEARING / 2)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(5000, ClosedLoopSlot.kSlot0)
@@ -84,14 +86,14 @@ class RevMotor:
         )
     )
 
-    driveDisabledConfig: SparkBaseConfig = (
+    DISABLED_DRIVE_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
     )
 
-    azimuthDisabledConfig: SparkBaseConfig = (
+    DISABLED_AZIMUTH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
         .inverted(True)
