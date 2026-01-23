@@ -1,4 +1,5 @@
 from motor import RevMotor
+from subsystem import Subsystem
 from rev import (
     SparkRelativeEncoder,
     SparkBaseConfig,
@@ -6,6 +7,7 @@ from rev import (
     ClosedLoopConfig,
     MAXMotionConfig,
     ClosedLoopSlot,
+    LimitSwitchConfig,
 )
 from inputs import Inputs
 from desiredState import DesiredState
@@ -15,24 +17,33 @@ import math
 from math import tau as TAU
 import numpy as np
 from wpimath.geometry import Pose3d
+from ntcore import NetworkTableInstance
 
 
-MAX_ROTATION = 3 * math.pi / 2
+MAX_ROTATION = degreesToRadians(270)
 TURRET_GAP = math.tau - MAX_ROTATION
 GEARING = 12  # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 
 
-class Turret:
+class Turret(Subsystem):
     # cancoder more like cantcoder
-    def __init__(self):
-        self.turretMotor = RevMotor(12)  # get right ID, motor for turning horizontally
-        self.turretMotorVertical = RevMotor(17)
+    # yaw is horizontal rotation
+    # pitch is vertical
 
-        horzConfig: SparkBaseConfig = (
+    def __init__(self):
+        self.motorYaw = RevMotor(12)  # get right ID, motor for turning horizontally
+        self.pitchMotor = RevMotor(17)
+
+        self.motorYaw.azimuthConfig = (
             SparkMaxConfig()
             .smartCurrentLimit(40)
             .inverted(True)
             .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+            .apply(
+                LimitSwitchConfig()
+                .reverseLimitSwitchEnabled()
+                .forwardLimitSwitchEnabled()
+            )
             .apply(
                 ClosedLoopConfig()
                 .pidf(0.15, 0, 0, 0)
@@ -48,31 +59,68 @@ class Turret:
             )
         )
 
-        self.turretMotor.configure(horzConfig)
+        self.motorYaw.configure(self.motorYaw.azimuthConfig)
 
-        self.turretEncoder = self.turretMotor.getEncoder()
-        self.turretVertEncoder = self.turretMotorVertical.getEncoder()
+        self.yawEncoder = self.motorYaw.getEncoder()
+        self.pitchEncoder = self.pitchMotor.getEncoder()
+
+        self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
+
+        self.homeSet: bool = False
 
         self.setPoint = 0  # in relation to the field
 
         self.odom = TurretOdometry()
 
+        self.table = NetworkTableInstance.getDefault().getTable("telementry")
+
+    def init():
+        pass
+
     def periodic(self, ds: DesiredState):
-        # camrot is in degrees
-        self.odom.updateWithEncoder(ds, self.turretEncoder)
+
+        if not self.homeSet:
+            self.reset(ds.limitA)
+            return
+
+        self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
+        self.odom.updateWithEncoder(ds.yaw, self.yawEncoder)
+
         self.setPoint = ds.turretSetPoint
+
         self.targetPoint()
         self.maintainSetpoint(ds.yaw)  # these go last
         self.dontOverdoIt()
-        self.turretMotor.setPosition(self.setPoint * GEARING)
+
+        self.motorYaw.setPosition(self.setPoint * GEARING)
 
     def disabled(self):
-        pass
+        self.motorYaw.setVelocity(0)
+        self.pitchMotor.setVelocity(0)
+
+        self.motorYaw.configure(self.motorYaw.azimuthDisabledConfig)
+        self.pitchMotor.configure(self.pitchMotor.azimuthDisabledConfig)
+
+        self.homeSet = False
+
+    def publish(self):
+
+        self.table.putBoolean("Turret Home Set", self.homeSet)
+        self.table.putNumber("Turret Yaw Setpoint", self.setPoint)
+        self.table.putNumber(
+            "Turret Yaw Actual Motor Setpoint", self.setPoint * GEARING
+        )
+        self.table.putNumber(
+            "Turret Yaw Feild Relative Rotation", self.odom.feildRelativeRot
+        )
+        self.table.putNumber(
+            "Turret Yaw Feild Relative Rotation Wrapped", self.odom.wrappedFRR
+        )
+        self.table.putNumber("Turret Yaw Encoder Motor Pos", self.yawPos)
+        self.table.putNumber("Turret Yaw Actual Encoder Pos", self.yawPos / GEARING)
 
     def maintainSetpoint(self, robotYaw):
-        self.setPoint -= self.odom.getGyroChange(
-            robotYaw
-        )  # modulo only returns positive
+        self.setPoint -= self.odom.getGyroChange(robotYaw)
 
     def dontOverdoIt(self):
         if self.setPoint > MAX_ROTATION + TURRET_GAP / 2:
@@ -86,6 +134,15 @@ class Turret:
         yDiff = pointPose.Y - robotPose.Y
         self.setPoint = math.atan(xDiff / yDiff)
 
+    def reset(self, limit):
+        if not self.homeSet:
+
+            self.motorYaw.setVelocity(-1)
+
+            if limit:
+                self.yawEncoder.setPosition(0)
+                self.homeSet = True
+
 
 class TurretOdometry:
     def __init__(self):
@@ -93,11 +150,13 @@ class TurretOdometry:
         self.wrappedFRR = 0  # wrapped field relative rotation
         self.pos: Pose3d = Pose3d()
 
-    def updateWithEncoder(self, ds: DesiredState, encoder: SparkRelativeEncoder):
-        roboYaw = ds.yaw
+    def updateWithEncoder(self, roboYaw, encoder: SparkRelativeEncoder):
+
         turretRaw = encoder.getPosition()
         turretRot = rotationsToRadians(turretRaw) / GEARING
-        self.wrappedFRR = (turretRot % TAU) * np.sign(turretRot)
+        self.wrappedFRR = (turretRot % TAU) * np.sign(
+            turretRot
+        )  # modulo only returns positive so multiply by the sign
         self.feildRelativeRot = roboYaw - turretRot
 
     def getGyroChange(self, yaw):
