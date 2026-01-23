@@ -1,16 +1,13 @@
 from subsystemManager import SubsystemManager
 from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
-from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
+from subsystems.robotState import RobotState
 from wpilib import TimedRobot
 
 
 class Robot(TimedRobot):
-    def init(self) -> None:
-        pass
-
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
             inputs=Inputs(),
@@ -18,24 +15,22 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
         )
-
-        self.init()
+        self.subsystems.robotInit()
 
     def robotPeriodic(self) -> None:
-        self.subsystems.time.periodic(self.subsystems.desiredState)
+        self.subsystems.robotPeriodic()
 
     def autonomousInit(self) -> None:
-        self.init()
+        self.subsystems.init()
 
     def autonomousPeriodic(self) -> None:
-        pass
+        self.subsystems.autonomousPeriodic()
 
     def teleopInit(self) -> None:
-        self.init()
         self.subsystems.init()
 
     def teleopPeriodic(self) -> None:
-        self.subsystems.periodic()
+        self.subsystems.teleopPeriodic()
 
     def teleopExit(self) -> None:
         self.disabledInit()
@@ -44,4 +39,4 @@ class Robot(TimedRobot):
         self.disabledPeriodic()
 
     def disabledPeriodic(self) -> None:
-        self.subsystems.disable()
+        self.subsystems.disabled()
