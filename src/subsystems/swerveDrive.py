@@ -1,11 +1,11 @@
 from math import tau as TAU
 from navx import AHRS
-from subsystems.networkTablesMixin import NetworkTablesMixin
 from phoenix6.hardware import CANcoder
 from phoenix6.units import rotation
 from rev import SparkBaseConfig
-from subsystems.robotState import RobotState
 from subsystems.motor import RevMotor
+from subsystems.networkTablesMixin import NetworkTablesMixin
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
