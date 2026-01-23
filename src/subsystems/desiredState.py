@@ -9,8 +9,7 @@ from wpimath.units import revolutions_per_minute as RPM
 class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
-    revShooter: RPM
-    shootShooter: RPM
+    revMotor: RPM
 
     def __post_init__(self) -> None:
         super().__init__()

@@ -1,6 +1,6 @@
 from subsystems.desiredState import DesiredState
 from subsystems.inputs import Inputs
-from subsystems.shooter import Shooter
+from subsystems.subsystemExample import SubsystemExample
 from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
@@ -13,7 +13,7 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
-    shooter: Shooter
+    subsystemExample: SubsystemExample 
 
     def init(self) -> None:
         for s in self:
@@ -39,7 +39,7 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
-            self.shooter,
+            self.subsystemExample,
         ]
 
     @property

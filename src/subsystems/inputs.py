@@ -28,8 +28,7 @@ class Inputs(Subsystem):
         self.desiredState = DesiredState(
             fieldSpeeds=ChassisSpeeds(),
             abtainableMaxSpeed=maxVelocity,
-            revShooter=0,
-            shootShooter=0,
+            revMotor=0,
         )
 
         self.revShooter: float = 0
@@ -46,8 +45,7 @@ class Inputs(Subsystem):
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
 
-        self.desiredState.revShooter = self._mechCtrl.getRightTriggerAxis()
-        self.desiredState.shootShooter = self._mechCtrl.getRightBumper()
+        self.desiredState.revMotor = self._mechCtrl.getRightTriggerAxis()
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
