@@ -45,7 +45,6 @@ class TimeData(Subsystem):
     def publish(self) -> None:
         self.publishDouble("delta_time", self.dt)
         self.publishDouble("time_since_init", self.timeSinceInit)
-        print("---")
 
 
 class Scalar:
