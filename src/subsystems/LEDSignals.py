@@ -18,8 +18,8 @@ class LEDSignals(Subsystem):
     def init(self) -> None:
         pass
 
-    def periodic(self, robotState: RobotState) -> None:
-        pass
+    def periodic(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def disabled(self) -> None:
         self.update(b8=0)  # EXAMPLE

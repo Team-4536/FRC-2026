@@ -1,5 +1,5 @@
-from subsystems.robotState import RobotState
 from subsystems.networkTablesMixin import NetworkTablesMixin
+from subsystems.robotState import RobotState
 from typing import Callable, Optional, Union
 
 

@@ -3,7 +3,6 @@ from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
-from subsystems.robotState import RobotState
 from wpilib import TimedRobot
 
 

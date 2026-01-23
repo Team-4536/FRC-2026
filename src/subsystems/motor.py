@@ -1,13 +1,15 @@
 from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
+    FeedbackSensor,
     MAXMotionConfig,
+    PersistMode,
+    ResetMode,
     SparkBaseConfig,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
 )
-from math import pi as PI
 from wpimath.units import radians
 from wpimath.units import revolutions_per_minute as RPM
 
@@ -19,8 +21,8 @@ class RevMotor:
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
             config=config,
-            resetMode=SparkMax.ResetMode.kResetSafeParameters,
-            persistMode=SparkMax.PersistMode.kPersistParameters,
+            resetMode=ResetMode.kResetSafeParameters,
+            persistMode=PersistMode.kPersistParameters,
         )
 
     def stopMotor(self) -> None:
@@ -28,13 +30,13 @@ class RevMotor:
 
     def setVelocity(self, rpm: RPM) -> None:
         self._ctrlr.getClosedLoopController().setReference(
-            value=rpm,
+            setpoint=rpm,
             ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
 
     def setPosition(self, rot: radians) -> None:
         self._ctrlr.getClosedLoopController().setReference(
-            value=rot,
+            setpoint=rot,
             ctrl=SparkMax.ControlType.kMAXMotionPositionControl,
         )
 
@@ -53,7 +55,7 @@ class RevMotor:
         .apply(
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00002)
-            .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .apply(
                 MAXMotionConfig()
@@ -72,7 +74,7 @@ class RevMotor:
         .apply(
             ClosedLoopConfig()
             .pidf(0.15, 0, 0, 0)
-            .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             # .positionWrappingEnabled(True)
             # .positionWrappingMinInput(-AZIMUTH_GEARING / 2)
