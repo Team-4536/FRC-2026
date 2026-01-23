@@ -1,5 +1,11 @@
 from functools import partial
-from ntcore import BooleanTopic, DoubleTopic, IntegerTopic, NetworkTableInstance, StringTopic
+from ntcore import (
+    BooleanTopic,
+    DoubleTopic,
+    IntegerTopic,
+    NetworkTableInstance,
+    StringTopic,
+)
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 from wpimath.kinematics import SwerveModuleState
 
@@ -43,7 +49,9 @@ class NetworkTablesMixin:
     def publishSwerve(
         self,
         name: str,
-        value: Tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState],
+        value: Tuple[
+            SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState
+        ],
         *subtables: str,
     ) -> None:
         topicFn = partial(self.table.getStructArrayTopic, type=value[0].__class__)
@@ -76,7 +84,9 @@ class NetworkTablesMixin:
                 value = topic.getEntry(default).get()
         return value
 
-    def getString(self, name: str, *subtables: str, default: Optional[str] = None) -> Optional[str]:
+    def getString(
+        self, name: str, *subtables: str, default: Optional[str] = None
+    ) -> Optional[str]:
         val = self._get(name, self.table.getStringTopic, *subtables, default=default)
         return str(val) if val is not None else None
 

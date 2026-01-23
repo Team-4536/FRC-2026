@@ -29,7 +29,9 @@ class Inputs(Subsystem):
             fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity * 0.2
         )  # ===== LOWER MAX SPEED FOR TESTING =====
 
-    def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
+    def init(
+        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
+    ) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
@@ -44,7 +46,9 @@ class Inputs(Subsystem):
         self.robotState.publish()
 
     def _calculateDrive(self) -> ChassisSpeeds:
-        vx, vy = self._circularScalar(x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX())
+        vx, vy = self._circularScalar(
+            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+        )
 
         omega: RPS = self._linearScalar(-self._driveCtrl.getRightX())
 

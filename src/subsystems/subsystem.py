@@ -20,9 +20,6 @@ class Subsystem(NetworkTablesMixin):
     def disabled(self) -> None:
         self._warn(self.disabled)
 
-    def publish(self) -> None:
-        self._warn(self.publish)
-
     def _warn(self, method: Callable[..., Union[None, RobotState]]) -> None:
         raise SubsystemMethodError(
             f"{method.__name__} method required in {self.__class__.__name__}"

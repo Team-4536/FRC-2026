@@ -31,13 +31,13 @@ class RevMotor:
     def setVelocity(self, rpm: RPM) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,
-            ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
+            ctrl=SparkMax.ControlType.kVelocity,
         )
 
     def setPosition(self, rot: radians) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rot,
-            ctrl=SparkMax.ControlType.kMAXMotionPositionControl,
+            ctrl=SparkMax.ControlType.kPosition,
         )
 
     def getEncoder(self) -> SparkRelativeEncoder:
@@ -76,9 +76,9 @@ class RevMotor:
             .pidf(0.15, 0, 0, 0)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            # .positionWrappingEnabled(True)
-            # .positionWrappingMinInput(-AZIMUTH_GEARING / 2)
-            # .positionWrappingMaxInput(AZIMUTH_GEARING / 2)
+            .positionWrappingEnabled(True)
+            .positionWrappingMinInput(-AZIMUTH_GEARING / 2)
+            .positionWrappingMaxInput(AZIMUTH_GEARING / 2)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(5000, ClosedLoopSlot.kSlot0)
