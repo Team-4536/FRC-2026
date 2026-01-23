@@ -1,11 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 
 
 @dataclass
-class DesiredState(NetworkTablesMixin):
+class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
 
@@ -13,6 +13,19 @@ class DesiredState(NetworkTablesMixin):
         super().__init__()
 
     def publish(self) -> None:
+        for field in fields(self):
+            name = field.name
+            value = getattr(self, name)
+
+            if isinstance(value, int):
+                self.publishInteger(name, value)
+            elif isinstance(value, str):
+                self.publishString(name, value)
+            elif isinstance(value, float):
+                self.publishDouble(name, value)
+            elif isinstance(value, bool):
+                self.publishBoolean(name, value)
+
         vx = float(self.fieldSpeeds.vx)
         vy = float(self.fieldSpeeds.vy)
         omega = float(self.fieldSpeeds.omega)
