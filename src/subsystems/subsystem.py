@@ -1,5 +1,5 @@
-from subsystems.desiredState import DesiredState
-from subsystems.networkTablesMixin import NetworkTablesMixin
+from desiredState import DesiredState
+from networkTablesMixin import NetworkTablesMixin
 from typing import Callable, Optional
 
 

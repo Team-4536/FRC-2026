@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from subsystems.networkTablesMixin import NetworkTablesMixin
+from networkTablesMixin import NetworkTablesMixin
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 

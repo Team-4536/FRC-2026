@@ -4,6 +4,7 @@ from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
+from subsystems.limelights import llCams
 from typing import List, NamedTuple
 
 
@@ -12,6 +13,7 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    llCam: llCams
 
     def init(self) -> None:
         for s in self:
@@ -34,9 +36,11 @@ class SubsystemManager(NamedTuple):
     @property
     def _dependant(self) -> List[Subsystem]:
         return [
+            self.inputs,
             self.ledSignals,
             self.swerveDrive,
             self.time,
+            self.llCam,
         ]
 
     @property
