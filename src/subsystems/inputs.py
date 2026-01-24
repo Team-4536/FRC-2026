@@ -26,7 +26,10 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, AButton=False
+            fieldSpeeds=ChassisSpeeds(),
+            abtainableMaxSpeed=maxVelocity,
+            AButton=False,
+            BButton=False,
         )
 
     def init(
@@ -38,6 +41,7 @@ class Inputs(Subsystem):
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
         self.desiredState.AButton = self._mechCtrl.getAButton()
+        self.desiredState.BButton = self._mechCtrl.getBButton()
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()
