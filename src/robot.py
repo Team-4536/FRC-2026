@@ -16,7 +16,6 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             intake=Intake(),
-            Abutton=
         )
         self.subsystems.robotInit()
 

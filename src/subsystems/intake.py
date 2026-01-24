@@ -1,5 +1,5 @@
 from subsystems.subsystem import Subsystem
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from ntcore import NetworkTableInstance
 from subsystems.motor import RevMotor
 
@@ -20,13 +20,13 @@ class Intake(Subsystem):
     def init(self) -> None:
         pass
 
-    def periodic(self, ds: DesiredState):
-        if ds.AButton:
+    def periodic(self, rs: RobotState):
+        if rs.AButton:
             self.intakeVelocityOne = 1
         else:
             self.intakeVelocityOne = 0
 
-        if ds.BButton:
+        if rs.BButton:
             self.intakeVelocityTwo = 1
         else:
             self.intakeVelocityTwo = 0

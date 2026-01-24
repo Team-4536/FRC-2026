@@ -7,7 +7,7 @@ from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 
 
 class Inputs(Subsystem):
