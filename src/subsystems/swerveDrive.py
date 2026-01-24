@@ -1,4 +1,4 @@
-from math import tau as TAU
+from math import pi as PI
 from navx import AHRS
 from phoenix6.hardware import CANcoder
 from phoenix6.units import rotation
@@ -17,7 +17,7 @@ from wpimath.kinematics import (
     SwerveModuleState,
 )
 from wpimath.units import meters_per_second as MPS
-from wpimath.units import meters, radiansToRotations
+from wpimath.units import meters, radiansToRotations, feetToMeters
 
 
 class SwerveModule(NetworkTablesMixin):
@@ -42,7 +42,7 @@ class SwerveModule(NetworkTablesMixin):
         self._position = Translation2d(0, 0)
 
         wheelDiam: meters = 0.1016
-        self.wheelCircumferance: meters = wheelDiam * TAU
+        self.wheelCircumferance: meters = wheelDiam * PI
 
     @property
     def driveDistance(self) -> meters:
@@ -102,7 +102,7 @@ class SwerveModules(NamedTuple):
     backLeft: SwerveModule
     backRight: SwerveModule
 
-    def symmetricPosition(self, x: float, y: float) -> None:
+    def symmetricPosition(self, x: meters, y: meters) -> None:
         self.frontLeft.setPosition(x, y)
         self.frontRight.setPosition(x, -y)
         self.backLeft.setPosition(-x, y)
@@ -134,7 +134,7 @@ class SwerveDrive(Subsystem):
     def __init__(self) -> None:
         super().__init__()
 
-        WHEEL_DISTANCE: meters = 1
+        WHEEL_DISTANCE: meters = feetToMeters(1)
         # self._modules = self.symmetricDrive(
         #     frontLeftDriveID=2,
         #     frontRightDriveID=8,
@@ -164,10 +164,9 @@ class SwerveDrive(Subsystem):
             frontRightEncoderID=22,
             backLeftEncoderID=23,
             backRightEncoderID=24,
-            xPos=1,
-            yPos=1,
+            xPos=WHEEL_DISTANCE,
+            yPos=WHEEL_DISTANCE,
         )
-        self._modules.symmetricPosition(WHEEL_DISTANCE, WHEEL_DISTANCE)
 
         self.initPos = Pose2d()
         self._kinematics = SwerveDrive4Kinematics(*self._modules.positions)
@@ -205,7 +204,7 @@ class SwerveDrive(Subsystem):
         robotState.pose = self.odometry.update(
             self.gyro.getRotation2d(),
             self._modules.modulePositions,
-        )  # UNUSED
+        )
 
         self.drive(
             fieldSpeeds=robotState.fieldSpeeds,
@@ -224,7 +223,7 @@ class SwerveDrive(Subsystem):
             fieldSpeeds.vx,
             fieldSpeeds.vy,
             fieldSpeeds.omega,
-            -self.gyro.getRotation2d(),
+            self.gyro.getRotation2d(),
         )
         moduleStates = self._kinematics.toSwerveModuleStates(chassisSpeeds)
 
@@ -271,10 +270,14 @@ class SwerveDrive(Subsystem):
         ],
     ):
         self.publishSwerve("swerve_states", swerveStates)
-        self.publishDouble("gyro_angle", self.gyro.getAngle())
+        self.publishDouble("gyro_angle", self.gyro.getAngle() % 360)
         self.publishDouble("module_1_desired_speed", swerveStates[0].speed)
         self.publishDouble(
-            "module_1_actual_speed", self._modules.frontLeft.driveEncoder.getVelocity()
+            "module_1_actual_speed",
+            self._modules.frontLeft.driveEncoder.getVelocity()
+            * self._modules.frontLeft.wheelCircumferance
+            / RevMotor.DRIVE_GEARiNG
+            / 60,
         )
 
     def symmetricDrive(
@@ -292,8 +295,8 @@ class SwerveDrive(Subsystem):
         backRightDriveID: int,
         backRightAzimuthID: int,
         backRightEncoderID: int,
-        xPos: int,
-        yPos: int,
+        xPos: meters,
+        yPos: meters,
     ) -> SwerveModules:
         modules = SwerveModules(
             *(
