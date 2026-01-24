@@ -25,9 +25,15 @@ class Inputs(Subsystem):
         self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
+<<<<<<< HEAD
         self.robotState = RobotState(
             fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity * 0.2
         )  # ===== LOWER MAX SPEED FOR TESTING =====
+=======
+        self.desiredState = DesiredState(
+            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity, AButton=False
+        )
+>>>>>>> parent of a8371c0 (two intake motors but both are manual)
 
     def init(
         self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
@@ -35,9 +41,15 @@ class Inputs(Subsystem):
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
+<<<<<<< HEAD
     def periodic(self, robotState: RobotState) -> RobotState:
         self.robotState.fieldSpeeds = self._calculateDrive()
         return robotState
+=======
+    def periodic(self, ds: DesiredState) -> None:
+        self.desiredState.fieldSpeeds = self._calculateDrive()
+        self.desiredState.AButton = self._mechCtrl.getAButton()
+>>>>>>> parent of a8371c0 (two intake motors but both are manual)
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
