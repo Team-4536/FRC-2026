@@ -75,7 +75,7 @@ class FollowTrajectory(AutoStages):
     def __init__(self, trajectoryName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(trajectoryName, isFlipped)
         self.desiredState = DesiredState
-        self.isDone = False
+        self.done = False
 
     def autoInit(self):
         self.startTime = wpilib.getTime()
@@ -110,5 +110,5 @@ class FollowTrajectory(AutoStages):
         ):
             return False
 
-        self.isDone = True
+        self.done = True
         return True
