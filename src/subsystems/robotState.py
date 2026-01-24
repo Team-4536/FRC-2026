@@ -4,6 +4,8 @@ from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 
+from wpimath.units import metersToFeet
+
 
 @dataclass
 class RobotState(NetworkTablesMixin):
@@ -28,13 +30,14 @@ class RobotState(NetworkTablesMixin):
             elif isinstance(value, bool):
                 self.publishBoolean(name, value)
 
-        vx = float(self.fieldSpeeds.vx)
-        vy = float(self.fieldSpeeds.vy)
-        omega = float(self.fieldSpeeds.omega)
+        self.publishDouble("vx", self.fieldSpeeds.vx, "FieldSpeeds")
+        self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
+        self.publishDouble("omega", self.fieldSpeeds.omega, "FieldSpeeds")
 
-        self.publishDouble("vx", vx, "FieldSpeeds")
-        self.publishDouble("vy", vy, "FieldSpeeds")
-        self.publishDouble("omega", omega, "FieldSpeeds")
+        if self.pose:
+            self.publishDouble("x", metersToFeet(self.pose.X()), "odom")
+            self.publishDouble("y", metersToFeet(self.pose.Y()), "odom")
+            self.publishDouble("angle", self.pose.rotation().degrees(), "odom")
 
     @classmethod
     def empty(cls, **kwargs):

@@ -64,7 +64,7 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
-            # .apply(FeedForwardConfig().kV(0.00205))
+            .apply(FeedForwardConfig().kV(0.00205))
         )
     )
 
