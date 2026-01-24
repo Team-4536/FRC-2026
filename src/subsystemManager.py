@@ -3,6 +3,7 @@ from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
+from subsystems.autoSubsystem import Autos
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
 
@@ -11,6 +12,7 @@ class SubsystemManager(NamedTuple):
     inputs: Inputs
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
+    autos: Autos
     time: TimeData
 
     def init(self) -> None:
