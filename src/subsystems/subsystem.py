@@ -22,5 +22,5 @@ class Subsystem(NetworkTablesMixin):
 
     def _warn(self, method: Callable[..., Union[None, RobotState]]) -> None:
         raise SubsystemMethodError(
-            f"{method.__name__} method required in {self.__class__.__name__}"
+            f"{method.__name__} method required in {self.__class__.__name__}"  # type: ignore[unresolved-attribute]
         )
