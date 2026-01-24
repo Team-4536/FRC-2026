@@ -6,21 +6,8 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
 
-import wpimath.kinematics  # FOR THE EXAMPLE
 
-
-class AutoStages(Subsystem):
-    def init(self) -> None:
-        self.robotState = RobotState(wpimath.kinematics.ChassisSpeeds(), 0)
-
-    def periodic(self, robotState: RobotState) -> RobotState:
-        return robotState
-
-    def disabled(self) -> None:
-        pass
-
-
-robotState: RobotState | None = None
+robotState: RobotState = None  # type: ignore
 
 
 class SubsystemManager(NamedTuple):
@@ -29,12 +16,10 @@ class SubsystemManager(NamedTuple):
     swerveDrive: SwerveDrive
     time: TimeData
 
-    PLACEHOLDER_AUTO_STAGES: AutoStages = AutoStages()  # example
-
     def init(self) -> None:
         for s in self.dependantSubsytems:
             s.init()
-        self.PLACEHOLDER_AUTO_STAGES.init()
+        self.inputs.init()
 
     def robotInit(self) -> None:
         self.time.init()
@@ -45,7 +30,7 @@ class SubsystemManager(NamedTuple):
 
     def autonomousPeriodic(self) -> None:
         global robotState
-        robotState = self.PLACEHOLDER_AUTO_STAGES.periodic(self.robotState)
+        robotState = self.inputs.periodic(self.robotState)  # replace with auto manager
         self._periodic(self.robotState)
 
     def teleopPeriodic(self) -> None:

@@ -1,4 +1,4 @@
-from math import atan2, copysign, cos, fmod, hypot, pi, sin
+from math import atan2, copysign, cos, hypot, sin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple
@@ -48,7 +48,9 @@ class TimeData(Subsystem):
 
 
 class Scalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+    def __init__(
+        self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
+    ) -> None:
         self.deadzone = deadzone
         self._exponent = exponent
         self._magnitude = magnitude
@@ -100,7 +102,9 @@ class Scalar:
 
 
 class CircularScalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+    def __init__(
+        self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
+    ) -> None:
         self.linearScalar = Scalar(deadzone, exponent, magnitude)
 
     def scale(self, *, x: float, y: float) -> Tuple[float, float]:

@@ -4,6 +4,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, Scalar
 from typing import Optional
 from wpilib import XboxController as Ctrlr
+from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
@@ -14,7 +15,6 @@ class Inputs(Subsystem):
         self,
         drivePort: int = 0,
         mechPort: int = 1,
-        maxVelocity: MPS = 8,
         maxAngularVelocity: RPS = TAU,
     ) -> None:
         super().__init__()
@@ -22,14 +22,16 @@ class Inputs(Subsystem):
         self._driveCtrl = Ctrlr(drivePort)
         self._mechCtrl = Ctrlr(mechPort)
 
+        self.robotState = RobotState.empty(abtainableMaxSpeed=5)
+
         self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
-        self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
+        self._circularScalar: CircularScalar = CircularScalar(
+            magnitude=self.robotState.abtainableMaxSpeed
+        )
 
-        self.robotState = RobotState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity * 0.2
-        )  # ===== LOWER MAX SPEED FOR TESTING =====
-
-    def init(self, drivePort: Optional[int] = None, mechPort: Optional[int] = None) -> None:
+    def init(
+        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
+    ) -> None:
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
@@ -44,7 +46,9 @@ class Inputs(Subsystem):
         self.robotState.publish()
 
     def _calculateDrive(self) -> ChassisSpeeds:
-        vx, vy = self._circularScalar(x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX())
+        vx, vy = self._circularScalar(
+            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+        )
 
         omega: RPS = self._linearScalar(-self._driveCtrl.getRightX())
 
