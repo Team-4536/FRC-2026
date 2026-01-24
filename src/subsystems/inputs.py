@@ -1,5 +1,5 @@
 from math import tau as TAU
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, Scalar
 from typing import Optional
@@ -25,12 +25,9 @@ class Inputs(Subsystem):
         self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
-        self.desiredState = DesiredState(
-            fieldSpeeds=ChassisSpeeds(),
-            abtainableMaxSpeed=maxVelocity,
-            AButton=False,
-            BButton=False,
-        )
+        self.robotState = RobotState(
+            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity * 0.2
+        )  # ===== LOWER MAX SPEED FOR TESTING =====
 
     def init(
         self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
@@ -38,16 +35,15 @@ class Inputs(Subsystem):
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
-    def periodic(self, ds: DesiredState) -> None:
-        self.desiredState.fieldSpeeds = self._calculateDrive()
-        self.desiredState.AButton = self._mechCtrl.getAButton()
-        self.desiredState.BButton = self._mechCtrl.getBButton()
+    def periodic(self, robotState: RobotState) -> RobotState:
+        self.robotState.fieldSpeeds = self._calculateDrive()
+        return robotState
 
     def disabled(self) -> None:
-        self.desiredState.fieldSpeeds = ChassisSpeeds()
+        self.robotState.fieldSpeeds = ChassisSpeeds()
 
     def publish(self) -> None:
-        self.desiredState.publish()
+        self.robotState.publish()
 
     def _calculateDrive(self) -> ChassisSpeeds:
         vx, vy = self._circularScalar(
