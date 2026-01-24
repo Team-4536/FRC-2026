@@ -43,6 +43,7 @@ class Inputs(Subsystem):
     def periodic(self, ds: DesiredState) -> None:
         self.desiredState.fieldSpeeds = self._calculateDrive()
         self.desiredState.AButton = self._mechCtrl.getAButton()
+        self.desiredState.BButton = self._mechCtrl.getBButton()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
