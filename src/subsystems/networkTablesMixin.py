@@ -20,7 +20,7 @@ class NetworkTablesMixin:
         self.table = NetworkTableInstance.getDefault().getTable(f"telemetry/{instance}")
         self._ntPersist: Dict[str, object] = {}
 
-    def _publish(
+    def __publish(
         self, name: str, value: Any, topicFn: Callable[[str], Any], *subtables: str
     ) -> None:
         if subtables:
@@ -35,16 +35,16 @@ class NetworkTablesMixin:
         pub.set(value)  # type: ignore[attr-defined]
 
     def publishString(self, name: str, value: str, *subtables: str) -> None:
-        self._publish(name, value, self.table.getStringTopic, *subtables)
+        self.__publish(name, value, self.table.getStringTopic, *subtables)
 
     def publishInteger(self, name: str, value: int, *subtables: str) -> None:
-        self._publish(name, value, self.table.getIntegerTopic, *subtables)
+        self.__publish(name, value, self.table.getIntegerTopic, *subtables)
 
     def publishDouble(self, name: str, value: float, *subtables: str) -> None:
-        self._publish(name, value, self.table.getDoubleTopic, *subtables)
+        self.__publish(name, value, self.table.getDoubleTopic, *subtables)
 
     def publishBoolean(self, name: str, value: bool, *subtables: str) -> None:
-        self._publish(name, value, self.table.getBooleanTopic, *subtables)
+        self.__publish(name, value, self.table.getBooleanTopic, *subtables)
 
     def publishSwerve(
         self,
@@ -55,9 +55,9 @@ class NetworkTablesMixin:
         *subtables: str,
     ) -> None:
         topicFn = partial(self.table.getStructArrayTopic, type=value[0].__class__)
-        self._publish(name, value, topicFn, *subtables)
+        self.__publish(name, value, topicFn, *subtables)
 
-    def _get(
+    def __get(
         self,
         name: str,
         topicFn: Callable[[str], Any],
@@ -87,23 +87,23 @@ class NetworkTablesMixin:
     def getString(
         self, name: str, *subtables: str, default: Optional[str] = None
     ) -> Optional[str]:
-        val = self._get(name, self.table.getStringTopic, *subtables, default=default)
+        val = self.__get(name, self.table.getStringTopic, *subtables, default=default)
         return str(val) if val is not None else None
 
     def getInteger(
         self, name: str, *subtables: str, default: Optional[int] = None
     ) -> Optional[int]:
-        val = self._get(name, self.table.getIntegerTopic, *subtables, default=default)
+        val = self.__get(name, self.table.getIntegerTopic, *subtables, default=default)
         return int(val) if val is not None else None
 
     def getDouble(
         self, name: str, *subtables: str, default: Optional[float] = None
     ) -> Optional[float]:
-        val = self._get(name, self.table.getDoubleTopic, *subtables, default=default)
+        val = self.__get(name, self.table.getDoubleTopic, *subtables, default=default)
         return float(val) if val is not None else None
 
     def getBoolean(
         self, name: str, *subtables: str, default: Optional[bool] = None
     ) -> Optional[bool]:
-        val = self._get(name, self.table.getBooleanTopic, *subtables, default=default)
+        val = self.__get(name, self.table.getBooleanTopic, *subtables, default=default)
         return bool(val) if val is not None else None

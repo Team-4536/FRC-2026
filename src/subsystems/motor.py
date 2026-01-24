@@ -2,6 +2,7 @@ from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
+    FeedForwardConfig,
     MAXMotionConfig,
     PersistMode,
     ResetMode,
@@ -22,7 +23,7 @@ class RevMotor:
         self._ctrlr.configure(
             config=config,
             resetMode=ResetMode.kResetSafeParameters,
-            persistMode=PersistMode.kPersistParameters,
+            persistMode=PersistMode.kNoPersistParameters,
         )
 
     def stopMotor(self) -> None:
@@ -63,6 +64,7 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
+            # .apply(FeedForwardConfig().kV(0.00205))
         )
     )
 

@@ -1,4 +1,4 @@
-from math import atan2, copysign, cos, fmod, hypot, pi, sin
+from math import atan2, copysign, cos, hypot, sin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple

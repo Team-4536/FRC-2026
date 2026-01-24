@@ -1,5 +1,6 @@
 from dataclasses import dataclass, fields
 from subsystems.networkTablesMixin import NetworkTablesMixin
+from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 
@@ -8,6 +9,7 @@ from wpimath.units import meters_per_second as MPS
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
+    pose: Pose2d
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -33,3 +35,11 @@ class RobotState(NetworkTablesMixin):
         self.publishDouble("vx", vx, "FieldSpeeds")
         self.publishDouble("vy", vy, "FieldSpeeds")
         self.publishDouble("omega", omega, "FieldSpeeds")
+
+    @classmethod
+    def empty(cls, **kwargs):
+        data = {f.name: None for f in fields(cls)}
+
+        data.update(kwargs)
+
+        return cls(**data)  # type: ignore
