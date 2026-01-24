@@ -45,7 +45,7 @@ jobs:
                   uv tool run black --check --diff src
             - name: Type checking with ty
               run: |
-                  uv tool run ty src
+                  uv tool run ty check src
             - name: Lint with flake8
               run: |
                   # stop the build if there are Python syntax errors or undefined names
