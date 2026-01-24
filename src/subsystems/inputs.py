@@ -27,7 +27,10 @@ class Inputs(Subsystem):
         self._circularScalar: CircularScalar = CircularScalar(magnitude=maxVelocity)
 
         self.robotState = RobotState(
-            fieldSpeeds=ChassisSpeeds(), abtainableMaxSpeed=maxVelocity * 0.2
+            fieldSpeeds=ChassisSpeeds(),
+            abtainableMaxSpeed=maxVelocity * 0.2,
+            AButton=False,
+            BButton=False,
         )  # ===== LOWER MAX SPEED FOR TESTING =====
 
     def init(
@@ -40,10 +43,10 @@ class Inputs(Subsystem):
         self.robotState.fieldSpeeds = self._calculateDrive()
         return robotState
 
-    def periodic(self, ds: DesiredState) -> None:
-        self.desiredState.fieldSpeeds = self._calculateDrive()
-        self.desiredState.AButton = self._mechCtrl.getAButton()
-        self.desiredState.BButton = self._mechCtrl.getBButton()
+    def periodic(self, rs: RobotState) -> None:
+        self.robotState.fieldSpeeds = self._calculateDrive()
+        self.robotState.AButton = self._mechCtrl.getAButton()
+        self.robotState.BButton = self._mechCtrl.getBButton()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()

@@ -12,7 +12,9 @@ import wpimath.kinematics  # FOR THE EXAMPLE
 
 class AutoStages(Subsystem):
     def init(self) -> None:
-        self.robotState = RobotState(wpimath.kinematics.ChassisSpeeds(), 0)
+        self.robotState = RobotState(
+            wpimath.kinematics.ChassisSpeeds(), 0, False, False
+        )
 
     def periodic(self, robotState: RobotState) -> RobotState:
         return robotState
