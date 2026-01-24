@@ -4,7 +4,6 @@ from typing import List, Optional
 from warnings import warn
 from wpilib import CAN
 
-
 NONE: int = 255
 
 

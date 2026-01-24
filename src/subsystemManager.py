@@ -6,7 +6,6 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
 
-
 robotState: RobotState = None  # type: ignore
 
 
