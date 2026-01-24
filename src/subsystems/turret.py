@@ -31,8 +31,10 @@ class Turret(Subsystem):
     # pitch is vertical
 
     def __init__(self):
-        self.motorYaw = RevMotor(12)  # get right ID, motor for turning horizontally
-        self.pitchMotor = RevMotor(17)
+        self.motorYaw = RevMotor(
+            deviceID=12
+        )  # get right ID, motor for turning horizontally
+        self.pitchMotor = RevMotor(deviceID=17)
 
         self.motorYaw.azimuthConfig = (
             SparkMaxConfig()
@@ -59,7 +61,7 @@ class Turret(Subsystem):
             )
         )
 
-        self.motorYaw.configure(self.motorYaw.azimuthConfig)
+        self.motorYaw.configure(config=self.motorYaw.azimuthConfig)
 
         self.yawEncoder = self.motorYaw.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
@@ -74,7 +76,7 @@ class Turret(Subsystem):
 
         self.table = NetworkTableInstance.getDefault().getTable("telementry")
 
-    def init():
+    def init(self):
         pass
 
     def periodic(self, ds: DesiredState):
@@ -88,7 +90,7 @@ class Turret(Subsystem):
 
         self.setPoint = ds.turretSetPoint
 
-        self.targetPoint()
+        self.targetPoint()  # need odom
         self.maintainSetpoint(ds.yaw)  # these go last
         self.dontOverdoIt()
 
@@ -98,8 +100,9 @@ class Turret(Subsystem):
         self.motorYaw.setVelocity(0)
         self.pitchMotor.setVelocity(0)
 
-        self.motorYaw.configure(self.motorYaw.azimuthDisabledConfig)
-        self.pitchMotor.configure(self.pitchMotor.azimuthDisabledConfig)
+        self.motorYaw.configure(config=self.motorYaw.azimuthDisabledConfig)
+        self.pitchMotor.configure(config=self.pitchMotor.azimuthDisabledConfig)
+        # do we need these .configure lines when revmotor allready does this?
 
         self.homeSet = False
 
@@ -128,10 +131,12 @@ class Turret(Subsystem):
         elif self.setPoint > MAX_ROTATION:
             self.setPoint = MAX_ROTATION
 
-    def targetPoint(self, pointPose: Pose3d, robotPose: Pose3d):  # make velocity later
+    def targetPoint(
+        self, pointPose: Pose3d, robotPose: Pose3d
+    ) -> None:  # make velocity later
 
-        xDiff = pointPose.X - robotPose.X
-        yDiff = pointPose.Y - robotPose.Y
+        xDiff = pointPose.X() - robotPose.X()
+        yDiff = pointPose.Y() - robotPose.Y()
         self.setPoint = math.atan(xDiff / yDiff)
 
     def reset(self, limit):
