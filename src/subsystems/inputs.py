@@ -7,6 +7,7 @@ from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
+from subsystems.desiredState import DesiredState
 
 
 class Inputs(Subsystem):
@@ -38,6 +39,10 @@ class Inputs(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
         self.robotState.fieldSpeeds = self._calculateDrive()
         return robotState
+
+    def periodic(self, ds: DesiredState) -> None:
+        self.desiredState.fieldSpeeds = self._calculateDrive()
+        self.desiredState.AButton = self._mechCtrl.getAButton()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
