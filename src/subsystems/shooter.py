@@ -13,8 +13,9 @@ class Shooter(Subsystem):
     def __init__(self):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
-        self.hubDistance = 2  # this will later be equal to the hypotenuse of Odometry and the Hub position
+        self.hubDistance = 2  # this will later be equal to the hypotenuse of odometry and the Hub position
         self.wheelRadius = 0.1  # this will later be equal to the radius of the wheels build decides to use
+        self.turretAngle = 70  # this will later be replaced by the turret subsystem's outputed variable
 
         self.revingMotor = RevMotor(deviceID=8)
         self.shooterMotor = RevMotor(deviceID=9)
@@ -37,7 +38,11 @@ class Shooter(Subsystem):
     def _calculateVelocity(self) -> float:
         self.velocityMps = math.sqrt(
             (9.8 * 0.9652**2)
-            / (2 * math.cos(70) * (self.hubDistance * math.tan(70) - 0.9652))
+            / (
+                2
+                * math.cos(self.turretAngle)
+                * (self.hubDistance * math.tan(self.turretAngle) - 0.9652)
+            )
         )
         return self.velocityMps / self.wheelRadius
 
