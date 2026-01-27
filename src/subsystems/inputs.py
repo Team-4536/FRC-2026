@@ -29,6 +29,7 @@ class Inputs(Subsystem):
             fieldSpeeds=ChassisSpeeds(),
             abtainableMaxSpeed=maxVelocity,
             revMotor=0,
+            climber= 0,
         )
 
         self.revShooter: float = 0
@@ -46,6 +47,8 @@ class Inputs(Subsystem):
         self.desiredState.fieldSpeeds = self._calculateDrive()
 
         self.desiredState.revMotor = self._mechCtrl.getRightTriggerAxis()
+
+        ds.climber = self._driveCtrl.getPOV()
 
     def disabled(self) -> None:
         self.desiredState.fieldSpeeds = ChassisSpeeds()

@@ -1,5 +1,6 @@
 from subsystemManager import SubsystemManager
 from subsystems.inputs import Inputs
+from subsystems.subsystemPractice import Climber
 from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystemExample import SubsystemExample
 from subsystems.motor import RevMotor
@@ -19,6 +20,7 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             subsystemExample=SubsystemExample(),
+            subsystemClimber=Climber(),
         )
 
         self.init()

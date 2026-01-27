@@ -1,5 +1,6 @@
 from subsystems.desiredState import DesiredState
 from subsystems.inputs import Inputs
+from subsystems.subsystemPractice import Climber
 from subsystems.subsystemExample import SubsystemExample
 from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystem import Subsystem
@@ -13,7 +14,8 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
-    subsystemExample: SubsystemExample 
+    subsystemExample: SubsystemExample
+    subsystemClimber: Climber 
 
     def init(self) -> None:
         for s in self:

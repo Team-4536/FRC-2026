@@ -10,7 +10,8 @@ class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     revMotor: RPM
-
+    climber: float
+ 
     def __post_init__(self) -> None:
         super().__init__()
 
