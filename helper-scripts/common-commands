@@ -1,4 +1,4 @@
-All of these commands should be run while in the directory 'C:\repos\FRC-2025\src'
+All of these commands should be run while in the directory 'C:\repos\FRC-2025'
 
 winget uv install: 'winget install --exact --disable-interactivity --accept-source-agreements --accept-package-agreements --silent --id=astral-sh.uv'
 
