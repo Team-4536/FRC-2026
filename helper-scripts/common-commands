@@ -4,8 +4,6 @@ winget uv install: 'winget install --exact --disable-interactivity --accept-sour
 
 run once per cloned repository (git clone): 'uv tool run pre-commit'
 
-Change to the 'src' directory (i.e, Repos/FRC-2025/src): 'cd src'
-
 create virtual environment: 'uv venv'
 use virtual environment: '.venv\Scripts\activate'
 
