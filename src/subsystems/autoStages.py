@@ -11,6 +11,10 @@ import math
 import wpilib  
 
 
+class RobotAutos(Enum):
+    DO_NOTHING = "Do Nothing"
+
+
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     nominalVoltage = 12.0
@@ -30,8 +34,8 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
     bottomRightWheelCords = Translation2d(0.276225, -0.276225)
 
-    robotMassKG = 0 # change later
-    robotMOI = 0 # change later
+    robotMassKG = 0  # change later
+    robotMOI = 0  # change later
     moduleConfig = ModuleConfig(
         wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
     )
@@ -72,7 +76,7 @@ class FollowTrajectory(AutoStages):
     def __init__(self, trajectoryName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(trajectoryName, isFlipped)
         self.desiredState = DesiredState
-        self.isDone = False
+        self.done = False
 
     def autoInit(self):
         self.startTime = wpilib.getTime()
@@ -107,5 +111,5 @@ class FollowTrajectory(AutoStages):
         ):
             return False
 
-        self.isDone = True
+        self.done = True
         return True
