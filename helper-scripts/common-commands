@@ -1,8 +1,10 @@
-All of these commands should be run while in the directory 'C:\repos\FRC-2025'
-
 winget uv install: 'winget install --exact --disable-interactivity --accept-source-agreements --accept-package-agreements --silent --id=astral-sh.uv'
 
-run once per cloned repository (git clone): 'uv tool run pre-commit'
+All of the following commands should be run while in your FRC-2026 folder/directory
+(generally in C:\repos\FRC-2026)
+
+run once per cloned repository/FRC-2026 folder (git clone): 'uv tool run pre-commit'
+(installs tool that checks for errors in code before commiting)
 
 create virtual environment: 'uv venv'
 use virtual environment: '.venv\Scripts\activate'
