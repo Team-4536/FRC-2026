@@ -5,8 +5,10 @@ from wpimath.units import radians_per_second as RPS
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import ChassisSpeeds
 from desiredState import DesiredState
+from subsystem import Subsystem
+from enum import Enum
 import math
-import wpilib
+import wpilib  
 
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
@@ -51,8 +53,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
-
-class AutoStages:
+class AutoStages(Subsystem):
     def __init__(self):
         pass
 
@@ -64,6 +65,7 @@ class AutoStages:
 
     def isDone(self):
         pass
+
 
 
 class FollowTrajectory(AutoStages):
@@ -81,9 +83,9 @@ class FollowTrajectory(AutoStages):
 
         self.targetState = self.trajectory.sample(self.currentTime)
 
-        self.desiredState.fieldSpeeds = self.targetState.fieldSpeeds
+        self.desiredState.fieldSpeeds = self.targetState
 
-        return self.desiredState
+        
 
     def isDone(self):
         currXPos = 0  # update with odemetry later

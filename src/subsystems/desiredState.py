@@ -20,3 +20,4 @@ class DesiredState(NetworkTablesMixin):
         self.publishDouble("vx", vx, "FieldSpeeds")
         self.publishDouble("vy", vy, "FieldSpeeds")
         self.publishDouble("omega", omega, "FieldSpeeds")
+ 
