@@ -37,7 +37,7 @@ class Shooter(Subsystem):
 
     def _calculateVelocity(self) -> float:
         self.velocityMps = math.sqrt(
-            (9.8 * 0.9652**2)
+            (9.81 * self.turretAngle**2)
             / (
                 2
                 * math.cos(self.turretAngle)
