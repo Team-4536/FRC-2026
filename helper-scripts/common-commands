@@ -1,0 +1,15 @@
+All of these commands should be run while in the directory 'C:\repos\FRC-2025\src'
+
+winget uv install: 'winget install --exact --disable-interactivity --accept-source-agreements --accept-package-agreements --silent --id=astral-sh.uv'
+
+run once per cloned repository (git clone): 'uv tool run pre-commit'
+
+Change to the 'src' directory (i.e, Repos/FRC-2025/src): 'cd src'
+
+create virtual environment: 'uv venv'
+use virtual environment: '.venv\Scripts\activate'
+
+sync packages: 'uv run robotpy --main src sync'
+run simulation: 'uv run robotpy --main src sim'
+deploy code: 'uv run robotpy --main src deploy'
+undeploy code: 'uv run robotpy --main src undeploy'
