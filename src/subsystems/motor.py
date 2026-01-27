@@ -6,6 +6,9 @@ from rev import (
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
+    FeedbackSensor,
+    ResetMode,
+    PersistMode,
 )
 from math import pi as PI
 from wpimath.units import radians
@@ -19,8 +22,8 @@ class RevMotor:
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
             config=config,
-            resetMode=SparkMax.ResetMode.kResetSafeParameters,
-            persistMode=SparkMax.PersistMode.kPersistParameters,
+            resetMode=ResetMode.kResetSafeParameters,
+            persistMode=PersistMode.kPersistParameters,
         )
 
     def stopMotor(self) -> None:
@@ -53,7 +56,7 @@ class RevMotor:
         .apply(
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00002)
-            .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .apply(
                 MAXMotionConfig()
@@ -72,7 +75,7 @@ class RevMotor:
         .apply(
             ClosedLoopConfig()
             .pidf(0.15, 0, 0, 0)
-            .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             # .positionWrappingEnabled(True)
             # .positionWrappingMinInput(-AZIMUTH_GEARING / 2)

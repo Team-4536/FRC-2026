@@ -138,7 +138,7 @@ class SwerveDrive(Subsystem):
             backRightDriveID=6,
             frontLeftAzimuthID=1,
             frontRightAzimuthID=7,
-            backLeftAzimuthID=3,
+            backLeftAzimuthID=100, #change to 3
             backRightAzimuthID=5,
             frontLeftEncoderID=21,
             frontRightEncoderID=24,
