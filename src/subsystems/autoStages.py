@@ -2,7 +2,7 @@ from pathplannerlib.path import PathPlannerPath, PathPlannerTrajectory
 from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
-from wpimath.geometry import Translation2d
+from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from desiredState import DesiredState
 from subsystem import Subsystem
@@ -53,7 +53,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     if isFlipped:
         path.flipPath
 
-    startingRotation = path.getStartingHolonomicPose().getRotation()
+    startingPose = path.getStartingHolonomicPose()
+    if startingPose:
+        startingRotation = startingPose.rotation()
+    startingRotation = Rotation2d()
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
@@ -67,8 +70,8 @@ class AutoStages(Subsystem):
     def run(self):
         pass
 
-    def isDone(self):
-        pass
+    def isDone(self) -> bool:
+        return False
 
 
 
@@ -87,17 +90,17 @@ class FollowTrajectory(AutoStages):
 
         self.targetState = self.trajectory.sample(self.currentTime)
 
-        self.desiredState.fieldSpeeds = self.targetState
+        self.desiredState.fieldSpeeds = self.targetState.fieldSpeeds
 
         
 
-    def isDone(self):
+    def isDone(self) -> bool:
         currXPos = 0  # update with odemetry later
         currYPos = 0  # update with odemetry later
         currRotation = 0  # update with odemetry later
-        endXPos = self.trajectory.getEndState.pose
-        endYPos = self.trajectory.getEndState.pose
-        endRotation = self.trajectory.getEndState.pose
+        endXPos = self.trajectory.getEndState().pose.x
+        endYPos = self.trajectory.getEndState().pose.y
+        endRotation = self.trajectory.getEndState().pose.rotation().radians()
         posError = 0.3  # change later
         rotationError = 0.3  # change later
 
