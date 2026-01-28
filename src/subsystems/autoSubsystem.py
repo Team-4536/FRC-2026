@@ -1,12 +1,14 @@
 from enum import Enum
+from subsystems.subsystem import Subsystem
 import wpilib
 
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
 
-class AutoSubsystem:
-    def __init___(self):
+class AutoSubsystem(Subsystem):
+    def __init__(self):
 
+        super().__init__()
         AUTO_SIDE_RED = "red"
         AUTO_SIDE_BLUE = "blue"
 

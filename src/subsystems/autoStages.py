@@ -5,15 +5,8 @@ from wpimath.units import radians_per_second as RPS
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from subsystems.robotState import RobotState
-from subsystems.subsystem import Subsystem
-from enum import Enum
 import math
 import wpilib  
-
-
-class RobotAutos(Enum):
-    DO_NOTHING = "Do Nothing"
-
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
@@ -60,7 +53,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
-class AutoStages(Subsystem):
+class AutoStages():
     def __init__(self):
         pass
 
