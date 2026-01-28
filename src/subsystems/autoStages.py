@@ -4,8 +4,8 @@ from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
-from desiredState import DesiredState
-from subsystem import Subsystem
+from subsystems.robotState import RobotState
+from subsystems.subsystem import Subsystem
 from enum import Enum
 import math
 import wpilib  
@@ -78,7 +78,7 @@ class AutoStages(Subsystem):
 class FollowTrajectory(AutoStages):
     def __init__(self, trajectoryName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(trajectoryName, isFlipped)
-        self.desiredState = DesiredState
+        self.robotState = RobotState
         self.done = False
 
     def autoInit(self):
@@ -90,7 +90,7 @@ class FollowTrajectory(AutoStages):
 
         self.targetState = self.trajectory.sample(self.currentTime)
 
-        self.desiredState.fieldSpeeds = self.targetState.fieldSpeeds
+        self.robotState.fieldSpeeds = self.targetState.fieldSpeeds
 
         
 

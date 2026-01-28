@@ -3,14 +3,12 @@ from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
-from subsystems.autoSubsystem import Autos
 from wpilib import TimedRobot
 import wpilib
 
 
 class Robot(TimedRobot):
     def robotInit(self) -> None:
-        self.autos = Autos()
         self.subsystems: SubsystemManager = SubsystemManager(
             inputs=Inputs(),
             ledSignals=LEDSignals(deviceID=0),
