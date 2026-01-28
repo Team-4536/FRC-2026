@@ -1,6 +1,6 @@
 from dataclasses import dataclass, fields
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Pose3d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 
@@ -12,6 +12,7 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     pose: Pose2d
+    camPos: Pose3d
 
     def __post_init__(self) -> None:
         super().__init__()

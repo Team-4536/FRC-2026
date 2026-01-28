@@ -5,6 +5,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
+from subsystems.cameras import CameraManager
 
 robotState: RobotState = None  # type: ignore
 
@@ -14,6 +15,7 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    cameras: CameraManager
 
     def init(self) -> None:
         for s in self.dependantSubsytems:
@@ -55,6 +57,7 @@ class SubsystemManager(NamedTuple):
         return [
             self.ledSignals,
             self.swerveDrive,
+            self.cameras,
         ]
 
     @property
