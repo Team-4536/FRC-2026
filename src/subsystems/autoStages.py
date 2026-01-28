@@ -65,7 +65,7 @@ class AutoStages:
     def run(self):
         pass
 
-    def isDone(self) -> bool:
+    def isDone(self, robotState: RobotState) -> bool:
         return False
 
 
@@ -80,16 +80,16 @@ class FollowTrajectory(AutoStages):
 
     def run(self):
 
-        self.currentTime = wpilib.getTime() - self.startTime
+        self.autoTime = wpilib.getTime() - self.startTime
 
-        self.targetState = self.trajectory.sample(self.currentTime)
+        self.targetState = self.trajectory.sample(self.autoTime)
 
         self.robotState.fieldSpeeds = self.targetState.fieldSpeeds
 
-    def isDone(self) -> bool:
-        currXPos = 0  # update with odemetry later
-        currYPos = 0  # update with odemetry later
-        currRotation = 0  # update with odemetry later
+    def isDone(self, robotState: RobotState) -> bool:
+        currXPos = robotState.pose.x
+        currYPos = robotState.pose.y
+        currRotation = robotState.pose.rotation().radians()
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
