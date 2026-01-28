@@ -6,7 +6,8 @@ from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from subsystems.robotState import RobotState
 import math
-import wpilib  
+import wpilib
+
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
@@ -53,7 +54,8 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
-class AutoStages():
+
+class AutoStages:
     def __init__(self):
         pass
 
@@ -65,7 +67,6 @@ class AutoStages():
 
     def isDone(self) -> bool:
         return False
-
 
 
 class FollowTrajectory(AutoStages):
@@ -84,8 +85,6 @@ class FollowTrajectory(AutoStages):
         self.targetState = self.trajectory.sample(self.currentTime)
 
         self.robotState.fieldSpeeds = self.targetState.fieldSpeeds
-
-        
 
     def isDone(self) -> bool:
         currXPos = 0  # update with odemetry later

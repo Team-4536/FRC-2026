@@ -2,8 +2,10 @@ from enum import Enum
 from subsystems.subsystem import Subsystem
 import wpilib
 
+
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
+
 
 class AutoSubsystem(Subsystem):
     def __init__(self):
