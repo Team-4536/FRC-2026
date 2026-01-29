@@ -20,7 +20,7 @@
     <small>creates a virtual environment to prevent problems from global packages:</small>
         `uv venv`
     &#8201;
-    <small>sets the virtual environment as the defaul python profile:</small>
+    <small>sets the virtual environment as the default python profile:</small>
         `.venv\Scripts\activate`
 ## common commands after setup
 
