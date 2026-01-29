@@ -62,29 +62,31 @@ class AutoStages:
     def autoInit(self):
         pass
 
-    def run(self):
-        pass
+    def run(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def isDone(self, robotState: RobotState) -> bool:
         return False
 
 
 class FollowTrajectory(AutoStages):
-    def __init__(self, trajectoryName: str, isFlipped: bool):
-        self.trajectory = loadTrajectory(trajectoryName, isFlipped)
+    def __init__(self, pathName: str, isFlipped: bool):
+        self.trajectory = loadTrajectory(pathName, isFlipped)
         self.robotState = RobotState
         self.done = False
 
     def autoInit(self):
         self.startTime = wpilib.getTime()
 
-    def run(self):
+    def run(self, robotState: RobotState):
 
-        self.autoTime = wpilib.getTime() - self.startTime
+        self.pathTime = wpilib.getTime() - self.startTime
 
-        self.targetState = self.trajectory.sample(self.autoTime)
+        targetState = self.trajectory.sample(self.pathTime)
 
-        self.robotState.fieldSpeeds = self.targetState.fieldSpeeds
+        robotState.fieldSpeeds = targetState.fieldSpeeds
+
+        return robotState
 
     def isDone(self, robotState: RobotState) -> bool:
         currXPos = robotState.pose.x

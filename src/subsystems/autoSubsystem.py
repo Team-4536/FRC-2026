@@ -13,10 +13,8 @@ class AutoSubsystem(Subsystem):
     def __init__(self):
         super().__init__()
 
-        autoStage = AutoStages()
-
-        AUTO_SIDE_RED = "red"
         AUTO_SIDE_BLUE = "blue"
+        AUTO_SIDE_RED = "red"
 
         self.autoRoutineChooser = wpilib.SendableChooser()
         self.autoRoutineChooser.setDefaultOption(
@@ -35,19 +33,30 @@ class AutoSubsystem(Subsystem):
 
     def init(self) -> None:
         self.routine: dict[str, AutoStages] = routineChooser(
-            self.autoRoutineChooser.getSelected()
+            self.autoRoutineChooser.getSelected(),
+            self.autoSideChooser.getSelected() == "blue",
         )
 
         self.currentPath = 0
         self.routineFinished = False
         self.autoKeys = list(self.routine)
 
-        if not self.routine:
-            self.routineFinished = True
+        if self.routine:
+            self.routine[self.autoKeys[self.currentPath]].autoInit()
 
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(self, robotState: RobotState) -> RobotState:  # TODO: Finish
 
-        return robotState  # TODO: Finish
+        self.routineFinished = self.currentPath >= len(self.autoKeys)
+
+        if not self.routineFinished:
+            robotState = self.routine[self.autoKeys[self.currentPath]].run(robotState)
+            if self.routine[self.autoKeys[self.currentPath]].isDone(robotState):
+                self.currentPath += 1
+                self.routineFinished = self.currentPath >= len(self.autoKeys)
+                if not self.routineFinished:
+                    self.routine[self.autoKeys[self.currentPath]].autoInit()
+
+        return robotState
 
     def disabled(self) -> None:
         pass
@@ -56,7 +65,7 @@ class AutoSubsystem(Subsystem):
         pass
 
 
-def routineChooser(selectedRoutine: str):
+def routineChooser(selectedRoutine: str, isFlipped: bool):
     routine: dict[str, AutoStages] = dict()
 
     if selectedRoutine == AutoRoutines.DO_NOTHING:

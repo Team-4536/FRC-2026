@@ -31,7 +31,7 @@ class SubsystemManager(NamedTuple):
 
     def autonomousPeriodic(self) -> None:
         global robotState
-        robotState = self.inputs.periodic(self.robotState)  # replace with auto manager
+        robotState = self.autos.periodic(self.robotState)
         self._periodic(self.robotState)
 
     def teleopPeriodic(self) -> None:
