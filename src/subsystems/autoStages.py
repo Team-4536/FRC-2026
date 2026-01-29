@@ -98,6 +98,9 @@ class FollowTrajectory(AutoStages):
         posError = 0.3  # change later
         rotationError = 0.3  # change later
 
+        if self.pathTime > self.trajectory.getTotalTimeSeconds():
+            self.done = True
+            return True
         if max(currXPos, endXPos) - min(currXPos, endXPos) > posError:
             return False
         if max(currYPos, endYPos) - min(currYPos, endYPos) > posError:
