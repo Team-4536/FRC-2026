@@ -17,8 +17,8 @@ class Shooter(Subsystem):
         self.wheelRadius = 0.1  # radius of the wheels build decides to use
         self.turretAngle = 70  # replace with the turret subsystem's outputed variable
 
-        self.revingMotor = RevMotor(deviceID=8)
-        self.shooterMotor = RevMotor(deviceID=9)
+        self.revingMotor = 0
+        self.shooterMotor = RevMotor(deviceID=14)
         super().__init__()
 
     def init(self) -> None:
@@ -28,9 +28,12 @@ class Shooter(Subsystem):
         self.table.putNumber("revShooter", ds.revShooter)
         self.table.putNumber("shootShooter", ds.shootShooter)
 
+        RevMotor(deviceID=11).setVelocity(self.revingMotor)
+        RevMotor(deviceID=12).setVelocity(self.revingMotor)
+
         if ds.revShooter > 0.1:
-            self.revingMotor.setVelocity(self._calculateVelocity())
-        elif ds.shootShooter and self.revingMotor.getEncoder().getVelocity() == 1:
+            self.revingMotor = self._calculateVelocity()
+        elif ds.shootShooter == 1:
             self.shooterMotor.setVelocity(self._calculateVelocity())
         else:
             self.disabled()
@@ -48,7 +51,7 @@ class Shooter(Subsystem):
 
     def disabled(self) -> None:
         self.shooterMotor.setVelocity(0)
-        self.revingMotor.setVelocity(0)
+        self.revingMotor = 0
 
     def publish(self):
         pass
