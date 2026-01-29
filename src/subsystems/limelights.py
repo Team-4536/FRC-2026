@@ -1,13 +1,17 @@
 import limelight
 import limelightresults
-import time
-from desiredState import DesiredState
-from subsystem import Subsystem
+
+# import time
+from subsystems.desiredState import DesiredState
+from subsystems.subsystem import Subsystem
+
+# from networkTablesMixin import NetworkTablesMixin
 
 # import json
 # import ntcore
+
 # from ntcore import NetworkTableInstance
-from ntcore import NetworkTable
+# from ntcore import NetworkTable
 
 
 # A = 0
@@ -64,19 +68,18 @@ from ntcore import NetworkTable
 
 # class FiducialResult:
 #     def __init__(self, fiducial_data):
-#         self.fiducial_id = fiducial_data["fID"]
+#         self.fiducial_id = fiducial_data["fID"] # prob want this
 #         # self.family = fiducial_data["fam"]
 #         # self.points = fiducial_data["pts"]
 #         # self.skew = fiducial_data["skew"]
 #         # self.camera_pose_target_space = fiducial_data["t6c_ts"]
-#         # self.robot_pose_field_space = fiducial_data["t6r_fs"]
+#         # self.robot_pose_field_space = fiducial_data["t6r_fs"] # and this
 #         # self.robot_pose_target_space = fiducial_data["t6r_ts"]
 #         # self.target_area = fiducial_data["ta"]
-#         self.target_x_degrees = fiducial_data["tx"]
-#         self.target_x_pixels = fiducial_data["txp"]
-#         self.target_y_degrees = fiducial_data["ty"]
-#         self.target_y_pixels = fiducial_data["typ"]
-#         pass
+#         self.target_x_degrees = fiducial_data["tx"] # |
+#         self.target_x_pixels = fiducial_data["txp"] # These
+#         self.target_y_degrees = fiducial_data["ty"] # Too
+#         self.target_y_pixels = fiducial_data["typ"] # |
 
 #     # aprilTagX = {}
 
@@ -107,7 +110,7 @@ from ntcore import NetworkTable
 
 #             # print the current pipeline settings
 
-#             # print(ll.get_pipeline_atindex(0))  # Required
+#             # print(ll.get_pipeline_atindex(0))
 #             limelightTable = NetworkTable.getSubTable("limelight")
 #             print(self.fiducial_id)
 
@@ -164,3 +167,8 @@ llcam = llCams()
 llcam.init()
 llcam.periodic(ds)
 llcam.disabled()
+
+
+class testLimelight:
+    def testLimelight():
+        pass

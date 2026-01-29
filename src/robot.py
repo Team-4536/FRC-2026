@@ -8,6 +8,7 @@ from subsystems.limelights import llCams
 from wpilib import TimedRobot
 
 
+
 class Robot(TimedRobot):
     def init(self) -> None:
         pass
@@ -47,3 +48,6 @@ class Robot(TimedRobot):
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disable()
+
+    def testInit(self):
+        llCams()
