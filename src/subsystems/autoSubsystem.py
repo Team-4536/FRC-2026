@@ -35,7 +35,7 @@ class AutoSubsystem(Subsystem):
     def init(self) -> None:
         self.routine: dict[str, AutoStages] = routineChooser(
             self.autoRoutineChooser.getSelected(),
-            self.autoSideChooser.getSelected() == "blue",
+            self.autoSideChooser.getSelected() == "red",
         )
 
         self.currentPath = 0

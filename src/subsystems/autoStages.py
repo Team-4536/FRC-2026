@@ -2,6 +2,7 @@ from pathplannerlib.path import PathPlannerPath, PathPlannerTrajectory
 from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
+from wpimath.units import feetToMeters, lbsToKilograms
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from subsystems.robotState import RobotState
@@ -28,8 +29,8 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
     bottomRightWheelCords = Translation2d(0.276225, -0.276225)
 
-    robotMassKG = 0  # change later
-    robotMOI = 0  # change later
+    robotMassKG = lbsToKilograms(100)  # change later
+    robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # change later
     moduleConfig = ModuleConfig(
         wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
     )
@@ -80,13 +81,15 @@ class FollowTrajectory(AutoStages):
 
     def run(self, robotState: RobotState):
 
+        self.robotState = robotState
+
         self.pathTime = wpilib.getTime() - self.startTime
 
         targetState = self.trajectory.sample(self.pathTime)
 
-        robotState.fieldSpeeds = targetState.fieldSpeeds
+        self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
-        return robotState
+        return self.robotState
 
     def isDone(self, robotState: RobotState) -> bool:
         currXPos = robotState.pose.x

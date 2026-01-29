@@ -21,6 +21,7 @@ class SubsystemManager(NamedTuple):
         for s in self.dependantSubsytems:
             s.init()
         self.inputs.init()
+        self.autos.init()
 
     def robotInit(self) -> None:
         self.time.init()
@@ -57,7 +58,6 @@ class SubsystemManager(NamedTuple):
         return [
             self.ledSignals,
             self.swerveDrive,
-            self.autos,
         ]
 
     @property
