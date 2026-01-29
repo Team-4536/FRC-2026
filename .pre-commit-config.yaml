@@ -1,15 +1,15 @@
 exclude: '^$'
 
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
-  hooks:
-  - id: trailing-whitespace
-- repo: https://github.com/psf/black
-  rev: 25.1.0
-  hooks:
-  - id: black
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.15.0
-  hooks:
-  - id: mypy
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v5.0.0
+      hooks:
+          - id: trailing-whitespace
+    - repo: https://github.com/psf/black
+      rev: 25.1.0
+      hooks:
+          - id: black
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.15.0
+      hooks:
+          - id: mypy

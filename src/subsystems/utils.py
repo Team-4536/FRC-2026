@@ -1,5 +1,5 @@
 from math import atan2, copysign, cos, hypot, sin
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
@@ -23,12 +23,16 @@ class TimeData(Subsystem):
         self.prevTime = time
         self.initTime = time
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, robotState: RobotState) -> RobotState:
         time = getTime()
 
         self.dt = time - self.prevTime
         self.timeSinceInit = time - self.initTime
         self.prevTime = time
+
+        self.publish()
+
+        return robotState
 
     def disabled(self) -> None:
         time = getTime()
@@ -44,7 +48,9 @@ class TimeData(Subsystem):
 
 
 class Scalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+    def __init__(
+        self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
+    ) -> None:
         self.deadzone = deadzone
         self._exponent = exponent
         self._magnitude = magnitude
@@ -96,7 +102,9 @@ class Scalar:
 
 
 class CircularScalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+    def __init__(
+        self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
+    ) -> None:
         self.linearScalar = Scalar(deadzone, exponent, magnitude)
 
     def scale(self, *, x: float, y: float) -> Tuple[float, float]:
