@@ -57,6 +57,7 @@ class SubsystemManager(NamedTuple):
         return [
             self.ledSignals,
             self.swerveDrive,
+            self.autos,
         ]
 
     @property

@@ -7,6 +7,7 @@ import wpilib
 
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
+    DRIVE_FORWARD_TEST = "Drive Forward Test"
 
 
 class AutoSubsystem(Subsystem):
