@@ -12,6 +12,13 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     pose: Pose2d
+    turretSpeed: float
+    turretSetPoint: int
+    motorDesiredState: float
+    yaw: float
+
+    limitA: bool
+    limitB: bool
 
     def __post_init__(self) -> None:
         super().__init__()
