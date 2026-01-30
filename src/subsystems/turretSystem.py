@@ -168,3 +168,52 @@ class TurretOdometry:
         wrappedRoboYaw = (yaw % TAU) * np.sign(yaw)
 
         return self.wrappedFRR - wrappedRoboYaw
+
+
+class Shooter(Subsystem):
+
+    def __init__(self):
+        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+
+        self.hubDistance = 2  # hypotenuse of odometry and the Hub position
+        self.wheelRadius = 0.1  # radius of the wheels build decides to use
+        self.turretAngle = 70  # replace with the turret subsystem's outputed variable
+
+        self.revingMotor = 0
+        self.shooterMotor = RevMotor(deviceID=14)
+        super().__init__()
+
+    def init(self) -> None:
+        pass
+
+    def periodic(self, rs: RobotState) -> None:
+        self.table.putNumber("revShooter", rs.revShooter)
+        self.table.putNumber("shootShooter", rs.shootShooter)
+
+        RevMotor(deviceID=11).setVelocity(self.revingMotor)
+        RevMotor(deviceID=12).setVelocity(self.revingMotor)
+
+        if rs.revShooter > 0.1:
+            self.revingMotor = self._calculateVelocity()
+        elif rs.shootShooter == 1:
+            self.shooterMotor.setVelocity(self._calculateVelocity())
+        else:
+            self.disabled()
+
+    def _calculateVelocity(self) -> float:
+        self.velocityMps = math.sqrt(
+            (9.81 * self.turretAngle**2)
+            / (
+                2
+                * math.cos(self.turretAngle)
+                * (self.hubDistance * math.tan(self.turretAngle) - 0.9652)
+            )
+        )
+        return self.velocityMps / self.wheelRadius
+
+    def disabled(self) -> None:
+        self.shooterMotor.setVelocity(0)
+        self.revingMotor = 0
+
+    def publish(self):
+        pass

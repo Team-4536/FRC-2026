@@ -36,6 +36,11 @@ class Inputs(Subsystem):
             magnitude=self.robotState.abtainableMaxSpeed
         )
 
+        self.revShooter: float = 0
+        self.shootShooter: float = 0
+
+        self.revShooter = False
+
     def init(
         self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
     ) -> None:
@@ -58,6 +63,8 @@ class Inputs(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self.robotState.fieldSpeeds = self._calculateDrive()
+        self.robotState.revShooter = self._mechCtrl.getRightTriggerAxis()
+        self.robotState.shootShooter = self._mechCtrl.getRightBumper()
         return robotState
 
     def disabled(self) -> None:

@@ -1,4 +1,5 @@
 from subsystems.inputs import Inputs
+from subsystems.turretSystem import Turret, Shooter
 from subsystems.LEDSignals import LEDSignals
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
@@ -14,6 +15,8 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    shooter: Shooter
+    turret: Turret
 
     def init(self) -> None:
         for s in self.dependantSubsytems:
@@ -55,6 +58,8 @@ class SubsystemManager(NamedTuple):
         return [
             self.ledSignals,
             self.swerveDrive,
+            self.time,
+            self.shooter,
         ]
 
     @property

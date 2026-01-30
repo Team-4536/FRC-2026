@@ -3,7 +3,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
-
+from wpimath.units import revolutions_per_minute as RPM
 from wpimath.units import metersToFeet
 
 
@@ -15,7 +15,9 @@ class RobotState(NetworkTablesMixin):
     turretSpeed: float
     turretSetPoint: int
     motorDesiredState: float
-    yaw: float
+
+    revShooter: RPM
+    shootShooter: RPM
 
     limitA: bool
     limitB: bool
