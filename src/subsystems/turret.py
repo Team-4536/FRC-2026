@@ -10,7 +10,7 @@ from rev import (
     LimitSwitchConfig,
 )
 from inputs import Inputs
-from desiredState import DesiredState
+from robotState import RobotState
 from phoenix6.hardware import CANcoder
 from wpimath.units import rotationsToRadians, degreesToRadians, rotationsToDegrees
 import math
@@ -79,19 +79,19 @@ class Turret(Subsystem):
     def init(self):
         pass
 
-    def periodic(self, ds: DesiredState):
+    def periodic(self, rs: RobotState):
 
         if not self.homeSet:
-            self.reset(ds.limitA)
+            self.reset(rs.limitA)
             return
 
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
-        self.odom.updateWithEncoder(ds.yaw, self.yawEncoder)
+        self.odom.updateWithEncoder(rs.yaw, self.yawEncoder)
 
-        self.setPoint = ds.turretSetPoint
+        self.setPoint = rs.turretSetPoint
 
         self.targetPoint()  # need odom
-        self.maintainSetpoint(ds.yaw)  # these go last
+        self.maintainSetpoint(rs.yaw)  # these go last
         self.dontOverdoIt()
 
         self.motorYaw.setPosition(self.setPoint * GEARING)
