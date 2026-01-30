@@ -12,9 +12,14 @@ from rev import (
 from inputs import Inputs
 from robotState import RobotState
 from phoenix6.hardware import CANcoder
-from wpimath.units import rotationsToRadians, degreesToRadians, rotationsToDegrees
+from wpimath.units import (
+    rotationsToRadians,
+    degreesToRadians,
+    rotationsToDegrees,
+    inchesToMeters,
+)
 import math
-from math import tau as TAU
+from math import tau as TAU, pi as PI
 import numpy as np
 from wpimath.geometry import Pose3d
 from ntcore import NetworkTableInstance
@@ -34,7 +39,6 @@ class Turret(Subsystem):
         self.motorYaw = RevMotor(
             deviceID=12
         )  # get right ID, motor for turning horizontally
-        self.pitchMotor = RevMotor(deviceID=17)
 
         self.motorYaw.azimuthConfig = (
             SparkMaxConfig()
@@ -64,7 +68,6 @@ class Turret(Subsystem):
         self.motorYaw.configure(config=self.motorYaw.azimuthConfig)
 
         self.yawEncoder = self.motorYaw.getEncoder()
-        self.pitchEncoder = self.pitchMotor.getEncoder()
 
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
 
@@ -101,7 +104,6 @@ class Turret(Subsystem):
         self.pitchMotor.setVelocity(0)
 
         self.motorYaw.configure(config=self.motorYaw.azimuthDisabledConfig)
-        self.pitchMotor.configure(config=self.pitchMotor.azimuthDisabledConfig)
         # do we need these .configure lines when revmotor allready does this?
 
         self.homeSet = False
@@ -175,20 +177,23 @@ class Shooter(Subsystem):
     def __init__(self):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
-        self.hubDistance = 2  # hypotenuse of odometry and the Hub position
-        self.wheelRadius = 0.1  # radius of the wheels build decides to use
-        self.turretAngle = 70  # replace with the turret subsystem's outputed variable
+        self.hubDistance = 0  # hypotenuse of odometry and the Hub position
+        self.wheelDiam = 3  # radius of the wheels build decides to use
+        self.wheelCirc = inchesToMeters(self.wheelDiam) * PI
 
         self.revingMotor = 0
         self.shooterMotor = RevMotor(deviceID=14)
+        self.pitchMotor = RevMotor(deviceID=17)
+
+        self.pitchEncoder = self.pitchMotor.getEncoder()
+        self.turretAngle = self.pitchEncoder.getPosition()
+
         super().__init__()
 
     def init(self) -> None:
         pass
 
     def periodic(self, rs: RobotState) -> None:
-        self.table.putNumber("revShooter", rs.revShooter)
-        self.table.putNumber("shootShooter", rs.shootShooter)
 
         RevMotor(deviceID=11).setVelocity(self.revingMotor)
         RevMotor(deviceID=12).setVelocity(self.revingMotor)
@@ -201,6 +206,8 @@ class Shooter(Subsystem):
             self.disabled()
 
     def _calculateVelocity(self) -> float:
+
+        self.turretAngle = self.pitchEncoder.getPosition()
         self.velocityMps = math.sqrt(
             (9.81 * self.turretAngle**2)
             / (
@@ -209,11 +216,13 @@ class Shooter(Subsystem):
                 * (self.hubDistance * math.tan(self.turretAngle) - 0.9652)
             )
         )
-        return self.velocityMps / self.wheelRadius
+        return self.velocityMps / self.wheelCirc * 60
 
     def disabled(self) -> None:
         self.shooterMotor.setVelocity(0)
         self.revingMotor = 0
+        self.pitchMotor.configure(config=self.pitchMotor.azimuthDisabledConfig)
 
     def publish(self):
-        pass
+        self.table.putNumber("revShooter", rs.revShooter)
+        self.table.putNumber("shootShooter", rs.shootShooter)
