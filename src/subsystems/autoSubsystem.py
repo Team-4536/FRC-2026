@@ -19,11 +19,11 @@ class AutoSubsystem(Subsystem):
 
         self.autoRoutineChooser = wpilib.SendableChooser()
         self.autoRoutineChooser.setDefaultOption(
-            AutoRoutines.DO_NOTHING.value,
-            AutoRoutines.DO_NOTHING.value,
+            AutoRoutines.DRIVE_FORWARD_TEST.value,
+            AutoRoutines.DRIVE_FORWARD_TEST,
         )
         for option in AutoRoutines:
-            self.autoRoutineChooser.addOption(option.value, option.value)
+            self.autoRoutineChooser.addOption(option.value, option)
 
         wpilib.SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
 
@@ -41,6 +41,8 @@ class AutoSubsystem(Subsystem):
         self.currentPath = 0
         self.routineFinished = False
         self.routineKeys = list(self.routine)
+
+        wpilib.SmartDashboard.putStringArray("routineKeys", self.routineKeys)
 
         if self.routine:
             self.routine[self.routineKeys[self.currentPath]].autoInit()
@@ -70,6 +72,8 @@ class AutoSubsystem(Subsystem):
 
 def routineChooser(selectedRoutine: str, isFlipped: bool):
     routine: dict[str, AutoStages] = dict()
+
+    wpilib.SmartDashboard.putString("routine", selectedRoutine)
 
     if selectedRoutine == AutoRoutines.DO_NOTHING:
         pass
