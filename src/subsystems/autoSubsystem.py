@@ -1,7 +1,7 @@
 from enum import Enum
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from subsystems.autoStages import AutoStages
+from subsystems.autoStages import AutoStages, FollowTrajectory
 import wpilib
 
 
@@ -40,22 +40,24 @@ class AutoSubsystem(Subsystem):
 
         self.currentPath = 0
         self.routineFinished = False
-        self.autoKeys = list(self.routine)
+        self.routineKeys = list(self.routine)
 
         if self.routine:
-            self.routine[self.autoKeys[self.currentPath]].autoInit()
+            self.routine[self.routineKeys[self.currentPath]].autoInit()
 
     def periodic(self, robotState: RobotState) -> RobotState:  # TODO: Finish
 
-        self.routineFinished = self.currentPath >= len(self.autoKeys)
+        self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
-            robotState = self.routine[self.autoKeys[self.currentPath]].run(robotState)
-            if self.routine[self.autoKeys[self.currentPath]].isDone(robotState):
+            robotState = self.routine[self.routineKeys[self.currentPath]].run(
+                robotState
+            )
+            if self.routine[self.routineKeys[self.currentPath]].isDone(robotState):
                 self.currentPath += 1
-                self.routineFinished = self.currentPath >= len(self.autoKeys)
+                self.routineFinished = self.currentPath >= len(self.routineKeys)
                 if not self.routineFinished:
-                    self.routine[self.autoKeys[self.currentPath]].autoInit()
+                    self.routine[self.routineKeys[self.currentPath]].autoInit()
 
         return robotState
 
@@ -71,5 +73,9 @@ def routineChooser(selectedRoutine: str, isFlipped: bool):
 
     if selectedRoutine == AutoRoutines.DO_NOTHING:
         pass
+    elif selectedRoutine == AutoRoutines.DRIVE_FORWARD_TEST:
+        routine["Drive Forward Test"] = FollowTrajectory(
+            "Drive Forward Test", isFlipped
+        )
 
     return routine
