@@ -5,6 +5,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
+from subsystems.servo import TestingServo
 
 robotState: RobotState = None  # type: ignore
 
@@ -14,6 +15,7 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    testServo : TestingServo
 
     def init(self) -> None:
         for s in self.dependantSubsytems:

@@ -4,6 +4,7 @@ from subsystems.LEDSignals import LEDSignals
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from wpilib import TimedRobot
+from subsystems.servo import TestingServo
 
 
 class Robot(TimedRobot):
@@ -13,6 +14,7 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
+            testServo=TestingServo(),
         )
         self.subsystems.robotInit()
 
