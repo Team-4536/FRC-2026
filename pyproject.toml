@@ -9,7 +9,7 @@ dependencies = [
     "robotpy-rev",
     "phoenix6",
     "photonlibpy",
-    "mypy"
+    "mypy",
     "ntcore",
     "limelightlib-python",
 

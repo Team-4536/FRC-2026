@@ -2,7 +2,7 @@ import limelight
 import limelightresults
 
 # import time
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 
 # from networkTablesMixin import NetworkTablesMixin
@@ -81,9 +81,6 @@ from subsystems.subsystem import Subsystem
 #         self.target_y_degrees = fiducial_data["ty"] # Too
 #         self.target_y_pixels = fiducial_data["typ"] # |
 
-#     # aprilTagX = {}
-
-#     # aprilTagY = {}
 #     def init(self) -> None:
 #         discovered_limelights = limelight.discover_limelights(debug=True)
 #         print("discovered limelights:", discovered_limelights)
@@ -93,22 +90,13 @@ from subsystems.subsystem import Subsystem
 #             self.ll = limelight.Limelight(limelight_address)
 #             self.results = self.ll.get_results()
 #             status = self.ll.get_status()
-#             print("-----")
 #             print("targeting results:", results)
-#             print("-----")
 #             print("status:", status)
-#             print("-----")
-#             print("temp:", ll.get_temp())
-#             print("-----")
 #             print("name:", ll.get_name())
-#             print("-----")
 #             print("fps:", ll.get_fps())
-#             print("-----")
 #             print("hwreport:", ll.hw_report())
 
 #             ll.enable_websocket()
-
-#             # print the current pipeline settings
 
 #             # print(ll.get_pipeline_atindex(0))
 #             limelightTable = NetworkTable.getSubTable("limelight")
@@ -116,19 +104,8 @@ from subsystems.subsystem import Subsystem
 
 #             # print(limelightTable)
 
-#     def periodic(self) -> None:
-#         print("Hello World")
 #         print(self.target_x_degrees)
 #         print(self.target_x_pixels)
-
-#     # self.ll.
-
-#     def disable(self) -> None:
-#         ll.disable_websocket()
-#         pass
-
-#     def publish(self) -> None:
-#         pass
 
 
 class llCams(Subsystem):
@@ -147,28 +124,18 @@ class llCams(Subsystem):
         print("discovered limelights:", self.discovered_limelights)
         self.ll.enable_websocket()
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, robotState: RobotState) -> RobotState:
         if self.discovered_limelights and self.ll:
             result = self.ll.get_latest_results()
             parsed_result = limelightresults.parse_results(result)
             for tag in parsed_result.fiducialResults:
                 print(tag.robot_pose_field_space, tag.fiducial_id)
 
+        return robotState
+
     def disabled(self) -> None:
         if self.ll:
             self.ll.disable_websocket()
 
     def publish(self) -> None:
-        pass
-
-
-ds: DesiredState = DesiredState(0, 0)
-llcam = llCams()
-llcam.init()
-llcam.periodic(ds)
-llcam.disabled()
-
-
-class testLimelight:
-    def testLimelight():
         pass

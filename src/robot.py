@@ -42,5 +42,5 @@ class Robot(TimedRobot):
     def disabledPeriodic(self) -> None:
         self.subsystems.disabled()
 
-    def testInit(self):
+    def testInit(self) -> None:
         llCams()
