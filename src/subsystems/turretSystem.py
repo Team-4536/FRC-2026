@@ -17,6 +17,9 @@ from wpimath.units import (
     degreesToRadians,
     rotationsToDegrees,
     inchesToMeters,
+    radians,
+    meters,
+    inches,
 )
 import math
 from math import tau as TAU, pi as PI
@@ -40,15 +43,15 @@ class Turret(Subsystem):
             deviceID=12
         )  # get right ID, motor for turning horizontally
 
-        self.motorYaw.azimuthConfig = (
+        self.motorYaw.AZIMUTH_CONFIG = (
             SparkMaxConfig()
             .smartCurrentLimit(40)
             .inverted(True)
             .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
             .apply(
                 LimitSwitchConfig()
-                .reverseLimitSwitchEnabled()
-                .forwardLimitSwitchEnabled()
+                .reverseLimitSwitchEnabled(True)
+                .forwardLimitSwitchEnabled(True)
             )
             .apply(
                 ClosedLoopConfig()
@@ -65,9 +68,13 @@ class Turret(Subsystem):
             )
         )
 
-        self.motorYaw.configure(config=self.motorYaw.azimuthConfig)
+        self.pitchMotor = RevMotor(deviceID=17)
+
+        self.motorYaw.configure(config=self.motorYaw.AZIMUTH_CONFIG)
+        self.pitchMotor.configure(config=self.pitchMotor.AZIMUTH_CONFIG)
 
         self.yawEncoder = self.motorYaw.getEncoder()
+        self.pitchEncoder = self.pitchMotor.getEncoder()
 
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
 
@@ -79,6 +86,15 @@ class Turret(Subsystem):
 
         self.table = NetworkTableInstance.getDefault().getTable("telementry")
 
+        self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
+
+        ballRadius: inches = 5.91 / 2
+        yPassDiff: meters = inchesToMeters(15 + ballRadius)
+        self.goalHeightFromTurret: meters = 1  # not entirly correct
+        self.yPass: meters = self.goalHeightFromTurret + yPassDiff
+        hubRadius: inches = 24.5 / 2
+        self.xPassDiff: meters = inchesToMeters(hubRadius)
+
     def init(self):
         pass
 
@@ -88,22 +104,23 @@ class Turret(Subsystem):
             self.reset(rs.limitA)
             return
 
+        rs.optimalTurretAngle = self.calculateAngle(rs.hubDistance)
+        robotYaw = rs.pose.rotation().radians()
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
-        self.odom.updateWithEncoder(rs.yaw, self.yawEncoder)
+        self.odom.updateWithEncoder(robotYaw, self.yawEncoder)
 
         self.setPoint = rs.turretSetPoint
 
         self.targetPoint()  # need odom
-        self.maintainSetpoint(rs.yaw)  # these go last
+        self.maintainSetpoint(robotYaw)  # these go last
         self.dontOverdoIt()
 
         self.motorYaw.setPosition(self.setPoint * GEARING)
 
     def disabled(self):
         self.motorYaw.setVelocity(0)
-        self.pitchMotor.setVelocity(0)
 
-        self.motorYaw.configure(config=self.motorYaw.azimuthDisabledConfig)
+        self.motorYaw.configure(config=self.motorYaw.DISABLED_AZIMUTH_CONFIG)
         # do we need these .configure lines when revmotor allready does this?
 
         self.homeSet = False
@@ -150,6 +167,15 @@ class Turret(Subsystem):
                 self.yawEncoder.setPosition(0)
                 self.homeSet = True
 
+    def calculateAngle(self, d: meters) -> radians:
+        xPass = d - self.xPassDiff
+        h = self.goalHeightFromTurret
+
+        numerator = self.yPass * d**2 - xPass**2 * h
+        denom = d * (xPass * d - xPass**2)
+
+        return math.atan(numerator / denom)
+
 
 class TurretOdometry:
     def __init__(self):
@@ -178,15 +204,13 @@ class Shooter(Subsystem):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
         self.hubDistance = 0  # hypotenuse of odometry and the Hub position
-        self.wheelDiam = 3  # radius of the wheels build decides to use
-        self.wheelCirc = inchesToMeters(self.wheelDiam) * PI
+        self.wheelDiam: inches = 3  # radius of the wheels build decides to use
+        self.wheelCirc: meters = inchesToMeters(self.wheelDiam) * PI
 
         self.revingMotor = 0
         self.shooterMotor = RevMotor(deviceID=14)
-        self.pitchMotor = RevMotor(deviceID=17)
 
-        self.pitchEncoder = self.pitchMotor.getEncoder()
-        self.turretAngle = self.pitchEncoder.getPosition()
+        self.gravity: float = 9.81
 
         super().__init__()
 
@@ -199,21 +223,22 @@ class Shooter(Subsystem):
         RevMotor(deviceID=12).setVelocity(self.revingMotor)
 
         if rs.revShooter > 0.1:
-            self.revingMotor = self._calculateVelocity()
+            self.revingMotor = self._calculateVelocity(
+                rs.optimalTurretAngle, rs.hubDistance
+            )
         elif rs.shootShooter == 1:
             self.shooterMotor.setVelocity(self._calculateVelocity())
         else:
             self.disabled()
 
-    def _calculateVelocity(self) -> float:
+    def _calculateVelocity(self, turretAngle, hubDistance) -> float:
 
-        self.turretAngle = self.pitchEncoder.getPosition()
         self.velocityMps = math.sqrt(
-            (9.81 * self.turretAngle**2)
+            (self.gravity * turretAngle**2)
             / (
                 2
-                * math.cos(self.turretAngle)
-                * (self.hubDistance * math.tan(self.turretAngle) - 0.9652)
+                * math.cos(turretAngle)
+                * (hubDistance * math.tan(turretAngle) - 0.9652)
             )
         )
         return self.velocityMps / self.wheelCirc * 60
@@ -221,7 +246,8 @@ class Shooter(Subsystem):
     def disabled(self) -> None:
         self.shooterMotor.setVelocity(0)
         self.revingMotor = 0
-        self.pitchMotor.configure(config=self.pitchMotor.azimuthDisabledConfig)
+        self.pitchMotor.setVelocity(0)
+        self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
 
     def publish(self):
         self.table.putNumber("revShooter", rs.revShooter)
