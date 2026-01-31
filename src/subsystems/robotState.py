@@ -10,6 +10,7 @@ class RobotState(NetworkTablesMixin):
     abtainableMaxSpeed: MPS
     AButton: bool
     BButton: bool
+    YButton: bool
 
     def __post_init__(self) -> None:
         super().__init__()

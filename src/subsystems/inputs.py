@@ -31,6 +31,7 @@ class Inputs(Subsystem):
             abtainableMaxSpeed=maxVelocity * 0.2,
             AButton=False,
             BButton=False,
+            YButton=False,
         )  # ===== LOWER MAX SPEED FOR TESTING =====
 
     def init(
@@ -47,6 +48,7 @@ class Inputs(Subsystem):
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.AButton = self._mechCtrl.getAButton()
         self.robotState.BButton = self._mechCtrl.getBButton()
+        self.robotState.YButton = self._mechCtrl.getYButton()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()

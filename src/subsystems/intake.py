@@ -31,6 +31,15 @@ class Intake(Subsystem):
         else:
             self.intakeVelocityTwo = 0
 
+            if rs.YButton:
+                self.intakeMotorOne = 1
+                self.intakeMotorTwo = 1
+            else:
+                self.intakeMotorOne = 0
+                self.intakeMotorTwo = 0
+                
+
+
         self.intakeMotorOne.setVelocity(self.intakeVelocityOne)
         self.intakeMotorTwo.setVelocity(self.intakeVelocityTwo)
 
