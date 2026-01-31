@@ -1,5 +1,5 @@
-from motor import RevMotor
-from subsystem import Subsystem
+from subsystems.motor import RevMotor
+from subsystems.subsystem import Subsystem
 from rev import (
     SparkRelativeEncoder,
     SparkBaseConfig,
@@ -8,15 +8,17 @@ from rev import (
     MAXMotionConfig,
     ClosedLoopSlot,
     LimitSwitchConfig,
+    FeedbackSensor,
 )
-from inputs import Inputs
-from robotState import RobotState
+from subsystems.inputs import Inputs
+from subsystems.robotState import RobotState
 from phoenix6.hardware import CANcoder
 from wpimath.units import (
     rotationsToRadians,
     degreesToRadians,
     rotationsToDegrees,
     inchesToMeters,
+    revolutions_per_minute as RPM,
 )
 import math
 from math import tau as TAU, pi as PI
@@ -37,7 +39,7 @@ class Turret(Subsystem):
 
     def __init__(self):
         self.motorYaw = RevMotor(
-            deviceID=12
+            deviceID=13
         )  # get right ID, motor for turning horizontally
 
         self.motorYaw.azimuthConfig = (
@@ -47,13 +49,13 @@ class Turret(Subsystem):
             .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
             .apply(
                 LimitSwitchConfig()
-                .reverseLimitSwitchEnabled()
-                .forwardLimitSwitchEnabled()
+                .forwardLimitSwitchEnabled(True)
+                .reverseLimitSwitchEnabled(True)
             )
             .apply(
                 ClosedLoopConfig()
                 .pidf(0.15, 0, 0, 0)
-                .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+                .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
                 .positionWrappingEnabled(False)
                 .apply(
@@ -176,14 +178,21 @@ class Shooter(Subsystem):
 
     def __init__(self):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.grav = 9.80665
 
         self.hubDistance = 0  # hypotenuse of odometry and the Hub position
         self.wheelDiam = 3  # radius of the wheels build decides to use
         self.wheelCirc = inchesToMeters(self.wheelDiam) * PI
 
-        self.revingMotor = 0
-        self.shooterMotor = RevMotor(deviceID=14)
+        self.kickMotor = RevMotor(deviceID=14)
         self.pitchMotor = RevMotor(deviceID=17)
+        self.kickMotorEncoder = self.kickMotor.getEncoder()
+
+        self.revingSpeed: RPM = 0
+        self.shooterSpeed: RPM = self.kickMotorEncoder.getPosition()
+
+        self.revingMotorTop = RevMotor(deviceID=11)
+        self.revingMotorBottom = RevMotor(deviceID=12)
 
         self.pitchEncoder = self.pitchMotor.getEncoder()
         self.turretAngle = self.pitchEncoder.getPosition()
@@ -195,13 +204,13 @@ class Shooter(Subsystem):
 
     def periodic(self, rs: RobotState) -> None:
 
-        RevMotor(deviceID=11).setVelocity(self.revingMotor)
-        RevMotor(deviceID=12).setVelocity(self.revingMotor)
+        self.revingMotorTop.setVelocity(self.revingSpeed)
+        self.revingMotorBottom.setVelocity(self.revingSpeed)
 
         if rs.revShooter > 0.1:
-            self.revingMotor = self._calculateVelocity()
+            self.revingSpeed = self._calculateVelocity()
         elif rs.shootShooter == 1:
-            self.shooterMotor.setVelocity(self._calculateVelocity())
+            self.kickMotor.setVelocity(self._calculateVelocity())
         else:
             self.disabled()
 
@@ -209,7 +218,7 @@ class Shooter(Subsystem):
 
         self.turretAngle = self.pitchEncoder.getPosition()
         self.velocityMps = math.sqrt(
-            (9.81 * self.turretAngle**2)
+            (self.grav * self.turretAngle**2)
             / (
                 2
                 * math.cos(self.turretAngle)
@@ -219,10 +228,10 @@ class Shooter(Subsystem):
         return self.velocityMps / self.wheelCirc * 60
 
     def disabled(self) -> None:
-        self.shooterMotor.setVelocity(0)
-        self.revingMotor = 0
+        self.kickMotor.setVelocity(0)
+        self.revingSpeed = 0
         self.pitchMotor.configure(config=self.pitchMotor.azimuthDisabledConfig)
 
     def publish(self):
-        self.table.putNumber("revShooter", rs.revShooter)
-        self.table.putNumber("shootShooter", rs.shootShooter)
+        self.table.putNumber("revShooter", self.revingSpeed)
+        self.table.putNumber("shootShooter", self.shooterSpeed)
