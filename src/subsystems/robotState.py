@@ -4,7 +4,7 @@ from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import revolutions_per_minute as RPM
-from wpimath.units import metersToFeet
+from wpimath.units import metersToFeet, radians, meters
 
 
 @dataclass
@@ -12,12 +12,13 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     pose: Pose2d
-    turretSpeed: float
-    turretSetPoint: int
     motorDesiredState: float
 
+    turretSetPoint: Pose2d
     revShooter: RPM
     shootShooter: RPM
+    optimalTurretAngle: radians
+    hubDistance: meters
 
     limitA: bool
     limitB: bool
