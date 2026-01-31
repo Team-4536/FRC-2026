@@ -3,7 +3,7 @@ from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
 from wpimath.units import feetToMeters, lbsToKilograms
-from wpimath.geometry import Translation2d, Rotation2d
+from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.kinematics import ChassisSpeeds
 from subsystems.robotState import RobotState
 import math
@@ -66,7 +66,7 @@ class AutoStages:
     def run(self, robotState: RobotState) -> RobotState:
         return robotState
 
-    def isDone(self, robotState: RobotState) -> bool:
+    def isDone(self) -> bool:
         return False
 
 
@@ -89,12 +89,17 @@ class FollowTrajectory(AutoStages):
 
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
+        print(str(targetState.fieldSpeeds) + "***********************")
+
         return self.robotState
 
-    def isDone(self, robotState: RobotState) -> bool:
-        currXPos = robotState.pose.x
-        currYPos = robotState.pose.y
-        currRotation = robotState.pose.rotation().radians()
+    def isDone(self) -> bool:
+        if self.robotState.pose == None:
+            self.robotState.pose = Pose2d()
+        print(self.robotState.pose, "robot pose")
+        currXPos = self.robotState.pose.x
+        currYPos = self.robotState.pose.y
+        currRotation = self.robotState.pose.rotation().radians()
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()

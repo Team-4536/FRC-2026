@@ -33,29 +33,38 @@ class AutoSubsystem(Subsystem):
         wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
     def init(self) -> None:
+        print(self.autoRoutineChooser.getSelected().value, "value to test")
         self.routine: dict[str, AutoStages] = routineChooser(
             self.autoRoutineChooser.getSelected().value,
             self.autoSideChooser.getSelected() == "red",
         )
 
+        print(self.routine, "self.routine")
+
         self.currentPath = 0
         self.routineFinished = False
-        self.routineKeys = list(self.routine)
+        self.routineKeys = list(self.routine.keys())
+
+        # print(self.routineKeys, "&^&^&^&^&^&^&^")
 
         wpilib.SmartDashboard.putStringArray("routineKeys", self.routineKeys)
 
         if self.routine:
             self.routine[self.routineKeys[self.currentPath]].autoInit()
 
+        # print(self.autoRoutineChooser.getSelected().value, ")(*&^%$#@!)")
+
     def periodic(self, robotState: RobotState) -> RobotState:  # TODO: Finish
+
+        self.robotState = robotState
 
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
-            robotState = self.routine[self.routineKeys[self.currentPath]].run(
-                robotState
+            self.robotState = self.routine[self.routineKeys[self.currentPath]].run(
+                self.robotState
             )
-            if self.routine[self.routineKeys[self.currentPath]].isDone(robotState):
+            if self.routine[self.routineKeys[self.currentPath]].isDone():
                 self.currentPath += 1
                 self.routineFinished = self.currentPath >= len(self.routineKeys)
                 if not self.routineFinished:
@@ -75,9 +84,9 @@ def routineChooser(selectedRoutine: str, isFlipped: bool):
 
     wpilib.SmartDashboard.putString("routine", selectedRoutine)
 
-    if selectedRoutine == AutoRoutines.DO_NOTHING:
+    if selectedRoutine == AutoRoutines.DO_NOTHING.value:
         pass
-    elif selectedRoutine == AutoRoutines.DRIVE_FORWARD_TEST:
+    elif selectedRoutine == AutoRoutines.DRIVE_FORWARD_TEST.value:
         routine["Drive Forward Test"] = FollowTrajectory(
             "Drive Forward Test", isFlipped
         )
