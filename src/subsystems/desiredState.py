@@ -10,6 +10,14 @@ class DesiredState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     revMotor: RPM
+    extended: bool
+    contracted: bool
+    buttonUp: bool
+    buttonDown: bool
+    buttonLeft: bool
+    buttonRight: bool
+    limitLeft: bool
+    limitRight: bool 
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -22,3 +30,4 @@ class DesiredState(NetworkTablesMixin):
         self.publishDouble("vx", vx, "FieldSpeeds")
         self.publishDouble("vy", vy, "FieldSpeeds")
         self.publishDouble("omega", omega, "FieldSpeeds")
+    

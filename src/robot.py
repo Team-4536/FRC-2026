@@ -6,6 +6,8 @@ from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from wpilib import TimedRobot
+from subsystems.climbing import Climbing
+from subsystems.turret import Turret
 
 
 class Robot(TimedRobot):
@@ -19,6 +21,9 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             subsystemExample=SubsystemExample(),
+            climbing=Climbing(),
+            Turret=Turret(),
+
         )
 
         self.init()
