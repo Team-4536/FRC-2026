@@ -205,7 +205,6 @@ class SwerveDrive(Subsystem):
             self.gyro.getRotation2d(),
             self._modules.modulePositions,
         )  # UNUSED
-        robotState.yaw = self.pose.rotation().radians()
         self.drive(
             fieldSpeeds=robotState.fieldSpeeds,
             attainableMaxSpeed=robotState.abtainableMaxSpeed,

@@ -16,7 +16,7 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             shooter=Shooter(),
-            turret=Turret(),
+            turret=Turret(13, 17),
         )
         self.subsystems.robotInit()
 

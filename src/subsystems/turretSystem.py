@@ -40,10 +40,12 @@ class Turret(Subsystem):
     # yaw is horizontal rotation
     # pitch is vertical
 
-    def __init__(self):
+    def __init__(self, yawMotorID, pitchMotorID):
         self.motorYaw = RevMotor(
-            deviceID=13
+            deviceID=yawMotorID
         )  # get right ID, motor for turning horizontally
+
+        self.pitchMotor = RevMotor(deviceID=pitchMotorID)
 
         self.motorYaw.AZIMUTH_CONFIG = (
             SparkMaxConfig()
@@ -70,8 +72,6 @@ class Turret(Subsystem):
             )
         )
 
-        self.pitchMotor = RevMotor(deviceID=17)
-
         self.motorYaw.configure(config=self.motorYaw.AZIMUTH_CONFIG)
         self.pitchMotor.configure(config=self.pitchMotor.AZIMUTH_CONFIG)
 
@@ -80,15 +80,14 @@ class Turret(Subsystem):
 
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
 
-        self.homeSet: bool = False
-
-        self.setPoint = 0  # in relation to the field
-
         self.odom = TurretOdometry()
 
         self.table = NetworkTableInstance.getDefault().getTable("telementry")
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
+
+        self.homeSet: bool = False
+        self.setPoint = 0  # in relation to the field
 
         ballRadius: inches = 5.91 / 2
         yPassDiff: meters = inchesToMeters(15 + ballRadius)
@@ -98,7 +97,8 @@ class Turret(Subsystem):
         self.xPassDiff: meters = inchesToMeters(hubRadius)
 
     def init(self):
-        pass
+        self.homeSet: bool = False
+        self.setPoint = 0  # in relation to the field
 
     def periodic(self, rs: RobotState):
 
@@ -121,8 +121,10 @@ class Turret(Subsystem):
 
     def disabled(self):
         self.motorYaw.setVelocity(0)
+        self.pitchMotor.setVelocity(0)
 
         self.motorYaw.configure(config=self.motorYaw.DISABLED_AZIMUTH_CONFIG)
+        self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
         # do we need these .configure lines when revmotor allready does this?
 
         self.homeSet = False
@@ -211,7 +213,6 @@ class Shooter(Subsystem):
         self.wheelCirc: meters = inchesToMeters(self.wheelDiam) * PI
 
         self.kickMotor = RevMotor(deviceID=14)
-        self.pitchMotor = RevMotor(deviceID=17)
         self.kickMotorEncoder = self.kickMotor.getEncoder()
 
         self.revingSpeed: RPM = 0
@@ -254,8 +255,6 @@ class Shooter(Subsystem):
     def disabled(self) -> None:
         self.kickMotor.setVelocity(0)
         self.revingSpeed = 0
-        self.pitchMotor.setVelocity(0)
-        self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
 
     def publish(self):
         self.table.putNumber("revShooter", self.revingSpeed)
