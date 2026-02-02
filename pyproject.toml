@@ -9,9 +9,14 @@ dependencies = [
     "robotpy-rev",
     "phoenix6",
     "photonlibpy",
-    "mypy"
+    "ty",
 ]
 
 
 [tool.uv]
 python-preference = "managed"
+
+
+[tool.ty.environment]
+python-version = "3.13"
+python = ".venv/bin/python3"

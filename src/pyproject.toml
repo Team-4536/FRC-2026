@@ -32,5 +32,4 @@ requires = [
     "robotpy-rev",
     "phoenix6",
     "photonlibpy",
-    "mypy"
 ]

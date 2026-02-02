@@ -14,7 +14,6 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
         )
-        self.subsystems.robotInit()
 
     def robotPeriodic(self) -> None:
         self.subsystems.robotPeriodic()
@@ -38,4 +37,7 @@ class Robot(TimedRobot):
         self.disabledPeriodic()
 
     def disabledPeriodic(self) -> None:
+        self.subsystems.disabled()
+
+    def testPeriodic(self) -> None:
         self.subsystems.disabled()

@@ -1,6 +1,6 @@
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
-from typing import Callable, Optional, Union
+from typing import Callable, Optional
 
 
 class SubsystemMethodError(Exception):
@@ -20,7 +20,11 @@ class Subsystem(NetworkTablesMixin):
     def disabled(self) -> None:
         self._warn(self.disabled)
 
-    def _warn(self, method: Callable[..., Union[None, RobotState]]) -> None:
+    def publish(self) -> None:
+        pass
+
+    def _warn(self, method: Callable[..., Optional[RobotState]]) -> None:
+        methodName = getattr(method, "__name__", "<unknown>")
         raise SubsystemMethodError(
-            f"{method.__name__} method required in {self.__class__.__name__}"  # type: ignore[unresolved-attribute]
-        )
+            f"{methodName} method required in {self.__class__.__name__}"
+        )  # how to tell typing that i know method with have a .__name__

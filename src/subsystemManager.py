@@ -20,16 +20,14 @@ class SubsystemManager(NamedTuple):
             s.init()
         self.inputs.init()
 
-    def robotInit(self) -> None:
-        self.time.init()
-
     def robotPeriodic(self) -> None:
-        self.time.periodic(self.robotState)
         self.robotState.publish()
+        for s in self:
+            s.publish()
 
     def autonomousPeriodic(self) -> None:
         global robotState
-        robotState = self.inputs.periodic(self.robotState)  # replace with auto manager
+        robotState = self.inputs.periodic(self.robotState)
         self._periodic(self.robotState)
 
     def teleopPeriodic(self) -> None:
@@ -40,7 +38,6 @@ class SubsystemManager(NamedTuple):
     def _periodic(self, robotState: RobotState) -> None:
         for s in self.dependantSubsytems:
             s.periodic(robotState)
-        self.time.periodic(robotState)
 
     def disabled(self) -> None:
         for s in self:
@@ -55,13 +52,14 @@ class SubsystemManager(NamedTuple):
         return [
             self.ledSignals,
             self.swerveDrive,
+            self.time,
         ]
 
     @property
     def robotState(self) -> RobotState:
         global robotState
 
-        if robotState == None:
+        if not robotState:
             robotState = self.inputs.robotState
 
         return robotState
