@@ -8,6 +8,7 @@ import wpilib
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
     DRIVE_FORWARD_TEST = "Drive Forward Test"
+    DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
 
 
 class AutoSubsystem(Subsystem):
@@ -82,11 +83,22 @@ def routineChooser(selectedRoutine: str, isFlipped: bool):
 
     wpilib.SmartDashboard.putString("routine", selectedRoutine)
 
-    if selectedRoutine == AutoRoutines.DO_NOTHING.value:
-        pass
-    elif selectedRoutine == AutoRoutines.DRIVE_FORWARD_TEST.value:
-        routine["Drive Forward Test"] = FollowTrajectory(
-            "Drive Forward Test", isFlipped
-        )
+    match selectedRoutine:
+        case AutoRoutines.DO_NOTHING.value:
+            pass
+        case AutoRoutines.DRIVE_FORWARD_TEST.value:
+            routine["Drive Forward Test"] = FollowTrajectory(
+                "Drive Forward Test",
+                isFlipped,
+            )
+        case AutoRoutines.DRIVE_FORWARD_BACK_TEST.value:
+            routine["Forward"] = FollowTrajectory(
+                "Forward",
+                isFlipped,
+            )
+            routine["Backward"] = FollowTrajectory(
+                "Backward",
+                isFlipped,
+            )
 
     return routine
