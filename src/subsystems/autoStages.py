@@ -46,12 +46,12 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     path = PathPlannerPath.fromPathFile(filename)
 
     if isFlipped:
-        path.flipPath
+        path = path.flipPath()
 
     startingPose = path.getStartingHolonomicPose()
+    startingRotation = Rotation2d()
     if startingPose:
         startingRotation = startingPose.rotation()
-    startingRotation = Rotation2d()
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
@@ -96,7 +96,9 @@ class FollowTrajectory(AutoStages):
     def isDone(self) -> bool:
         if self.robotState.pose == None:
             self.robotState.pose = Pose2d()
+
         print(self.robotState.pose, "robot pose")
+
         currXPos = self.robotState.pose.x
         currYPos = self.robotState.pose.y
         currRotation = self.robotState.pose.rotation().radians()
@@ -105,6 +107,9 @@ class FollowTrajectory(AutoStages):
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
         posError = 0.3  # change later
         rotationError = 0.3  # change later
+
+        print(endXPos, endYPos, endRotation, "end pos")
+        print(self.trajectory.getTotalTimeSeconds())
 
         if self.pathTime > self.trajectory.getTotalTimeSeconds():
             self.done = True
