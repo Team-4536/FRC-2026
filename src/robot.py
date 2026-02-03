@@ -11,9 +11,6 @@ from subsystems.turret import Turret
 
 
 class Robot(TimedRobot):
-    def init(self) -> None:
-        pass
-
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
             inputs=Inputs(),
@@ -26,23 +23,20 @@ class Robot(TimedRobot):
 
         )
 
-        self.init()
-
     def robotPeriodic(self) -> None:
-        self.subsystems.time.periodic(self.subsystems.desiredState)
+        self.subsystems.robotPeriodic()
 
     def autonomousInit(self) -> None:
-        self.init()
+        self.subsystems.init()
 
     def autonomousPeriodic(self) -> None:
-        pass
+        self.subsystems.autonomousPeriodic()
 
     def teleopInit(self) -> None:
-        self.init()
         self.subsystems.init()
 
     def teleopPeriodic(self) -> None:
-        self.subsystems.periodic()
+        self.subsystems.teleopPeriodic()
 
     def teleopExit(self) -> None:
         self.disabledInit()
@@ -51,4 +45,7 @@ class Robot(TimedRobot):
         self.disabledPeriodic()
 
     def disabledPeriodic(self) -> None:
-        self.subsystems.disable()
+        self.subsystems.disabled()
+
+    def testPeriodic(self) -> None:
+        self.subsystems.disabled()
