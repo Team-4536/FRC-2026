@@ -8,8 +8,9 @@ from wpimath.units import meters_per_second as MPS
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
-    AButton: bool
-    BButton: bool
+    intakeManualButton: bool
+    intakeSensorTest: bool
+    intakeEjectButton: bool
 
     def __post_init__(self) -> None:
         super().__init__()

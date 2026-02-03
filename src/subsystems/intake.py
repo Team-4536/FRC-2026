@@ -1,44 +1,52 @@
 from subsystems.subsystem import Subsystem
-from subsystems.robotState import RobotState
-from ntcore import NetworkTableInstance
 from subsystems.motor import RevMotor
+from subsystems.robotState import RobotState
 
 
 class Intake(Subsystem):
-    def __init__(self):
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-        self.intakeMotorOne = RevMotor(deviceID=10)
-        self.intakeMotorTwo = RevMotor(deviceID=9)
-        self.intakeVelocityOne = 0
-        self.intakeVelocityTwo = 0
-        # change to the actual ID v
-        # self.intakeSensor = wpilib.AnalogInput(3).getValue()
-        self.table.putNumber("intake volts 1", self.intakeVelocityOne)
-        self.table.putNumber("intake volts 2", self.intakeVelocityTwo)
-        # self.table.putNumber("intake sensor", self.intakeSensor)
+    def __init__(self, FrontMotorID, BackMotorID):
+        self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
+        self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
 
     def init(self) -> None:
-        pass
+        self.intakeVelManual = 0
+        self.intakeVelAutomatic = 0
+        self.velSetpoint = 1
+        self.ejectSetpoint = -5
+        # TODO change this to an actual sensor when you have one
+        # self.intakeSensor = sensing boi
 
     def periodic(self, rs: RobotState):
-        if rs.AButton:
-            self.intakeVelocityOne = 1
+        if rs.intakeManualButton:
+            self.intakeVelManual = self.velSetpoint
         else:
-            self.intakeVelocityOne = 0
+            self.intakeVelManual = 0
 
-        if rs.BButton:
-            self.intakeVelocityTwo = 1
+        # TODO change this as well when you have an actual sensor
+        if rs.intakeSensorTest:
+            self.intakeVelAutomatic = self.velSetpoint
         else:
-            self.intakeVelocityTwo = 0
+            self.intakeVelAutomatic = 0
 
-        self.intakeMotorOne.setVelocity(self.intakeVelocityOne)
-        self.intakeMotorTwo.setVelocity(self.intakeVelocityTwo)
+        # emergency button in case a ball gets stuck
+        if rs.intakeEjectButton:
+            self.intakeVelManual = self.ejectSetpoint
+            self.intakeVelAutomatic = self.ejectSetpoint
+        else:
+            self.intakeVelAutomatic = 0
+            self.intakeVelManual = 0
+
+        self.intakeMotorManual.setVelocity(self.intakeVelManual)
+        self.intakeMotorAutomatic.setVelocity(self.intakeVelAutomatic)
 
     def disabled(self):
-        self.intakeMotorOne.setVelocity(0)
-        self.intakeMotorTwo.setVelocity(0)
-        self.intakeVelocityOne = 0
-        self.intakeVelocityTwo = 0
+        self.intakeMotorManual.setVelocity(0)
+        self.intakeMotorAutomatic.setVelocity(0)
+        self.intakeVelManual = 0
+        self.intakeVelAutomatic = 0
 
     def publish(self):
-        pass
+        # TODO check to make sure you did this right
+        self.publishDouble("manual velocity", self.intakeVelManual, "Intake")
+        self.publishDouble("automatic velocity", self.intakeVelAutomatic, "Intake")
+        # self.publishBoolean("intake sensor", self.intakeSensor, "Intake")

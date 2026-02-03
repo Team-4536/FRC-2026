@@ -29,8 +29,8 @@ class Inputs(Subsystem):
         self.robotState = RobotState(
             fieldSpeeds=ChassisSpeeds(),
             abtainableMaxSpeed=maxVelocity * 0.2,
-            AButton=False,
-            BButton=False,
+            intakeMotorButton=False,
+            FakeIntakeSensor=False,
         )  # ===== LOWER MAX SPEED FOR TESTING =====
 
     def init(
@@ -45,8 +45,9 @@ class Inputs(Subsystem):
 
     def periodic(self, rs: RobotState) -> None:
         self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.AButton = self._mechCtrl.getAButton()
-        self.robotState.BButton = self._mechCtrl.getBButton()
+        self.robotState.intakeManualButton = self._mechCtrl.getAButton()
+        self.robotState.intakeSensorTest = self._mechCtrl.getBButton()
+        self.robotState.intakeEjectButton = self._mechCtrl.getLeftBumper()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
