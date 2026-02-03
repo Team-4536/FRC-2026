@@ -16,7 +16,7 @@ class Intake(Subsystem):
         # TODO change this to an actual sensor when you have one
         # self.intakeSensor = sensing boi
 
-    def periodic(self, rs: RobotState):
+    def periodic(self, rs: RobotState) -> RobotState:
         if rs.intakeManualButton:
             self.intakeVelManual = self.velSetpoint
         else:
@@ -39,6 +39,8 @@ class Intake(Subsystem):
         self.intakeMotorManual.setVelocity(self.intakeVelManual)
         self.intakeMotorAutomatic.setVelocity(self.intakeVelAutomatic)
 
+        return rs
+
     def disabled(self):
         self.intakeMotorManual.setVelocity(0)
         self.intakeMotorAutomatic.setVelocity(0)
@@ -46,7 +48,7 @@ class Intake(Subsystem):
         self.intakeVelAutomatic = 0
 
     def publish(self):
-        # TODO check to make sure you did this right
-        self.publishDouble("manual velocity", self.intakeVelManual, "Intake")
-        self.publishDouble("automatic velocity", self.intakeVelAutomatic, "Intake")
+        #  TODO check to make sure you did this right
+        self.publishFloat("manual velocity", self.intakeVelManual, "Intake")
+        self.publishFloat("automatic velocity", self.intakeVelAutomatic, "Intake")
         # self.publishBoolean("intake sensor", self.intakeSensor, "Intake")
