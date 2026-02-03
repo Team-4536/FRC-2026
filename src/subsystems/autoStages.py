@@ -29,8 +29,8 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
     bottomRightWheelCords = Translation2d(0.276225, -0.276225)
 
-    robotMassKG = lbsToKilograms(100)  # change later
-    robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # change later
+    robotMassKG = lbsToKilograms(100)  # TODO: change later
+    robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # TODO: change later
     moduleConfig = ModuleConfig(
         wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
     )
@@ -104,8 +104,8 @@ class FollowTrajectory(AutoStages):
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
-        posError = 0.3  # change later
-        rotationError = 0.3  # change later
+        posError = 0.3  # TODO: change later
+        rotationError = 0.3  # TODO: change later
 
         print(endXPos, endYPos, endRotation, "end pos")
         print(self.trajectory.getTotalTimeSeconds())
