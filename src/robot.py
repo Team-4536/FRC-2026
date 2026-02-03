@@ -5,6 +5,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.limelights import llCams
 from wpilib import TimedRobot
+from ntcore import NetworkTableInstance
 
 
 class Robot(TimedRobot):

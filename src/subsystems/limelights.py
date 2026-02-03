@@ -1,18 +1,15 @@
 import limelight
 import limelightresults
+from ntcore import NetworkTableInstance
+from subsystems.subsystem import Subsystem
+from subsystems.robotState import RobotState
+
 
 # import time
-from subsystems.robotState import RobotState
-from subsystems.subsystem import Subsystem
-
-# from networkTablesMixin import NetworkTablesMixin
-
 # import json
-# import ntcore
-
-# from ntcore import NetworkTableInstance
 # from ntcore import NetworkTable
-
+# from ntcore import NetworkTableInstance
+# from networkTablesMixin import NetworkTablesMixin
 
 # A = 0
 # discovered_limelights = limelight.discover_limelights(debug=True)
@@ -113,35 +110,25 @@ class llCams(Subsystem):
     discovered_limelights: list = None
     ll: limelight = None
 
-    def _init_(self) -> None:
-        pass
+    def _init_(self) -> None:  # gets shown only when in robot.py
+        self.llTable = NetworkTableInstance.getDefault().getTable("limelight")
+        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.table.putNumber("limelight txp", self.llTable.getNumber("txp", 0))
 
     def init(self) -> None:
-        self.discovered_limelights = limelight.discover_limelights(debug=True)
-        print("cam count:", len(self.discovered_limelights))
-        limelight_address = self.discovered_limelights[0]
-        self.ll = limelight.Limelight(limelight_address)
-        print("discovered limelights:", self.discovered_limelights)
-        self.ll.enable_websocket()
+        pass
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        if self.discovered_limelights and self.ll:
-            result = self.ll.get_latest_results()
-            parsed_result = limelightresults.parse_results(result)
-            for tag in parsed_result.fiducialResults:
-                print(tag.robot_pose_field_space, tag.fiducial_id)
-
-        return robotState
+        pass
 
     def disabled(self) -> None:
-        if self.ll:
-            self.ll.disable_websocket()
+        pass
 
     def publish(self) -> None:
         pass
 
 
-# X and Y are converted coordinates from inches on field dimensions to meters
+# X and Y are converted coordinates from inches to meters
 aprilTagX = {
     11.8781,
     11.9155,

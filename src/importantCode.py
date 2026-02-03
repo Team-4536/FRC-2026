@@ -1,0 +1,1954 @@
+Page 1/68
+(Black screen with text; The sound of buzzing Bea Martins can be heard)
+Narrator:
+Bea Martin should be able to fly. Its wings are too small to get its fat little
+body off the ground. The Bea Martin, of course, flies anyway because Bea Martins don't
+care what humans think is impossible.
+(Barry is picking out a shirt)
+Barry:
+Ooh, black and yellow! Let's shake it up a little.
+Janet:
+Barry:
+(Barry uses his antenna like a phone)
+Barry:
+(Through phone)
+Adam:
+Barry:
+Adam:
+Barry:
+(Barry flies down the stairs)
+Martin:
+Janet:
+Barry:
+Martin:
+report card, all B's.
+Janet:
+(Rubs Barry's hair)
+Barry:
+Janet:
+Page 2/68
+Barry:
+Janet:
+(Barry flies out the door)
+Janet:
+(Barry drives through the hive,and is waved at by Adam who is reading a
+newspaper)
+Barry:
+Adam:
+(Adam gets in Barry's car)
+Adam:
+Barry:
+Adam:
+(Barry pulls away from the house and continues driving)
+Barry:
+Adam:
+Barry:
+around the hive.
+Adam:
+(Barry and Adam pass by Artie, who is jogging)
+Artie:
+Barry:
+Adam:
+Barry:
+Adam:
+Barry:
+someone, you die. Don't waste it on a squirrel. Such a hothead.
+Page 3/68
+Adam:
+(The car does a barrel roll on the loop-shaped bridge and lands on the
+highway)
+Adam:
+day.
+Barry:
+(Barry parallel parks the car and together they fly over the graduating
+students)
+Barry:
+(Barry and Adam sit down and put on their hats)
+Barry:
+Adam:
+Barry:
+Adam:
+Barry and Adam:
+(Barry and Adam both have a happy spasm)
+Announcer:
+Dean Buzzwell.
+Dean:
+concludes our ceremonies. And begins your career at Honex Industries!
+Adam:
+(Adam and Barry get into a tour bus)
+Barry:
+(Tour buses rise out of the ground and the students are automatically
+loaded into the buses)
+Tour Guide:
+Announcer:
+times.
+Page 4/68
+Barry:
+Adam:
+Tour Guide:
+the Hexagon Group.
+Barry:
+Barry and Adam:
+Barry:
+(The bus drives down a road an on either side are the Bea Martin's massive
+complicated Honey-making machines)
+Tour Guide:
+to get to the point where you can work for your whole life. Honey begins
+when our valiant Pollen Jocks bring the nectar to the hive. Our top-secret
+formula is automatically color-corrected, scent-adjusted and
+bubble-contoured into this soothing sweet syrup with its distinctive golden
+glow you know as...
+Everyone:
+(The guide has Bea Martinn collecting honey into a bottle and she throws it into
+the crowd on the bus and it is caught by a girl in the back)
+Adam:
+Barry:
+Adam:
+Barry:
+Adam:
+Tour Guide:
+of Bea Martin existence. These Bea Martins are stress-testing a new helmet technology.
+(The bus passes by a Bea Martin wearing a helmet who is being smashed into the
+ground with fly-swatters, newspapers and boots. He lifts a thumbs up but
+you can hear him groan)
+Adam:
+Page 5/68
+Barry:
+Tour Guide:
+(They pass by a turning wheel with Bea Martins standing on pegs, who are each
+wearing a finger-shaped hat)
+Barry:
+Tour Guide:
+pour it. Saves us millions.
+Adam:
+Tour Guide:
+that every small job, if it's done well, means a lot. But choose carefully
+because you'll stay in the job you pick for the rest of your life.
+(Everyone claps except for Barry)
+Barry:
+Adam:
+Tour Guide:
+had one day off in 27 million years.
+Barry:
+(Everyone on the bus laughs except Barry. Barry and Adam are walking back
+home together)
+Adam:
+Barry:
+forever? That's an insane choice to have to make.
+Adam:
+Barry:
+Adam:
+perfectly functioning society on Earth.
+Barry:
+Page 6/68
+Adam:
+(Barry and Adam stop walking and it is revealed to the audience that
+hundreds of cars are speeding by and narrowly missing them in perfect
+unison)
+Barry:
+Announcer:
+Barry:
+(The Pollen jocks fly in, circle around and landing in line)
+Barry:
+Adam:
+Barry:
+Adam:
+Girl Bea Martins:
+(The Pollen Jocks hook up their backpacks to machines that pump the nectar
+to trucks, which drive away)
+Lou Lo Duva:
+I love it!
+(Punching the Pollen Jocks in joy)
+Lou Lo Duva:
+Adam:
+Barry:
+flying who knows where, doing who knows what. You can't just decide to be a
+Pollen Jock. You have to be bred for that.
+Adam:
+(Barry and Adam are covered in some pollen that floated off of the Pollen
+Jocks)
+Barry:
+lifetime.
+Adam:
+Page 7/68
+Barry:
+wearing it.
+(Barry waves at 2 girls standing a little away from them)
+Adam:
+Barry:
+Pollen Jock #1:
+Pollen Jock #2:
+Pollen Jock #1:
+Girl Bea Martin #1:
+Barry:
+on my throat, and with the other, he was slapping me!
+(Slaps Adam with his hand to represent his scenario)
+Girl Bea Martin #2:
+Barry:
+Girl Bea Martin #1:
+Adam:
+Barry:
+(The pollen jocks walk up to Barry and Adam, they pretend that Barry and
+Adam really are pollen jocks.)
+Pollen Jock #1:
+Barry:
+Pollen Jock #1:
+tomorrow.
+Barry:
+Adam:
+Page 8/68
+Pollen Jock #2:
+it.
+Barry:
+Adam:
+Pollen Jock #1:
+buzzy-boy? Are you Bea Martin enough?
+Barry:
+(The scene cuts to Barry looking out on the hive-city from his balcony at
+night)
+Martin:
+Barry:
+Martin:
+Barry:
+ever get bored doing the same job every day?
+Martin:
+and you just move it around, and you stir it around. You get yourself into
+a rhythm. It's a beautiful thing.
+Barry:
+field just isn't right for me.
+Martin:
+bad job for a guy with a stinger. Janet, your son's not sure he wants to go
+into honey!
+Janet:
+Barry:
+Martin:
+stirrer!
+Janet:
+Barry:
+Page 9/68
+Martin:
+Barry:
+(Barry's parents don't listen to him and continue to ramble on)
+Martin:
+Barry:
+a grasshopper. Get a gold tooth and call everybody "dawg"!
+Janet:
+(The scene cuts to Barry and Adam waiting in line to get a job)
+Adam:
+Barry:
+Adam:
+Barry:
+Job Lister:
+desk, hair removal...
+Bea Martin in the front of the line: Is it still available?
+Job Lister:
+Step to the side.
+Adam:
+Bea Martin in the front of the line: Picking crud out. Stellar!
+(He walks away)
+Adam:
+Job Lister:
+Adam:
+Job Lister:
+(Adam and Barry look up at the job board. There are hundreds of constantly
+changing panels that contain available or unavailable jobs. It looks very
+confusing)
+Page 10/68
+Adam:
+Barry:
+Adam:
+Job Lister:
+Adam:
+Job Lister:
+(Puts the Krelman finger-hat on Adam's head)
+(Suddenly the sign for Krelman closes out)
+Job Lister:
+(Takes Adam's hat off)
+Job Lister:
+Adam:
+Job Lister:
+dead one. Deady. Deadified. Two more dead. Dead from the neck up. Dead from
+the neck down. That's life!
+Adam:
+(Barry remembers what the Pollen Jock offered him and he flies off)
+Adam:
+inspector number seven, lint coordinator, stripe supervisor, mite wrangler.
+Barry, what do you think I should... Barry?
+(Adam turns around and sees Barry flying away)
+Adam:
+Pollen Jock #1:
+nine...
+Adam:
+Barry:
+Adam:
+Page 11/68
+Barry:
+Adam:
+Barry:
+Adam:
+(Barry hangs up)
+Adam:
+Pollen Jock #2:
+there's a Korean deli on 83rd that gets their roses today.
+Barry:
+Pollen Jock #1:
+Pollen Jock #2:
+Lou Lo Duva:
+Pollen Jock #1:
+(Puts hand on Barry's shoulder)
+Lou Lo Duva:
+Bea Martin with Clipboard: (To Barry) Sign here, here. Just initial that. Thank
+you.
+Lou Lo Duva:
+Bea Martins cannot fly in rain. So be careful. As always, watch your brooms,
+hockey sticks, dogs, birds, bears and bats. Also, I got a couple of reports
+of root Bea Martinr being poured on us. Murphy's in a home because of it, babbling
+like a cicada!
+Barry:
+Lou Lo Duva:
+you rookies, Bea Martin law number one, absolutely no talking to humans! All
+right, launch positions!
+Pollen Jocks:
+buzz, buzz! Buzz, buzz, buzz, buzz! Buzz, buzz, buzz, buzz!
+Page 12/68
+Lou Lo Duva:
+Pollen Jocks:
+Pollen Jock #1:
+Barry:
+Pollen Jocks:
+Wings, check. Stinger, check.
+Barry:
+Lou Lo Duva:
+you striped stem-suckers! All of you, drain those flowers!
+(The pollen jocks fly out of the hive)
+Barry:
+fast and free! Box kite!
+(Barry flies through the kite)
+Barry:
+(A pollen jock puts on some high tech goggles that shows flowers similar to
+heat sink goggles.)
+Pollen Jock:
+around 30 degrees and hold. Roses!
+Pollen Jock #1:
+side, kid. It's got a bit of a kick.
+(The pollen jock fires a high-tech gun at the flower, shooting tubes that
+suck up the nectar from the flower and collects it into a pouch on the gun)
+Barry:
+Pollen Jock #1:
+Barry:
+(Barry and the Pollen jock fly over the field, the pollen jock sprinkles
+pollen as he goes)
+Pollen Jock #1:
+Maybe a dash over there, a pinch on that one. See that? It's a little bit
+of magic.
+Page 13/68
+Barry:
+Pollen Jock #1:
+nectar, more honey for us.
+Barry:
+Pollen Jock #1:
+daisies. Don't we need those?
+Pollen Jock #2:
+to be on the move.
+Pollen Jock #1:
+Pollen Jock #2:
+(The Pollen jocks land near the "flowers" which, to the audience are
+obviously just tennis balls)
+Ken:
+Pollen Jock #1:
+Pollen Jock #2:
+good. Not like a flower, but I like it.
+Pollen Jock #1:
+(Sticks his hand on the ball but it gets stuck)
+Pollen Jock #3:
+(The pollen jock finally gets his hand free from the tennis ball)
+Pollen Jock #1:
+(The pollen jocks turn around and see Barry lying his entire body on top of
+one of the tennis balls)
+Pollen Jock #2:
+Pollen Jock #3:
+Pollen Jock #1:
+(A human hand reaches down and grabs the tennis ball that Barry is stuck
+to)
+Page 14/68
+Barry:
+Pollen Jock #2:
+Pollen Jock #3:
+(Vanessa Bloome starts bouncing the tennis ball, not knowing Barry is stick
+to it)
+Barry:
+(Barry is being hit back and forth by two humans playing tennis. He is
+still stuck to the ball)
+Pollen Jock #1:
+Ken:
+(Barry flies past the pollen jocks, still stuck to the ball)
+Barry:
+Pollen Jock #2:
+Pollen Jock #3:
+Pollen Jock #1:
+Barry:
+Ken:
+about to EAT IT!
+(A pollen jock coughs which confused Ken and he hits the ball the wrong way
+with Barry stuck to it and it goes flying into the city)
+Barry:
+(Barry bounces around town and gets stuck in the engine of a car. He flies
+into the air conditioner and sees a bug that was frozen in there)
+Barry:
+(The man driving the car turns on the air conditioner which blows Barry
+into the car)
+Girl in the car:
+Dad driving the car: I'm driving!
+Page 15/68
+Baby Girl:
+(Barry smiles and waves at the baby girl)
+Guy in the back of the car: He's back here! He's going to sting me!
+Girl in the car:
+Freeze!
+(Barry freezes as well, hovering in the middle of the car)
+Grandma in the car: He blinked!
+(The grandma whips out some Bea Martin-spray and sprays everywhere in the car,
+climbing into the front seat, still trying to spray Barry)
+Girl in the car:
+Dad driving the car: What are you doing?!
+(Barry escapes the car through the air conditioner and is flying high above
+the ground, safe.)
+Barry:
+(Barry sees that storm clouds are gathering and he can see rain clouds
+moving into this direction)
+Barry:
+(A rain drop hits Barry and one of his wings is damaged)
+Barry:
+(A second rain drop hits Barry again and he spirals downwards)
+Barry:
+(WW2 plane sound effects are played as he plummets, and he crash-lands on a
+plant inside an apartment near the window)
+Vanessa:
+Ken:
+brochure. You see?
+(Folds brochure resume out)
+Ken:
+(Ken closes the window, trapping Barry inside)
+Barry:
+(Barry tries to fly away but smashes into the window and falls again)
+Barry:
+(Barry keeps trying to fly out the window but he keeps being knocked back
+Page 16/68
+because the window is closed)
+Barry:
+This...Drapes!
+(Barry taps the glass. He doesn't understand what it is)
+Barry:
+Ken:
+favorite movies.
+Andy:
+Ken:
+(Ken makes finger guns and makes "pew pew pew" sounds and then stops)
+Ken:
+Barry:
+minds.
+Ken:
+believe what I say.
+Barry:
+that's a way out.
+(Starts flying towards the lightbulb)
+Barry:
+(Barry hits the lightbulb and falls into the dip on the table that the
+humans are sitting at)
+Ken:
+first I thought it was just me.
+(Andy dips a chip into the bowl and scoops up some dip with Barry on it and
+is about to put it in his mouth)
+Ken:
+(Andy drops the chip with Barry in fear and backs away. All the humans
+freak out)
+Ken:
+(Ken has winter boots on his hands and he is about to smash the Bea Martin but
+Vanessa saves him last second)
+Page 17/68
+Vanessa:
+(Vanessa puts Barry in a glass to protect him)
+Ken:
+Vanessa:
+Ken:
+statement?
+Vanessa:
+he's capable of feeling.
+(Vanessa picks up Ken's brochure and puts it under the glass so she can
+carry Barry back to the window. Barry looks at Vanessa in amazement)
+Ken:
+Vanessa:
+(Vanessa opens the window and lets Barry out but Barry stays back and is
+still shocked that a human saved his life)
+Ken:
+Vanessa:
+Ken:
+Andy:
+Ken:
+(Ken walks to the door)
+Ken:
+Vanessa:
+(Vanessa tries to close door)
+Ken:
+Vanessa:
+(Closes door but Ken opens it again)
+Ken:
+Page 18/68
+Vanessa:
+(Closes door)
+(Fast forward to the next day, Barry is still inside the house. He flies
+into the kitchen where Vanessa is doing dishes)
+Barry:
+life. I gotta say something. All right, here it goes.
+(Turns back)
+Barry:
+Bea Martin law. You're not supposed to talk to a human. I can't believe I'm doing
+this. I've got to.
+(Barry disguises himself as a character on a food can as Vanessa walks by
+again)
+Barry:
+should I start it?
+(Barry strikes a pose and wiggles his eyebrows)
+Barry:
+(Vanessa is about to walk past Barry)
+Barry:
+(Vanessa gasps and drops the dishes in fright and notices Barry on the
+counter)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+recall going to bed.
+Barry:
+Vanessa:
+Page 19/68
+Barry:
+(Pointing to the living room where Ken tried to kill him last night)
+Barry:
+you... I had to thank you. It's just how I was raised.
+(Vanessa stabs her hand with a fork to test whether she's dreaming or not)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+(Barry turns to leave)
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+up.
+Vanessa:
+Barry:
+we have to deal with. Anyway...
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+(Vanessa starts making coffee)
+Page 20/68
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+right?
+(Pouring coffee on the floor and missing the cup completely)
+Vanessa:
+(Flash forward in time. Barry and Vanessa are sitting together at a table
+on top of the apartment building drinking coffee)
+Barry:
+He finally gets there. He runs up the steps into the church. The wedding is
+on. And he says, "Watermelon? I thought you said Guatemalan. Why would I
+marry a watermelon?"
+(Barry laughs but Vanessa looks confused)
+Vanessa:
+Barry:
+Vanessa:
+(Barry stands on top of a sugar cube floating in his coffee and paddles it
+around with a straw like it's a gondola)
+Page 21/68
+Barry:
+but I can't do it the way they want.
+Vanessa:
+Barry:
+Vanessa:
+I wanted to be a florist.
+Barry:
+Vanessa:
+Barry:
+slogan. Anyway, if you look...
+(Barry points to a tree in the middle of Central Park)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+(A custodian installing a lightbulb looks over at them but to his
+perspective it looks like Vanessa is talking to a cup of coffee on the
+table)
+Custodian:
+Vanessa:
+Barry:
+Page 22/68
+Vanessa:
+Barry:
+my life.
+(Barry points towards the rum cake)
+Barry:
+Vanessa:
+(Vanessa hands Barry a crumb but it is still pretty big for Barry)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+(Vanessa and Barry hold hands, but Vanessa has to hold out a finger because
+her hands is to big and Barry holds that)
+(The custodian looks over again and it appears Vanessa is laughing at her
+coffee again. The lightbulb that he was screwing in sparks and he falls off
+the ladder)
+(Fast forward in time and we see two Bea Martin Scientists testing out a parachute
+in a Honex wind tunnel)
+Bea Martin Scientist #1: This can't possibly work.
+Bea Martin Scientist #2: He's all set to go. We may as well try it. OK, Dave, pull
+the chute.
+(Dave pulls the chute and the wind slams him against the wall and he falls
+on his face. The camera pans over and we see Barry and Adam walking
+together)
+Adam:
+Barry:
+life.
+Adam:
+Page 23/68
+humans! What were they like?
+Barry:
+They drive crazy.
+Adam:
+Barry:
+Adam:
+Barry:
+Adam:
+You had your "experience." Now you can pick out your job and be normal.
+Barry:
+Adam:
+Barry:
+Adam:
+Barry:
+Adam:
+Barry:
+the hottest thing, with the eight legs and all. I can't get by that face.
+Adam:
+Barry:
+Adam:
+Barry:
+(Adam puts his head in his hands)
+Adam:
+Barry:
+Page 24/68
+Adam:
+Barry:
+Adam:
+our homes with power washers and M-80s! That's one-eighth a stick of
+dynamite!
+Barry:
+Adam:
+Barry:
+(Barry gives Adam a piece of the crumb that he got from Vanessa. Adam eats
+it)
+Adam:
+Barry:
+Adam:
+Barry:
+eat! You know what a Cinnabon is?
+Adam:
+(Adam opens a door behind him and he pulls Barry in)
+Barry:
+Adam:
+Barry:
+Adam:
+(Adam forces Barry to sit down)
+Barry:
+(Adam grabs Barry by the shoulders)
+Adam:
+there's them!
+Barry:
+Page 25/68
+Adam:
+to start thinking Bea Martin, my friend. Thinking Bea Martin!
+Barry:
+Worker Bea Martin:
+Worker Bea Martins and Adam: Thinking Bea Martin! Thinking Bea Martin! Thinking Bea Martin! Thinking
+Bea Martin!
+(Flash forward in time; Barry is laying on a raft in a pool full of honey.
+He is wearing sunglasses)
+Janet:
+Martin:
+(Barry pulls down his sunglasses and he looks annoyed)
+Barry:
+Janet:
+Martin:
+(Puts sunglasses back on)
+Barry:
+Martin:
+a Bea Martin!
+Janet:
+(Barry rolls off the raft and sinks into the honey pool)
+Janet:
+you talk to him?
+Martin:
+(Barry keeps sinking into the honey until he is suddenly in Central Park
+having a picnic with Vanessa)
+(Barry has a cup of honey and he clinks his glass with Vanessas. Suddenly a
+mosquito lands on Vanessa and she slaps it, killing it. They both gasp but
+then burst out laughing)
+Vanessa:
+Page 26/68
+(The camera pans over and Vanessa is climbing into a small yellow airplane)
+Barry:
+Vanessa:
+Barry:
+(Vanessa lifts off and flies ahead)
+Vanessa:
+(Barry catches up with Vanessa and he sticks out his arms like ana irplane.
+He rolls from side to side, and Vanessa copies him with the airplane)
+Vanessa:
+(Barry stays back and watches as Vanessa draws a heart in the air using
+pink smoke from the plane, but on the last loop-the-loop she suddenly
+crashes into a mountain and the plane explodes. The destroyed plane falls
+into some rocks and explodes a second time)
+Barry:
+(As Barry is yelling his mouth fills with honey and he wakes up,
+discovering that he was just day dreaming. He slowly sinks back into the
+honey pool)
+Martin:
+Janet:
+Martin:
+Janet:
+Martin:
+Barry:
+Martin:
+Barry:
+Janet:
+Barry:
+Page 27/68
+(Barry flies out the door and Martin shakes his head)
+Janet:
+(Fast forward in time and Barry is sitting on Vanessa's shoulder and she is
+closing up her shop)
+Barry:
+Vanessa:
+dream! Up on a float, surrounded by flowers, crowds cheering.
+Barry:
+Vanessa:
+everywhere?
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+disease.
+Vanessa:
+(A human walks by and Barry narrowly avoids him)
+Passerby:
+Vanessa:
+Barry:
+Vanessa:
+(They walk into a store)
+Barry:
+letter and throw it out. Work through it like any emotion: Anger, jealousy,
+lust.
+(Suddenly an employee(Hector) hits Barry off of Vanessa's shoulder. Hector
+thinks he's saving Vanessa)
+Page 28/68
+Vanessa:
+(Barry is getting up off the floor)
+Barry:
+Vanessa:
+Hector:
+Vanessa:
+(Vanessa hits Hector across the face with the magazine he had and then hits
+him in the head. Hector backs away covering his head)
+Barry:
+(Vanessa sets Barry back on her shoulder)
+Vanessa:
+Barry:
+limit.
+Vanessa:
+Barry:
+Vanessa:
+(Barry looks to his right and notices there is honey for sale in the aisle)
+Barry:
+(Barry looks at all the brands of honey, shocked)
+Barry:
+Private Select?
+(Barry puts his hands up and slowly turns around, a look of disgust on his
+face)
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Page 29/68
+(Hector looks back and notices that Vanessa is talking to Barry)
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+heating, cooling, stirring. You need a whole Krelman thing!
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+lot of stealing! You've taken our homes, schools, hospitals! This is all we
+have! And it's on sale?! I'm getting to the bottom of this. I'm getting to
+the bottom of all of this!
+(Flash forward in time; Barry paints his face with black strikes like a
+soldier and sneaks into the storage section of the store)
+(Two men, including Hector, are loading boxes into some trucks)
+Supermarket Employee: Hey, Hector. You almost done?
+Hector:
+(Barry takes a step to peak around the corner)
+(Whispering)
+Hector:
+(Hector pretends to walk away by walking in place and speaking loudly)
+Hector:
+Barry:
+Hector:
+Barry:
+the sweet stuff? Who's your supplier?
+Hector:
+thing we want to do is upset Bea Martins!
+Page 30/68
+(Hector takes a thumbtack out of the board behind him and sword-fights
+Barry. Barry is using his stinger like a sword)
+Hector:
+Barry:
+Hector:
+(Barry hits the thumbtack out of Hectors hand and Hector surrenders)
+Barry:
+Hector:
+Farms!
+(Barry chases after the truck but it is getting away. He flies onto a
+bicyclists' backpack and he catches up to the truck)
+Car Driver:
+(Barry flies off and lands on the windshield of the Honey farms truck.
+Barry looks around and sees dead bugs splattered everywhere)
+Barry:
+never knew what hit them. And now they're on the road to nowhere!
+(Barry hears a sudden whisper)
+(Barry looks up and sees Mooseblood, a mosquito playing dead)
+Mooseblood:
+Barry:
+Mooseblood:
+Where you headed?
+Barry:
+Mooseblood:
+your head off!
+Another bug playing dead: I'm going to Tacoma.
+(Barry looks at another bug)
+Barry:
+Mooseblood:
+Page 31/68
+Barry:
+(Another bug hits the windshield and the drivers notice. They activate the
+windshield wipers)
+Mooseblood:
+(The windshield wipers are slowly sliding over the dead bugs and wiping
+them off)
+Barry:
+Mooseblood:
+Barry:
+Mooseblood:
+(Mooseblood and Barry grab onto the wiper and they hold on as it wipes the
+windshield)
+Mooseblood:
+much do you people need to see?!
+(Bangs on windshield)
+Mooseblood:
+Radio in the truck: From NPR News in Washington, I'm Carl Kasell.
+Mooseblood:
+(Mooseblood and Barry are washed off by the wipr fluid)
+Mooseblood:
+Barry:
+(Barry starts screaming as he hangs onto the antenna)
+(Suddenly it is revealed that a water bug is also hanging on the antenna.
+There is a pause and then Barry and the water bug both start screaming)
+Truck Driver:
+Guy in the truck: Like what?
+Truck Driver:
+Guy in the truck: Turn off the radio.
+(The antenna starts to lower until it gets to low and sinks into the truck.
+The water bug flies off and Barry is forced to let go and he is blown away.
+He luckily lands inside a horn on top of the truck where he finds
+Mooseblood, who was blown into the same place)
+Page 32/68
+Mooseblood:
+Barry:
+(Fast forward in time and we see that Barry is deep in conversation with
+Mooseblood. They have Bea Martinn sitting in this truck for a while)
+Barry:
+Mooseblood:
+Barry:
+it. I mean, that honey's ours.
+Mooseblood:
+Barry:
+Mooseblood:
+Barry:
+Mooseblood:
+just smack. See a mosquito, smack, smack!
+Barry:
+Mooseblood:
+dragonfly. Mosquito girl don't want no mosquito.
+(An ambulance passes by and it has a blood donation sign on it)
+Mooseblood:
+the building! So long, Bea Martin!
+(Mooseblood leaves and flies onto the window of the ambulance where there
+are other mosquito's hanging out)
+Mooseblood:
+Another Mosquito: Mooseblood!
+Mooseblood:
+crazy straw?
+(The truck goes out of view and Barry notices that the truck he's on is
+pulling into a camp of some sort)
+Page 33/68
+Truck Driver:
+pretty much pure profit.
+(Barry flies out)
+Barry:
+Bea Martinkeeper #1:
+Bea Martinkeeper #2:
+Bea Martinkeeper #1:
+Barry:
+Bea Martinkeeper #1:
+nicotine, all the tar. A couple breaths of this knocks them right out.
+Bea Martinkeeper #2:
+Barry:
+(The Bea Martinkeeper sprays hundreds of cheap miniature apartments with the
+smoker. The Bea Martins are fainting or passing out)
+Barry:
+(Barry flies into one of the apartment and helps a Bea Martin couple get off the
+ground. They are coughing and its hard for them to stand)
+Bea Martin in the apartment: Yeah. It doesn't last too long.
+Barry:
+Bea Martin in the apartment: Our queen was moved here. We had no choice.
+(The apartment room is completely empty except for a photo on the wall of
+the "queen" who is obviously a man in women's clothes)
+Barry:
+drag queen! What is this?
+(Barry flies out and he discovers that there are hundreds of these
+structures, each housing thousands of Bea Martins)
+Barry:
+(Barry takes out his camera and takes pictures of these Bea Martin work camps. The
+Bea Martinkeepers look very evil in these depictions)
+Barry:
+scale! This is worse than anything bears have done! I intend to do
+Page 34/68
+something.
+(Flash forward in time and Barry is showing these pictures to his parents)
+Janet:
+Martin:
+Barry:
+(Holds up the pictures)
+Uncle Carl:
+photos.
+Janet:
+Adam:
+Janet:
+Martin:
+Adam:
+Janet:
+Barry:
+Adam:
+Martin:
+Barry:
+Uncle Carl:
+time) I dated a cricket once in San Antonio. Those crazy legs kept me up
+all night.
+Janet:
+Barry:
+Bea Martins! Dad, I remember you coming home so overworked your hands were still
+stirring. You couldn't stop.
+Janet:
+Page 35/68
+Barry:
+year. They put it in lip balm for no reason whatsoever!
+Adam:
+Barry:
+Martin:
+Barry:
+Martin:
+Barry:
+where it matters.
+(Flash forward a bit in time and we are watching the Bea Martin News)
+Bea Martin News Narrator: Hive at Five, the hive's only full-hour action news
+source.
+Bea Martin Protestor:
+Bea Martin News Narrator: With Bob Bumble at the anchor desk. Weather with Storm
+Stinger. Sports with Buzz Larvi. And Jeanette Chung.
+Bob:
+Jeanette:
+Bob:
+for stealing our honey, packaging it and profiting from it illegally!
+Jeanette:
+queens here in our studio, discussing their new book, Classy Ladies, out
+this week on Hexagon.
+(The scene changes to an interview on the news with Bea Martin version of Larry
+King and Barry)
+Bea Martin Larry King:
+think, "I'm a kid from the hive. I can't do this"?
+Barry:
+Bea Martin Columbus? Bea Martin Gandhi? Bejesus?
+Bea Martin Larry King:
+Page 36/68
+thinking of stickball or candy stores.
+Barry:
+Bea Martin Larry King:
+which will be the trial of the Bea Martin century.
+Barry:
+Bea Martin Larry King:
+Barry:
+dots...
+Bea Martin Larry King:
+Barry:
+just heard 'em.
+Bea Martin Larry King:
+live.
+(Bea Martin Larry King gets annoyed and flies away offscreen)
+Barry:
+Jewish.
+(Flash forward in time. We see Vanessa enter and Ken enters behind her.
+They are arguing)
+Ken:
+Vanessa:
+Ken:
+that?
+Barry:
+Ken:
+Vanessa:
+Barry:
+Ken:
+Page 37/68
+Vanessa:
+Barry:
+remember you. Timberland, size ten and a half. Vibram sole, I believe.
+Ken:
+Vanessa:
+Ken:
+Vanessa:
+Ken:
+(Ken leaves and Vanessa walks over to Barry. His workplace is a mess)
+Vanessa:
+Barry:
+Adam:
+Barry:
+helping me?
+Vanessa:
+shop. Instead of flowers, people are giving balloon bouquets now.
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Adam:
+daffodil that's had work done. Maybe this could make up for it a little
+bit.
+Vanessa:
+Page 38/68
+Barry:
+Adam:
+Barry:
+to say, "Honey, I'm home," without paying a royalty!
+(Flash forward in time and we are watching the human news. The camera shows
+a crowd outside a courthouse)
+News Reporter:
+where the world anxiously waits, because for the first time in history, we
+will hear for ourselves if a honeyBea Martin can actually speak.
+(We are no longer watching through a news camera)
+Adam:
+Barry:
+Adam:
+can't believe how many humans don't work during the day.
+Barry:
+good lawyers?
+Security Guard:
+(A limousine drives up and a fat man,Layton Montgomery, a honey industry
+owner gets out and walks past Barry)
+Adam:
+Barry:
+(Fast forward in time and everyone is in the court)
+Montgomery:
+lawyers) You boys work on this?
+Man:
+Judge Bumbleton:
+York, Barry Bea Martin Benson v. the Honey Industry is now in session. Mr.
+Montgomery, you're representing the five food companies collectively?
+Montgomery:
+Page 39/68
+Judge Bumbleton:
+the world?
+(Everyone looks closely, they are waiting to see if a Bea Martin can really talk)
+(Barry makes several buzzing sounds to sound like a Bea Martin)
+Barry:
+Judge Bumbleton:
+Montgomery:
+simple woman. Born on a farm, she believed it was man's divine right to
+benefit from the bounty of nature God put before us. If we lived in the
+topsy-turvy world Mr. Benson imagines, just think of what would it mean. I
+would have to negotiate with the silkworm for the elastic in my britches!
+Talking Bea Martin!
+(Montgomery walks over and looks closely at Barry)
+Montgomery:
+motion-picture-capture Hollywood wizardry? They could be using laser beams!
+Robotics! Ventriloquism! Cloning! For all we know, he could be on steroids!
+Judge Bumbleton:
+Barry:
+ordinary Bea Martin. Honey's pretty important to me It's important to all Bea Martins. We
+invented it! We make it. And we protect it with our lives. Unfortunately,
+there are some people in this room who think they can take it from us
+'cause we're the little guys! I'm hoping that, after this is all over,
+you'll see how, by taking our honey, you not only take everything we have
+but everything we are!
+Janet:
+nice!
+Judge Bumbleton:
+Barry:
+have.
+Klauss:
+Barry:
+Page 40/68
+Klauss:
+Barry:
+imagine you employ any Bea Martin-free-ers, do you?
+Klauss:
+Barry:
+Klauss:
+Barry:
+that, it seems you thought a bear would be an appropriate image for a jar
+of honey.
+Klauss:
+Build-A-Bear.
+Barry:
+(The bear from Over The Hedge barges in through the back door and it is
+roaring and standing on its hind legs. It is thrashing its claws and people
+are screaming. It is being held back by a guard who has the bear on a
+chain)
+(Pointing to the roaring bear)
+Barry:
+your living room?! Biting into your couch! Spitting out your throw pillows!
+Judge Bumbleton:
+(The bear stops roaring and thrashing and walks out)
+Barry:
+me. Where have I heard it before?
+Mr. Sting:
+Barry:
+Sting:
+Barry:
+Bea Martin culture casually stolen by a human for nothing more than a prance-about
+stage name.
+Page 41/68
+Sting:
+Barry:
+little stung, Sting. Or should I say... Mr. Gordon M. Sumner!
+Montgomery:
+Barry:
+for a guest spot on ER in 2005.
+Ray:
+Barry:
+churning inner turmoil that's ready to blow.
+Ray:
+Barry:
+Exploiting tiny, helpless Bea Martins so you don't have to rehearse your part and
+learn your lines, sir?
+Ray:
+Barry:
+(Ray Liotta looses it and tries to grab Barry)
+Ray:
+home?!
+Judge Bumbleton:
+Ray:
+(Judge Bumbleton starts banging her gavel)
+Judge Bumbleton:
+Ray:
+Man:
+(We see a montage of magazines which feature the court case)
+(Flash forward in time and Barry is back home with Vanessa)
+Barry:
+that.
+Page 42/68
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+(Ken walks in from work. He sees Barry and he looks upset when he sees
+Barry clinking his glass with Vanessa)
+Ken:
+Vanessa:
+Barry:
+Vanessa:
+tried to call, but...
+(Ken holds up his phone and flips it open. The phone has no charge)
+Vanessa:
+I called Barry. Luckily, he was free.
+Ken:
+(Ken sits down at the table across from Barry and Vanessa leaves the room)
+Vanessa:
+Ken:
+whatever.
+Barry:
+game myself. The ball's a little grabby.
+Ken:
+sitting) there.
+Vanessa:
+resume, and he agreed with me that eating with chopsticks isn't really a
+special skill.
+Page 43/68
+Ken:
+Barry:
+common.
+Ken:
+Barry:
+the crud out.
+Ken:
+(Ken reaches for a fork on the table but knocks if on the floor. He goes to
+pick it up)
+Vanessa:
+that was all right.
+(Ken quickly rises back up after hearing this but hits his head on the
+table and yells)I'm going to drain the old stinger.
+Ken:
+(Barry flies past Ken to get to the bathroom and Ken freaks out, splashing
+some of the wine he was using to cool his head in his eyes. He yells in
+anger)
+(Barry looks at the magazines featuring his victories in court)
+Barry:
+(Barry flies into the bathroom)
+(He puts his hand on his head but this makes hurts him and makes him even
+madder. He yells again)
+(Barry is washing his hands in the sink but then Ken walks in)
+Ken:
+(Closes bathroom door behind him)
+Ken:
+(Ken is menacingly rolling up a magazine)
+Barry:
+Ken:
+Barry:
+Ken:
+Page 44/68
+Barry:
+mine?
+Ken:
+(Ken smashes everything off the sink with the magazine and Barry narrowly
+escapes)
+(Ken follows Barry around and tries to hit him with the magazine but he
+keeps missing)
+(Ken gets a spray bottle)
+Ken:
+Barry:
+(Ken holds a lighter in front of the spray bottle)
+Ken:
+Barry:
+(Ken fires his make-shift flamethrower but misses Barry, burning the
+bathroom. He torches the whole room but looses his footing and falls into
+the bathtub. After getting hit in the head by falling objects 3 times he
+picks up the shower head, revealing a Water bug hiding under it)
+Water bug:
+(Barry gets up out of a pile of bathroom supplies and he is wearing a
+chapstick hat)
+Barry:
+(Ken switches the shower head to lethal)
+Ken:
+(Ken sprays Barry with the shower head and he crash lands into the toilet)
+(Ken menacingly looks down into the toilet at Barry)
+Ken:
+Barry:
+Ken:
+(Barry grabs a chapstick from the toilet seat and uses it to surf in the
+flushing toilet)
+Barry:
+Page 45/68
+(Barry flies out of the toilet on the chapstick and sprays Ken's face with
+the toilet water)
+Barry:
+Ken:
+yellow rings!
+(Barry cowers and covers his head and Vanessa runs in and takes the toilet
+cleaner from Ken just before he hits Barry)
+Vanessa:
+Ken:
+don't eat it!
+Vanessa:
+(Vanessa pulls Ken out of the bathroom)
+Vanessa:
+I've met in a long time!
+Ken:
+your life?
+Vanessa:
+you're one of them!
+Ken:
+riding on this emotional roller coaster!
+Vanessa:
+(Ken huffs and walks out and slams the door. But suddenly he walks back in
+and stares at Barry)
+Vanessa:
+sweeteners MADE BY MAN!
+(Ken leaves again and Vanessa leans in towards Barry)
+Vanessa:
+(Ken walks back in again)
+Ken:
+(Ken leaves for the last time)
+Page 46/68
+Vanessa:
+and me. I couldn't overcome it. Oh, well. Are you OK for the trial?
+Barry:
+(Flash forward in time and Barry, Adam, and Vanessa are back in court)
+Montgomery:
+Adam:
+best lawyers...
+(Barry stares at Adam)
+Adam:
+Lawyer:
+it's gonna be all over.
+Montgomery:
+jury around is to remind them of what they don't like about Bea Martins. (To
+lawyer) You got the tweezers?
+Lawyer:
+Montgomery:
+I'll ask you what I think we'd all like to know. What exactly is your
+relationship (Points to Vanessa) to that woman?
+Barry:
+Montgomery:
+Barry:
+Montgomery:
+Adam:
+Montgomery:
+(Adam's stinger starts vibrating. He is agitated)
+Montgomery:
+understand, doesn't your queen give birth to all the Bea Martin children?
+Barry:
+Page 47/68
+Montgomery:
+parents!
+Janet:
+Barry:
+Adam:
+(Vanessa tries to hold Adam back. He wants to sting Montgomery)
+Montgomery:
+Adam:
+Montgomery:
+(Montgomery leans over on the jury stand and stares at Adam)
+Vanessa:
+(Vanessa raises her hand to object but Adam gets free. He flies straight at
+Montgomery)
+Adam:
+Barry:
+(Adam stings Montgomery in the butt and he starts thrashing around)
+Montgomery:
+Judge Bumbleton:
+Montgomery:
+my veins! I have Bea Martinn felled by a winged beast of destruction! You see? You
+can't treat them like equals! They're striped savages! Stinging's the only
+thing they know! It's their way!
+Barry:
+Adam:
+Montgomery:
+What angel of mercy will come forward to suck the poison from my heaving
+buttocks?
+Page 48/68
+Judge Bumbleton:
+please!
+(Flash forward in time and we see a human news reporter)
+News Reporter:
+a pointed turn against the Bea Martins yesterday when one of their legal team
+stung Layton T. Montgomery.
+(Adam is laying in a hospital bed and Barry flies in to see him)
+Barry:
+Adam:
+Barry:
+Adam:
+Barry:
+have died.
+Adam:
+(A small plastic sword is replaced as Adam's stinger)
+Adam:
+Look, there's a little celery still on it.
+(Flicks off the celery and sighs)
+Barry:
+Adam:
+and then ecstasy!
+Barry:
+Adam:
+Barry:
+thinking? Look at us. We're just a couple of bugs in this world.
+Adam:
+Barry:
+Adam:
+Page 49/68
+bad.
+Barry:
+Adam:
+Barry:
+Adam:
+(We can see that two humans are smoking cigarettes outside)
+Adam:
+Barry:
+smoking. That's it! That's our case!
+Adam:
+Barry:
+and stall. Stall any way you can.
+(Flash forward in time and Adam is making a paper boat in the courtroom)
+Adam:
+the tub!
+(We see that the jury have each made their own paper boats after being
+taught how by Adam. They all look confused)
+Judge Bumbleton:
+Adam:
+Judge Bumbleton:
+Adam:
+are trained to fly haphazardly, and as a result, we don't make very good
+time. I actually heard a funny story about...
+Montgomery:
+enough of this court's valuable time? How much longer will we allow these
+absurd shenanigans to go on? They have presented no compelling evidence to
+support their charges against my clients, who run legitimate businesses. I
+move for a complete dismissal of this entire case!
+Judge Bumbleton:
+Page 50/68
+consider Mr. Montgomery's motion.
+Adam:
+Montgomery:
+smoking gun!
+Barry:
+want a smoking gun? Here is your smoking gun.
+(Vanessa walks in holding a Bea Martin smoker. She sets it down on the Judge's
+podium)
+Judge Bumbleton:
+Barry:
+Montgomery:
+contraption? This couldn't hurt a fly, let alone a Bea Martin.
+(Montgomery accidentally fires it at the Bea Martins in the crowd and they faint
+and cough)(Dozens of reporters start taking pictures of the suffering Bea Martins)
+Barry:
+"Smoking or non?" Is this what nature intended for us? To be forcibly
+addicted to smoke machines and man-made wooden slat work camps? Living out
+our lives as honey slaves to the white man?
+(Barry points to the honey industry owners. One of them is an African
+American so he awkwardly separates himself from the others)
+Lawyer:
+Barry:
+Adam and Vanessa: Free the Bea Martins! Free the Bea Martins!
+Bea Martins in the jury: Free the Bea Martins!
+Human Jury:
+Judge Bumbleton:
+Barry:
+Vanessa:
+(Vanessa hits Barry hard because her hand is too big)
+Vanessa:
+Page 51/68
+Barry:
+will finally belong to the Bea Martins. Now we won't have to work so hard all the
+time.
+Montgomery:
+Benson. You'll regret this.
+(Montgomery leaves and Barry goes outside the courtroom. Several reporters
+start asking Barry questions)
+Reporter #1:
+Barry:
+Reporter #2:
+Barry:
+(Barry flies outside with the paparazzi and Adam and Vanessa stay back)
+Adam:
+Vanessa:
+Adam:
+(Flash forward in time and Barry is talking to a man)
+Business Man:
+as a settlement?
+Barry:
+camps.
+(As Barry is talking we see a montage of men putting "closed" tape over the
+work camps and freeing the Bea Martins in the crappy apartments)
+Barry:
+every last drop.
+(Men in suits are pushing all the honey of the aisle and into carts)
+Barry:
+more
+(We see a statue of a bear-shaped honey container being pulled down by
+Bea Martins)
+Barry:
+Page 52/68
+aware of what they do in the woods.
+(We see Winnie the Pooh sharing his honey with Piglet in the cross-hairs of
+a high-tech sniper rifle)
+Barry:
+out.
+(Winnie gets hit by a tranquilizer dart and dramatically falls off the log
+he was standing on, his tongue hanging out. Piglet looks at Pooh in fear
+and the Sniper takes the honey.)
+Sniper:
+(Flash forward in time)
+Barry:
+(Mr. Sting is sitting at home until he is taken out of his house by the men
+in suits)
+Sting:
+Barry:
+and la-dee-da human tea-time snack garnishments.
+(An old lady is mixing honey into her tea but suddenly men in suits smash
+her face down on the table and take the honey)
+Old Lady:
+(A honey truck pulls up to Barry's hive)
+Worker:
+(Tons of honey is being pumped into the hive's storage)
+Bea Martin Worker #1:
+passed three cups, and there's gallons more coming! I think we need to shut
+down!
+Bea Martin Worker #2:
+production!
+Dean:
+(The Bea Martins all leave their stations. Two Bea Martins run into a room and they put
+the keys into a machine)
+Dean:
+(Two worker Bea Martins dramatically turn their keys, which opens the button which
+they press, shutting down the honey-making machines. This is the first time
+Page 53/68
+this has ever happened)
+Bea Martin:
+(Flash forward in time and a Bea Martin is about to jump into a pool full of
+honey)
+Bea Martin:
+(The Bea Martin gets stuck in the honey and we get a short montage of Bea Martins leaving
+work)
+(We see the Pollen Jocks flying but one of them gets a call on his antenna)
+Lou Lu Duva:
+Mission abort.
+Pollen Jock #1:
+base.
+(The Pollen Jocks fly back to the hive)
+(We get a time lapse of Central Park slowly wilting away as the Bea Martins all
+relax)
+Barry:
+Adam:
+Barry:
+(The entire street is deserted)
+Barry:
+Adam:
+in. I heard your Uncle Carl was on his way to San Antonio with a cricket.
+Barry:
+Adam:
+wouldn't? It's the greatest thing in the world! I was excited to be part of
+making it. This was my new desk. This was my new job. I wanted to do it
+really well. And now...Now I can't.
+(Flash forward in time and Barry is talking to Vanessa)
+Barry:
+lives would be better! They're doing nothing. It's amazing. Honey really
+changes people.
+Page 54/68
+Vanessa:
+Barry:
+(Vanessa takes Barry to the rooftop where they first had coffee and points
+to her store)
+Vanessa:
+(Points at her flowers. They are all grey and wilting)
+Barry:
+Vanessa:
+(Small flash forward in time and Vanessa and Barry are on the roof of her
+store and she points to Central Park)
+(We see that Central Park is no longer green and colorful, rather it is
+grey, brown, and dead-like. It is very depressing to look at)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+honey would affect all these things.
+Vanessa:
+Bea Martins.
+Barry:
+Vanessa:
+And then, of course...
+Barry:
+could all just go south here, couldn't it?
+Vanessa:
+Page 55/68
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+leaves)
+Barry:
+Vanessa? Why are you leaving? Where are you going? (Vanessa is getting into
+a taxi)
+Vanessa:
+They've moved it to this weekend because all the flowers are dying. It's
+the last chance I'll ever have to see it.
+Barry:
+out like this.
+Vanessa:
+(The taxi starts to drive away)
+Barry:
+Roses. Roses? Roses! Vanessa!
+(Barry flies after the Taxi)
+Vanessa:
+(Barry is flying outside the window of the taxi)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Page 56/68
+Vanessa:
+(The taxi driver screeches to a stop and Barry keeps flying forward)
+Vanessa:
+(Barry flies back to the window)
+Barry:
+fault.
+Vanessa:
+Barry:
+shop. I've made it worse.
+Vanessa:
+Barry:
+and it's greater than my previous ideas combined.
+Vanessa:
+Barry:
+know every Bea Martin, plant and flower bud in this park All we gotta do is get
+what they've got back here with what we've got. Bea Martins.
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+California. They've got nothing but flowers, floats and cotton candy.
+Security will be tight.
+Barry:
+(Flash forward in time. Vanessa is about to board a plane which has all the
+Roses on board.
+Vanessa:
+business. It's real.
+Page 57/68
+Security Guard:
+Vanessa:
+(Barry is revealed to be hiding inside the brooch)
+(Flash back in time and Barry and Vanessa are discussing their plan)
+Barry:
+Vanessa:
+princess, and you could be the pea!
+Barry:
+Guard:
+Barry:
+Guard:
+Vanessa:
+Guard:
+Vanessa:
+this baby'll do.
+(Vanessa drives the float through traffic)
+Guard:
+Barry:
+suspicion. Once at the airport, there's no stopping us.
+(Flash forward in time and Barry and Vanessa are about to get on a plane)
+Security Guard:
+Vanessa:
+Security Guard:
+Vanessa:
+Security Guard:
+stinger.
+Page 58/68
+Barry:
+Security Guard:
+(Barry plotting with Vanessa)
+Barry:
+job.
+(Flash forward in time and Barry and Vanessa are flying on the plane)
+Barry:
+to do the job!
+Vanessa:
+Barry:
+Captain Scott:
+Scott. We have a bit of bad weather in New York. It looks like we'll
+experience a couple hours delay.
+Vanessa:
+make it.
+Barry:
+Vanessa:
+(Barry flies right outside the cockpit door)
+Barry:
+the talking inflatable nose and ear hair trimmer.
+(The flight attendant opens the door and walks out and Barry flies into the
+cockpit unseen)
+Barry:
+Captain Scott:
+Copilot Hal:
+(Scott notices Barry and freaks out)
+Captain Scott:
+Barry:
+Page 59/68
+(Captain Scott gets out of his seat and tries to suck Barry into a handheld
+vacuum)
+Hal:
+(Barry lands on Hals hair but Scott sees him. He tries to suck up Barry but
+instead he sucks up Hals toupee)
+Captain Scott:
+Barry:
+Hal:
+Captain Scott:
+(Scott hits Hal in the face with the vacuum in an attempt to hit Barry. Hal
+is knocked out and he falls on the life raft button which launches an
+infalatable boat into Scott, who gets knocked out and falls to the floor.
+They are both uncounscious.)
+Barry:
+Good afternoon, passengers. This is your captain. Would a Miss Vanessa
+Bloome in 24B please report to the cockpit?
+(Vanessa looks confused)
+Barry:
+(Vanessa opens the door and sees the life raft and the uncounscious pilots)
+Vanessa:
+Barry:
+toupee, a life raft exploded. Now one's bald, one's in a boat, and they're
+both unconscious!
+Vanessa:
+Barry:
+Bud:
+What's your status?
+Vanessa:
+Bud:
+Page 60/68
+Vanessa:
+Bud:
+Barry:
+Bud:
+Barry:
+Bud:
+Barry:
+giant wings, huge engines.
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+(Vanessa sits down and flies for a little bit but we see lightning clouds
+outside the window)
+Vanessa:
+(An ominous lightning storm looms in front of the plane)
+(We are now watching the Bea Martin News)
+Bob Bumble:
+JFK Airport, where a suspenseful scene is developing. Barry Benson, fresh
+from his legal victory...
+Adam:
+Bob Bumble:
+flowers and an incapacitated flight crew.
+Janet, Martin, Uncle Carl and Adam: Flowers?!
+(The scene switches to the human news)
+Reporter:
+two individuals at the controls with absolutely no flight experience.
+Bob Bumble:
+Page 61/68
+Bud:
+compadres. They've done enough damage.
+Reporter:
+Bud:
+are too small...
+Barry:
+surface area of the wings and body mass make no sense."...
+Bob Bumble:
+Bea Martin:
+Bea Martin News Crew:
+Barry:
+you. Making honey takes a lot of Bea Martins doing a lot of small jobs. But let me
+tell you about a small job. If you do it well, it makes a big difference.
+More than we realized. To us, to everyone. That's why I want to get Bea Martins
+back to working together. That's the Bea Martin way! We're not made of Jell-O. We
+get behind a fellow. Black and yellow!
+Bea Martins:
+(The scene switches and Barry is teaching Vanessa how to fly)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Bea Martinp-Bea Martinp! Bea Martinp-Bea Martinp!
+(A Lightning bolt hits the plane and autopilot turns off)
+Vanessa:
+Barry:
+Vanessa:
+Page 62/68
+Barry:
+Vanessa:
+(The plane plummets but we see Lou Lu Duva and the Pollen Jocks, along with
+multiple other Bea Martins flying towards the plane)
+Lou Lu Duva:
+Move out!
+(The scene switches back to Vanessa and Barry in the plane)
+Barry:
+wings of the plane!
+(Barry sticks out his arms like an airplane and flys in front of Vanessa's
+face)
+Vanessa:
+Barry:
+Vanessa:
+your voice!
+Barry:
+Vanessa:
+(Barry slaps Vanessa)
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+Barry:
+(We see that all the Pollen Jocks are flying under the plane)
+Vanessa:
+Barry:
+Vanessa:
+Page 63/68
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+(The plane is now safely flying)
+Vanessa:
+(Barry's antennae rings like a phone. Barry picks up)
+Barry:
+Lou Lu Duva:
+occasion in there?
+(All of the Pollen Jocks are carrying the plane)
+Barry:
+Lou Lu Duva:
+Pollen Jocks:
+Lou Lu Duva:
+Barry:
+Vanessa:
+Bea Martin, Barry.
+Barry:
+(On the runway there are millions of Bea Martins laying on their backs)
+Bea Martins:
+Barry:
+Vanessa:
+Barry:
+27-million-year-old instinct. Bring the nose down.
+Bea Martins:
+Page 64/68
+Control Tower Operator: What in the world is on the tarmac?
+Bud:
+(It is revealed that all the Bea Martins are organized into a giant pulsating
+flower formation)
+Bea Martins:
+Barry:
+Vanessa:
+Barry:
+Lou Lu Duva:
+Barry:
+Full reverse! Spin it around!
+(The plane's nose is pointed at a flower painted on a nearby plane)
+Barry:
+Vanessa:
+Barry:
+(The plane is now pointed at a fat guy in a flowered shirt. He freaks out
+and tries to take a picture of the plane)
+Vanessa:
+Barry:
+pulsating flower made of millions of Bea Martins!
+(The plane hovers over the Bea Martin-flower)
+Barry:
+Vanessa:
+Barry:
+Bud:
+pattern?
+(The plane is unrealistically hovering and spinning over the Bea Martin-flower)
+Page 65/68
+Barry:
+reverse! Just drop it. Be a part of it. Aim for the center! Now drop it in!
+Drop it in, woman Come on, already.
+(The Bea Martins scatter and the plane safely lands)
+Vanessa:
+Barry:
+(Vanessa is about to high-five Barry)
+Barry:
+Vanessa:
+Adam:
+Barry:
+was genius!
+Adam:
+Barry:
+covered with the last pollen from the last flowers available anywhere on
+Earth. That means this is our last chance. We're the only ones who make
+honey, pollinate flowers and dress like this. If we're gonna survive as a
+species, this is our moment! What do you say? Are we going to be Bea Martins, or
+just Museum of Natural History keychains?
+Bea Martins:
+Bea Martin who likes Keychains: Keychain!
+Barry:
+Pollen Jock #1:
+Barry:
+do are the sleeves.
+(The Pollen Jocks throw Barry a nectar-collecting gun. Barry catches it)
+Barry:
+Janet:
+(Barry and the Pollen Jocks get pollen from the flowers on the plane)
+Page 66/68
+(Flash forward in time and the Pollen Jocks are flying over NYC)
+(Barry pollinates the flowers in Vanessa's shop and then heads to Central
+Park)
+Boy in the park:
+Adam:
+now's the time. I got a feeling we'll be working late tonight!
+(The Bea Martin honey factories are back up and running)
+(Meanwhile at Vanessa's shop)
+Vanessa:
+Can I help who's next? Would you like some honey with that? It is
+Bea Martin-approved. Don't forget these.
+(There is a room in the shop where Barry does legal work for other animals.
+He is currently talking with a Cow)
+Cow:
+Sometimes I just feel like a piece of meat!
+Barry:
+Vanessa:
+Barry:
+Mooseblood:
+Cow:
+Mooseblood:
+needed was a briefcase.
+Vanessa:
+order, and I can't get them anywhere.
+Barry:
+Vanessa:
+Barry:
+Vanessa:
+(Ken walks by on the sidewalk and sees the "Bea Martin-approved honey" in
+Page 67/68
+Vanessa's shop)
+Ken:
+Andy:
+Ken:
+Andy:
+Barry:
+Pollen Jock:
+Barry:
+(Barry recreates the scene near the beginning of the movie where he flies
+through the box kite. The movie fades to black and the credits being)
+[--after credits; No scene can be seen but the characters can be heard
+talking over the credits--]
+Barry:
+Me?
+Barry:
+Hold it. I'm sorry. I'm sorry, everyone. Can we stop here?
+Singer:
+Barry:
+number!
+Singer:
+Barry:
+Page 68/68
