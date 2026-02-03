@@ -80,7 +80,6 @@ class FollowTrajectory(AutoStages):
         self.startTime = wpilib.getTime()
 
     def run(self, robotState: RobotState):
-
         self.robotState = robotState
 
         self.pathTime = wpilib.getTime() - self.startTime
@@ -111,9 +110,9 @@ class FollowTrajectory(AutoStages):
         print(endXPos, endYPos, endRotation, "end pos")
         print(self.trajectory.getTotalTimeSeconds())
 
-        if self.pathTime > self.trajectory.getTotalTimeSeconds():
-            self.done = True
-            return True
+        # if self.pathTime > self.trajectory.getTotalTimeSeconds():
+        #     self.done = True
+        #     return True
         if max(currXPos, endXPos) - min(currXPos, endXPos) > posError:
             return False
         if max(currYPos, endYPos) - min(currYPos, endYPos) > posError:

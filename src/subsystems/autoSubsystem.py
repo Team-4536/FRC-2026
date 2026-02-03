@@ -32,7 +32,7 @@ class AutoSubsystem(Subsystem):
         self.autoSideChooser.addOption(AUTO_SIDE_RED, AUTO_SIDE_RED)
         wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
-    def init(self) -> None:
+    def phaseInit(self) -> None:
         print(self.autoRoutineChooser.getSelected().value, "value to test")
         self.routine: dict[str, AutoStages] = routineChooser(
             self.autoRoutineChooser.getSelected().value,
@@ -56,13 +56,11 @@ class AutoSubsystem(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:  # TODO: Finish
 
-        self.robotState = robotState
-
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
             self.robotState = self.routine[self.routineKeys[self.currentPath]].run(
-                self.robotState
+                robotState
             )
             if self.routine[self.routineKeys[self.currentPath]].isDone():
                 self.currentPath += 1
