@@ -30,8 +30,8 @@ class RobotState(NetworkTablesMixin):
             elif isinstance(value, bool):
                 self.publishBoolean(name, value)
 
-        self.publishDouble("vx", self.fieldSpeeds.vx, "FieldSpeeds")
-        self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
+        # self.publishDouble("vx", self.fieldSpeeds.vx, "FieldSpeeds")
+        # self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishDouble("omega", self.fieldSpeeds.omega, "FieldSpeeds")
 
         if self.pose:
