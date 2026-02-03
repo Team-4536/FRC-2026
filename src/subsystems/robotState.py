@@ -24,8 +24,8 @@ class RobotState(NetworkTablesMixin):
 
             self.publishGeneric(name, value)
 
-        self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
-        self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
+        # self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
+        # self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
 
         if self.pose:
