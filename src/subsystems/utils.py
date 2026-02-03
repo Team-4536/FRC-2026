@@ -1,5 +1,5 @@
 from math import atan2, copysign, cos, hypot, sin
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
@@ -10,41 +10,45 @@ class TimeData(Subsystem):
     def __init__(self) -> None:
         super().__init__()
 
+        time = getTime()
         self.dt: seconds = 0
         self.timeSinceInit: seconds = 0
-        self.prevTime: seconds = 0
-        self.initTime: seconds = 0
+        self.timeSincePhaseInit: seconds = 0
+        self.prevTime: seconds = time
+        self.initTime: seconds = time
+        self.phaseInitTime: seconds = time
 
-    def init(self) -> None:
-        time: seconds = getTime()
-
-        self.dt = 0
-        self.timeSinceInit = 0
-        self.prevTime = time
-        self.initTime = time
-
-    def periodic(self, ds: DesiredState) -> None:
+    def phaseInit(self) -> None:
         time = getTime()
+        self.timeSincePhaseInit = 0
+        self.phaseInitTime = time
 
+    def periodic(self, robotState: RobotState) -> RobotState:
+        time = getTime()
         self.dt = time - self.prevTime
         self.timeSinceInit = time - self.initTime
+        self.timeSincePhaseInit = time - self.phaseInitTime
         self.prevTime = time
+
+        return robotState
 
     def disabled(self) -> None:
         time = getTime()
-
-        self.dt = 0
+        self.dt = time - self.prevTime
         self.timeSinceInit = time - self.initTime
-
-        self.publish()
+        self.timeSincePhaseInit = 0
+        self.prevTime = time
 
     def publish(self) -> None:
-        self.publishDouble("delta_time", self.dt)
-        self.publishDouble("time_since_init", self.timeSinceInit)
+        self.publishFloat("delta_time", self.dt)
+        self.publishFloat("time_since_init", self.timeSinceInit)
+        self.publishFloat("time_since_phase_init", self.timeSincePhaseInit)
 
 
 class Scalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+    def __init__(
+        self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
+    ) -> None:
         self.deadzone = deadzone
         self._exponent = exponent
         self._magnitude = magnitude
@@ -96,7 +100,9 @@ class Scalar:
 
 
 class CircularScalar:
-    def __init__(self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1) -> None:
+    def __init__(
+        self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
+    ) -> None:
         self.linearScalar = Scalar(deadzone, exponent, magnitude)
 
     def scale(self, *, x: float, y: float) -> Tuple[float, float]:
