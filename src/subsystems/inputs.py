@@ -10,8 +10,6 @@ from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
 from math import pi as PI
 
-from wpilib import DigitalInput
-
 
 class Inputs(Subsystem):
     def __init__(
@@ -27,9 +25,6 @@ class Inputs(Subsystem):
         self._mechCtrl = Ctrlr(mechPort)
 
         self.robotState = RobotState.empty(abtainableMaxSpeed=5)
-
-        self.limitSwitch1 = DigitalInput(10)
-        self.limitSwitch2 = DigitalInput(0)
 
         self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
         self._circularScalar: CircularScalar = CircularScalar(
@@ -50,7 +45,6 @@ class Inputs(Subsystem):
     def periodic(self) -> None:
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.turretSpeed = self._linearScalar(self._mechCtrl.getLeftX() * 30)
-        self.robotState.turretSetPoint = self._mechCtrl.getPOV()
         self.robotState.motorDesiredState = self._linearScalar(
             self._mechCtrl.getRightY()
         )
@@ -58,13 +52,13 @@ class Inputs(Subsystem):
         self.robotState.motorDesiredState = self._linearScalar(
             self._mechCtrl.getRightY()
         )
-        self.robotState.limitA = self.limitSwitch2.get()
-        self.robotState.limitB = self.limitSwitch1.get()
+        self.robotState.turretManualToggle = self._mechCtrl.getYButtonPressed() # TODO assign button for manual toggle
+        self.robotState.turretManualSetpoint = self._mechCtrl.getPOV()
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.revShooter = self._mechCtrl.getRightTriggerAxis()
-        self.robotState.shootShooter = self._mechCtrl.getRightBumper()
+        self.robotState.kickShooter = self._mechCtrl.getRightBumper()
         return robotState
 
     def disabled(self) -> None:

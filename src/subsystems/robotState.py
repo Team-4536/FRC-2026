@@ -19,8 +19,8 @@ class RobotState(NetworkTablesMixin):
     optimalTurretAngle: radians
     hubDistance: meters
 
-    limitA: bool
-    limitB: bool
+    turretManualToggle: bool
+    turretManualSetpoint: float
 
     def __post_init__(self) -> None:
         super().__init__()

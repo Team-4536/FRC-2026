@@ -1,5 +1,6 @@
 from subsystems.motor import RevMotor
 from subsystems.subsystem import Subsystem
+from subsystems.robotState import RobotState
 from rev import (
     SparkRelativeEncoder,
     SparkBaseConfig,
@@ -26,13 +27,15 @@ from wpimath.units import (
 import math
 from math import tau as TAU, pi as PI
 import numpy as np
-from wpimath.geometry import Pose2d, Translation3d
+from wpimath.geometry import Pose2d, Translation3d, Translation2d, Rotation2d
 from ntcore import NetworkTableInstance
+from wpilib import DigitalInput
 
 
 MAX_ROTATION = degreesToRadians(270)
 TURRET_GAP = math.tau - MAX_ROTATION
-GEARING = 12  # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
+YAW_GEARING = 12  # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
+PITCH_GEARING = 2
 
 # TODO find feild positions for each
 RED_RIGHT_SHUTTLE_POS: Translation3d = Translation3d()
@@ -49,6 +52,8 @@ Y_PASS: meters = GOAL_HEIGHT + Y_PASS_DIFF
 HUB_RADIUS: inches = 24.5 / 2
 X_PASS_DIFF: meters = inchesToMeters(HUB_RADIUS)
 
+MANUAL_SPEED: RPM = 120
+
 
 class Turret(Subsystem):
     # cancoder more like cantcoder
@@ -56,13 +61,13 @@ class Turret(Subsystem):
     # pitch is vertical
 
     def __init__(self, yawMotorID, pitchMotorID):
-        self.motorYaw = RevMotor(
+        self.yawMotor = RevMotor(
             deviceID=yawMotorID
         )  # get right ID, motor for turning horizontally
 
         self.pitchMotor = RevMotor(deviceID=pitchMotorID)
 
-        self.motorYaw.AZIMUTH_CONFIG = (
+        self.yawMotor.AZIMUTH_CONFIG = (
             SparkMaxConfig()
             .smartCurrentLimit(40)
             .inverted(True)
@@ -87,10 +92,15 @@ class Turret(Subsystem):
             )
         )
 
-        self.motorYaw.configure(config=self.motorYaw.AZIMUTH_CONFIG)
+        self.pitchMotor.AZIMUTH_CONFIG.apply(
+            ClosedLoopConfig()
+            .reverseLimitSwitchEnabled(True)
+        )
+
+        self.yawMotor.configure(config=self.yawMotor.AZIMUTH_CONFIG)
         self.pitchMotor.configure(config=self.pitchMotor.AZIMUTH_CONFIG)
 
-        self.yawEncoder = self.motorYaw.getEncoder()
+        self.yawEncoder = self.yawMotor.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
 
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
@@ -105,6 +115,13 @@ class Turret(Subsystem):
         self.yawSetPoint = 0  # in relation to the field
         self.target: Translation3d = Translation3d()
 
+        self.yawLimitSwitch = DigitalInput(10)
+        self.pitchLimitSwitch - DigitalInput(0) # TODO chnage
+
+        self.manualMode = False
+        self.yawVelocity = 0
+        self.pitchVelocity = 0
+
     def init(self):
         self.homeSet: bool = False
         self.yawSetPoint = 0  # in relation to the field
@@ -112,27 +129,70 @@ class Turret(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
 
         if not self.homeSet:
-            self.reset(robotState.limitA)
+            self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
             return robotState
 
-        robotState.optimalTurretAngle = self.calculateAngle(robotState.hubDistance)
         robotYaw = robotState.pose.rotation().radians()
-        self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.odom.updateWithEncoder(robotYaw, self.yawEncoder)
 
-        self.targetPoint(self.target, robotState.pose)  # need odom
+        if(robotState.turretManualToggle):
+            self.manualMode = not self.manualMode
+
+        if(self.manualMode):
+            self.manualUpdate(robotState.turretManualSetpoint)
+
+        else:
+            self.automaticUpdate(robotState)
+        
+        
+        self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
+
         self.maintainRotation(robotYaw)  # these go last
         self.dontOverdoIt()
 
-        self.motorYaw.setPosition(self.yawSetPoint * GEARING)
+        if(self.manualMode):
+            self.yawMotor.setVelocity(self.yawVelocity)
+            self.pitchMotor.setVelocity(self.pitchVelocity)
+
+        else:
+            self.yawMotor.setPosition(self.yawSetPoint * YAW_GEARING)
+            self.pitchMotor.setPosition(robotState.optimalTurretAngle * PITCH_GEARING)
 
         return robotState
 
-    def disabled(self):
-        self.motorYaw.setVelocity(0)
-        self.pitchMotor.setVelocity(0)
+    def automaticUpdate(self, robotState: RobotState):
 
-        self.motorYaw.configure(config=self.motorYaw.DISABLED_AZIMUTH_CONFIG)
+        robotState.optimalTurretAngle = self.calculateAngle(robotState.hubDistance)
+        self.targetPoint(self.target, robotState.pose)  # need odom
+
+    def manualUpdate(self, setPoint: float):
+        
+        self.yawVelocity = 0
+        self.pitchVelocity = 0
+
+        if(setPoint == -1):
+            return
+
+        if(setPoint > 0 and setPoint < 180):
+            self.yawVelocity = 1
+        
+        elif(setPoint > 180 and setPoint < 360):
+            self.yawVelocity = -1
+
+        if(setPoint > 270 or setPoint < 90):
+            self.pitchVelocity = 1
+
+        elif(setPoint > 90 and setPoint < 270):
+            self.pitchVelocity = -1
+
+        self.yawVelocity *= MANUAL_SPEED
+        self.pitchVelocity *= MANUAL_SPEED
+
+    def disabled(self):
+        self.yawMotor.stopMotor()
+        self.pitchMotor.stopMotor()
+
+        self.yawMotor.configure(config=self.yawMotor.DISABLED_AZIMUTH_CONFIG)
         self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
         # do we need these .configure lines when revmotor allready does this?
 
@@ -143,7 +203,7 @@ class Turret(Subsystem):
         self.table.putBoolean("Turret Home Set", self.homeSet)
         self.table.putNumber("Turret Yaw Setpoint", self.yawSetPoint)
         self.table.putNumber(
-            "Turret Yaw Actual Motor Setpoint", self.yawSetPoint * GEARING
+            "Turret Yaw Actual Motor Setpoint", self.yawSetPoint * YAW_GEARING
         )
         self.table.putNumber(
             "Turret Yaw Feild Relative Rotation", self.odom.feildRelativeRot
@@ -152,7 +212,7 @@ class Turret(Subsystem):
             "Turret Yaw Feild Relative Rotation Wrapped", self.odom.wrappedFRR
         )
         self.table.putNumber("Turret Yaw Encoder Motor Pos", self.yawPos)
-        self.table.putNumber("Turret Yaw Actual Encoder Pos", self.yawPos / GEARING)
+        self.table.putNumber("Turret Yaw Actual Encoder Pos", self.yawPos / YAW_GEARING)
 
     def maintainRotation(self, robotYaw):
         self.yawSetPoint -= self.odom.getGyroChange(robotYaw)
@@ -174,10 +234,12 @@ class Turret(Subsystem):
     def reset(self, limit):
         if not self.homeSet:
 
-            self.motorYaw.setVelocity(-1)
+            self.yawMotor.setVelocity(-1)
+            self.pitchMotor.setVelocity(-1)
 
             if limit:
                 self.yawEncoder.setPosition(0)
+                self.pitchEncoder.setPosition(0)
                 self.homeSet = True
 
     def calculateAngle(self, d: meters) -> radians:
@@ -199,7 +261,7 @@ class TurretOdometry:
     def updateWithEncoder(self, roboYaw, encoder: SparkRelativeEncoder):
 
         turretRaw = encoder.getPosition()
-        turretRot = rotationsToRadians(turretRaw) / GEARING
+        turretRot = rotationsToRadians(turretRaw) / YAW_GEARING
         self.wrappedFRR = (turretRot % TAU) * np.sign(
             turretRot
         )  # modulo only returns positive so multiply by the sign
