@@ -236,7 +236,7 @@ class Shooter(Subsystem):
                 rs.optimalTurretAngle, rs.hubDistance
             )
         elif rs.shootShooter == 1:
-            pass  # feed stuff
+            self.kickMotor.setVelocity(1)
         else:
             self.disabled()
 
