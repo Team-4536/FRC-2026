@@ -150,7 +150,7 @@ class SwerveDrive(Subsystem):
 
         WHEEL_DISTANCE: meters = inchesToMeters(10.875)
 
-        self._modules = self.symmetricDrive(
+        self._modules = self._symmetricDrive(
             frontLeftDriveID=2,
             frontRightDriveID=4,
             backLeftDriveID=6,
@@ -184,9 +184,9 @@ class SwerveDrive(Subsystem):
 
         self._gyro.reset()
 
-    def init(self) -> None:
-        self.configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
-        self.configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
+    def phaseInit(self) -> None:
+        self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
+        self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
 
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:
@@ -206,8 +206,8 @@ class SwerveDrive(Subsystem):
 
     def disabled(self) -> None:
         self._modules.stopModules()
-        self.configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
-        self.configureAzimuthMotors(config=RevMotor.DISABLED_AZIMUTH_CONFIG)
+        self._configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
+        self._configureAzimuthMotors(config=RevMotor.DISABLED_AZIMUTH_CONFIG)
 
     def drive(self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: MPS) -> None:
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -228,14 +228,6 @@ class SwerveDrive(Subsystem):
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
 
-    def configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
-        for module in self._modules:
-            module.configureDriveMotor(config=config)
-
-    def configureAzimuthMotors(self, *, config: SparkBaseConfig) -> None:
-        for module in self._modules:
-            module.configureAzimuthMotor(config=config)
-
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)
         self.publishFloat("gyro_angle", self._gyro.getAngle() % 360)
@@ -252,10 +244,10 @@ class SwerveDrive(Subsystem):
             self.publishFloat(f"{name}_angle", module.azimuthRotation, "azimuth")
 
         self.publishFloatArray(
-            "estimated_robot_position", self.estimateCurrentPosition()
+            "estimated_robot_position", self._estimateCurrentPosition()
         )
 
-    def estimateCurrentPosition(self) -> Tuple[meters, meters, rotation]:
+    def _estimateCurrentPosition(self) -> Tuple[meters, meters, rotation]:
         x, y, omega = 0.0, 0.0, 0.0
 
         modules = self._modules
@@ -274,7 +266,15 @@ class SwerveDrive(Subsystem):
 
         return (x, y, omega)
 
-    def symmetricDrive(
+    def _configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
+        for module in self._modules:
+            module.configureDriveMotor(config=config)
+
+    def _configureAzimuthMotors(self, *, config: SparkBaseConfig) -> None:
+        for module in self._modules:
+            module.configureAzimuthMotor(config=config)
+
+    def _symmetricDrive(
         self,
         *,
         frontLeftDriveID: int,

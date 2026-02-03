@@ -17,8 +17,8 @@ class SubsystemManager(NamedTuple):
 
     def init(self) -> None:
         for s in self.dependantSubsytems:
-            s.init()
-        self.inputs.init()
+            s.phaseInit()
+        self.inputs.phaseInit()
 
     def robotPeriodic(self) -> None:
         self.robotState.publish()

@@ -18,7 +18,7 @@ class TimeData(Subsystem):
         self.initTime: seconds = time
         self.phaseInitTime: seconds = time
 
-    def init(self) -> None:
+    def phaseInit(self) -> None:
         time = getTime()
         self.timeSincePhaseInit = 0
         self.phaseInitTime = time

@@ -11,8 +11,8 @@ class Subsystem(NetworkTablesMixin):
     def __init__(self, *, instance: Optional[str] = None):
         super().__init__(instance=instance)
 
-    def init(self) -> None:
-        self._warn(self.init)
+    def phaseInit(self) -> None:
+        self._warn(self.phaseInit)
 
     def periodic(self, robotState: RobotState) -> RobotState:  # type: ignore
         self._warn(self.periodic)
