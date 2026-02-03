@@ -5,7 +5,6 @@ from typing import (
     Callable,
     cast,
     Dict,
-    List,
     Optional,
     Sequence,
     Tuple,
@@ -19,10 +18,8 @@ Struct: TypeAlias = object
 
 class NetworkTablesMixin:
     def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
-        if instance is None:
+        if not instance:
             instance = self.__class__.__name__
-        else:
-            instance = f"{self.__class__.__name__}/{instance}"
 
         self.table = NetworkTableInstance.getDefault().getTable(f"{table}/{instance}")
         self._ntPersist: Dict[str, object] = {}
@@ -86,34 +83,36 @@ class NetworkTablesMixin:
     def publishGeneric(
         self,
         name: str,
-        value: Union[
-            int,
-            Sequence[int],
-            str,
-            Sequence[str],
-            float,
-            Sequence[float],
-            Struct,
-            Sequence[Struct],
+        value: Optional[
+            Union[
+                int,
+                Sequence[int],
+                str,
+                Sequence[str],
+                float,
+                Sequence[float],
+                Struct,
+                Sequence[Struct],
+            ]
         ],
         *subtables: str,
     ) -> None:
         if isinstance(value, int):
             self.publishInteger(name, value, *subtables)
         elif isinstance(value, Sequence) and isinstance(value[0], int):
-            self.publishIntegerArray(name, cast(List[int], value), *subtables)
+            self.publishIntegerArray(name, cast(Sequence[int], value), *subtables)
         elif isinstance(value, str):
             self.publishString(name, value, *subtables)
         elif isinstance(value, Sequence) and isinstance(value[0], str):
-            self.publishStringArray(name, cast(List[str], value), *subtables)
+            self.publishStringArray(name, cast(Sequence[str], value), *subtables)
         elif isinstance(value, float):
             self.publishFloat(name, value, *subtables)
         elif isinstance(value, Sequence) and isinstance(value[0], float):
-            self.publishFloatArray(name, cast(List[float], value), *subtables)
+            self.publishFloatArray(name, cast(Sequence[float], value), *subtables)
         elif isinstance(value, bool):
             self.publishBoolean(name, value, *subtables)
         elif isinstance(value, Sequence) and isinstance(value[0], bool):
-            self.publishBooleanArray(name, cast(List[bool], value), *subtables)
+            self.publishBooleanArray(name, cast(Sequence[bool], value), *subtables)
 
     def publishSwerve(
         self,
@@ -129,6 +128,7 @@ class NetworkTablesMixin:
         self,
         name: str,
         topicFn: Callable[[str], Any],
+        table: str = "teleop",
         *subtables: str,
         default: Any = None,
     ) -> Any:
@@ -140,14 +140,22 @@ class NetworkTablesMixin:
         return topic.getEntry(default).get()
 
     def getString(
-        self, name: str, *subtables: str, default: Optional[str] = None
+        self,
+        name: str,
+        *subtables: str,
+        default: Optional[str] = None,
+        tableInstance: Optional[str] = None,
     ) -> Optional[str]:
-        val = self.__get(name, self.table.getStringTopic, *subtables, default=default)
+        if not tableInstance:
+            table = self.table
+        else:
+            table = self.table
+        val = self.__get(name, table.getStringTopic, *subtables, default=default)
         return str(val) if val is not None else None
 
     def getStringArray(
-        self, name: str, *subtables: str, default: Optional[List[str]] = None
-    ) -> Optional[List[str]]:
+        self, name: str, *subtables: str, default: Optional[Sequence[str]] = None
+    ) -> Optional[Sequence[str]]:
         val = self.__get(
             name, self.table.getStringArrayTopic, *subtables, default=default
         )
@@ -160,8 +168,8 @@ class NetworkTablesMixin:
         return int(val) if val is not None else None
 
     def getIntegerArray(
-        self, name: str, *subtables: str, default: Optional[List[int]] = None
-    ) -> Optional[List[int]]:
+        self, name: str, *subtables: str, default: Optional[Sequence[int]] = None
+    ) -> Optional[Sequence[int]]:
         val = self.__get(
             name, self.table.getIntegerArrayTopic, *subtables, default=default
         )
@@ -174,8 +182,8 @@ class NetworkTablesMixin:
         return float(val) if val is not None else None
 
     def getFloatArray(
-        self, name: str, *subtables: str, default: Optional[List[float]] = None
-    ) -> Optional[List[float]]:
+        self, name: str, *subtables: str, default: Optional[Sequence[float]] = None
+    ) -> Optional[Sequence[float]]:
         val = self.__get(
             name, self.table.getFloatArrayTopic, *subtables, default=default
         )
@@ -188,8 +196,8 @@ class NetworkTablesMixin:
         return bool(val) if val is not None else None
 
     def getBooleanArray(
-        self, name: str, *subtables: str, default: Optional[List[bool]] = None
-    ) -> Optional[List[bool]]:
+        self, name: str, *subtables: str, default: Optional[Sequence[bool]] = None
+    ) -> Optional[Sequence[bool]]:
         val = self.__get(
             name, self.table.getBooleanArrayTopic, *subtables, default=default
         )
