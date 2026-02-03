@@ -32,7 +32,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     robotMassKG = lbsToKilograms(100)  # TODO: change later
     robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # TODO: change later
     moduleConfig = ModuleConfig(
-        wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 1
+        wheelRadiusMeters, maxVelocity, wheelCOF, motor, currentLimit, 4
     )
     moduleOffsets = [
         topLeftWheelCords,
@@ -110,9 +110,9 @@ class FollowTrajectory(AutoStages):
         print(endXPos, endYPos, endRotation, "end pos")
         print(self.trajectory.getTotalTimeSeconds())
 
-        # if self.pathTime > self.trajectory.getTotalTimeSeconds():
-        #     self.done = True
-        #     return True
+        if self.pathTime > self.trajectory.getTotalTimeSeconds():
+            self.done = True
+            return True
         if max(currXPos, endXPos) - min(currXPos, endXPos) > posError:
             return False
         if max(currYPos, endYPos) - min(currYPos, endYPos) > posError:
