@@ -14,7 +14,6 @@ from typing import (
 )
 from wpimath.kinematics import SwerveModuleState
 
-
 Struct: TypeAlias = object
 
 

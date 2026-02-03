@@ -10,6 +10,7 @@ dependencies = [
     "phoenix6",
     "photonlibpy",
     "ty",
+    "pre-commit",
 ]
 
 
