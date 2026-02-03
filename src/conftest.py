@@ -5,4 +5,6 @@ from robot import Robot
 
 
 def pytest_runtest_setup(item: Function) -> None:
-    item.config.pluginmanager.register(PyFrcPlugin(Robot, Path("robot.py"), isolated=True))
+    item.config.pluginmanager.register(
+        PyFrcPlugin(Robot, Path("robot.py"), isolated=True)
+    )

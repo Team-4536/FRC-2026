@@ -1,4 +1,4 @@
-
+#
 # Use this configuration file to control what RobotPy packages are installed
 # on your RoboRIO
 #
@@ -32,5 +32,4 @@ requires = [
     "robotpy-rev",
     "phoenix6",
     "photonlibpy",
-    "mypy"
 ]

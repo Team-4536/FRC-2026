@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "RobotPy SIM",
+            "name": "RobotPy Sim",
             "type": "debugpy",
             "request": "launch",
             "module": "robotpy",
