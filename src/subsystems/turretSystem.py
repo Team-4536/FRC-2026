@@ -245,7 +245,7 @@ class Shooter(Subsystem):
                 robotState.optimalTurretAngle, robotState.hubDistance
             )
         elif robotState.shootShooter == 1:
-            pass  # feed stuff
+            self.kickMotor.setVelocity(1)
         else:
             self.disabled()
 
