@@ -24,10 +24,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
 
-    topLeftWheelCords = Translation2d(-0.276225, 0.276225)
-    topRightWheelCords = Translation2d(0.276225, 0.276225)
-    bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
-    bottomRightWheelCords = Translation2d(0.276225, -0.276225)
+    topLeftWheelCords = Translation2d(0.276225, 0.276225)
+    topRightWheelCords = Translation2d(0.276225, -0.276225)
+    bottomLeftWheelCords = Translation2d(-0.276225, 0.276225)
+    bottomRightWheelCords = Translation2d(-0.276225, -0.276225)
 
     robotMassKG = lbsToKilograms(100)  # TODO: change later
     robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # TODO: change later
