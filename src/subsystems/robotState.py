@@ -14,7 +14,6 @@ class RobotState(NetworkTablesMixin):
     pose: Pose2d
     motorDesiredState: float
 
-    turretSetPoint: Pose2d
     revShooter: RPM
     shootShooter: RPM
     optimalTurretAngle: radians
