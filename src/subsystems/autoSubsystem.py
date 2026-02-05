@@ -23,8 +23,8 @@ class AutoSubsystem(Subsystem):
             AutoRoutines.DRIVE_FORWARD_TEST.value,
             AutoRoutines.DRIVE_FORWARD_TEST,
         )
-        for option in AutoRoutines:
-            self.autoRoutineChooser.addOption(option.value, option)
+        for routine in AutoRoutines:
+            self.autoRoutineChooser.addOption(routine.value, routine)
 
         wpilib.SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
 
@@ -34,9 +34,9 @@ class AutoSubsystem(Subsystem):
         wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
     def phaseInit(self) -> None:
-        print(self.autoRoutineChooser.getSelected().value, "value to test")
+        print(self.autoRoutineChooser.getSelected(), "value to test")
         self.routine: dict[str, AutoStages] = routineChooser(
-            self.autoRoutineChooser.getSelected().value,
+            self.autoRoutineChooser.getSelected(),
             self.autoSideChooser.getSelected() == "red",
         )
 
@@ -55,7 +55,7 @@ class AutoSubsystem(Subsystem):
 
         # print(self.autoRoutineChooser.getSelected().value, ")(*&^%$#@!)")
 
-    def periodic(self, robotState: RobotState) -> RobotState:  # TODO: Finish
+    def periodic(self, robotState: RobotState) -> RobotState:
 
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
@@ -78,20 +78,18 @@ class AutoSubsystem(Subsystem):
         pass
 
 
-def routineChooser(selectedRoutine: str, isFlipped: bool):
+def routineChooser(selectedRoutine: AutoRoutines, isFlipped: bool):
     routine: dict[str, AutoStages] = dict()
 
-    wpilib.SmartDashboard.putString("routine", selectedRoutine)
-
     match selectedRoutine:
-        case AutoRoutines.DO_NOTHING.value:
+        case AutoRoutines.DO_NOTHING:
             pass
-        case AutoRoutines.DRIVE_FORWARD_TEST.value:
+        case AutoRoutines.DRIVE_FORWARD_TEST:
             routine["Drive Forward Test"] = FollowTrajectory(
                 "Drive Forward Test",
                 isFlipped,
             )
-        case AutoRoutines.DRIVE_FORWARD_BACK_TEST.value:
+        case AutoRoutines.DRIVE_FORWARD_BACK_TEST:
             routine["Forward"] = FollowTrajectory(
                 "Forward",
                 isFlipped,
