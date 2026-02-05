@@ -73,7 +73,7 @@ class AutoStages:
 class FollowTrajectory(AutoStages):
     def __init__(self, pathName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(pathName, isFlipped)
-        self.robotState = RobotState
+        self.robotState = RobotState.empty()
         self.done = False
 
     def autoInit(self):
@@ -87,8 +87,6 @@ class FollowTrajectory(AutoStages):
         targetState = self.trajectory.sample(self.pathTime)
 
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
-
-        print(str(targetState.fieldSpeeds) + "***********************")
 
         return self.robotState
 
