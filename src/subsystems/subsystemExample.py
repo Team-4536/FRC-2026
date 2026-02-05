@@ -1,6 +1,6 @@
 from subsystems.subsystem import Subsystem
 from subsystems.motor import RevMotor
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from ntcore import NetworkTableInstance
 
 # motor vars do not include real device id at this time (1-13)
@@ -19,7 +19,7 @@ class SubsystemExample(Subsystem):
     def init(self) -> None:
         pass
 
-    def periodic(self, ds: DesiredState) -> None:
+    def periodic(self, ds: RobotState) -> None:
         self.table.putNumber("revMotorr", ds.revMotor)
         
 

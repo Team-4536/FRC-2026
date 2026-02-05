@@ -7,7 +7,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
 from subsystems.climbing import Climbing
-from subsystems.turret import Turret 
+# from subsystems.turret import Turret 
 
 robotState: RobotState = None  # type: ignore
 
@@ -19,7 +19,7 @@ class SubsystemManager(NamedTuple):
     time: TimeData
     subsystemExample: SubsystemExample 
     climbing: Climbing
-    turret: Turret
+    # turret: Turret
     
 
     def init(self) -> None:

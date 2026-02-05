@@ -31,9 +31,9 @@ class Inputs(Subsystem):
         self.limtiRightTur = DigitalInput(3) #^^
     
 
-        self.desiredState = DesiredState(
+        self.desiredState = RobotState(
             fieldSpeeds=ChassisSpeeds(),
-            abtainableMaxSpeed=maxVelocity,
+            #abtainableMaxSpeed=maxVelocity,
             revMotor=0,
             extended=False,
             contracted=True,
@@ -100,11 +100,7 @@ class Inputs(Subsystem):
 
     def _calculateDrive(self) -> ChassisSpeeds:
         vx, vy = self._circularScalar(
-<<<<<<< HEAD
-            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
-=======
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
->>>>>>> 51f5352d65d38f56a1a90d17f94e92f53a6c1ba3
         )
 
         omega: RPS = self._linearScalar(-self._driveCtrlr.getRightX())
