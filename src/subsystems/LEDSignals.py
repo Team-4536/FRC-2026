@@ -1,9 +1,8 @@
-from subsystems.desiredState import DesiredState
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import List, Optional
 from warnings import warn
 from wpilib import CAN
-
 
 NONE: int = 255
 
@@ -15,17 +14,14 @@ class LEDSignals(Subsystem):
         self.apiID = 0
         self.can = CAN(deviceID)
 
-    def init(self) -> None:
+    def phaseInit(self) -> None:
         pass
 
-    def periodic(self, ds: DesiredState) -> None:
-        pass
+    def periodic(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def disabled(self) -> None:
         self.update(b8=0)  # EXAMPLE
-
-    def publish(self) -> None:
-        pass
 
     def update(
         self,
