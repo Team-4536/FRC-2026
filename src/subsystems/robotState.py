@@ -1,10 +1,14 @@
 from dataclasses import dataclass, fields
+from math import pi as PI
+import math
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Translation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import revolutions_per_minute as RPM
-from wpimath.units import metersToFeet, radians, meters
+from wpimath.units import metersToFeet, radians, meters, inchesToMeters
+
+ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 
 
 @dataclass
@@ -21,6 +25,9 @@ class RobotState(NetworkTablesMixin):
 
     turretManualToggle: bool
     turretManualSetpoint: float
+
+    robotOmegaVelocity: MPS
+    robotLinearVelocity: Translation2d
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -55,3 +62,14 @@ class RobotState(NetworkTablesMixin):
         data.update(kwargs)
 
         return cls(**data)  # type: ignore
+
+
+def getTangentalVelocity(
+    posX: meters, posY: meters, angle: radians, speed: MPS
+) -> MPS:  # TODO change to a translation2D for angle relative to feild
+    tangentAngle: radians = math.atan(posY / posX) + PI / 2
+    actualAngle: radians = math.cos(tangentAngle - angle)
+
+    tangentvelocity: MPS = speed * actualAngle
+
+    return tangentvelocity

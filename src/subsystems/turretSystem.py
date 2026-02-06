@@ -1,6 +1,7 @@
 from subsystems.motor import RevMotor
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import RobotState
+from robotState import ROBOT_RADIUS, getTangentalVelocity
 from rev import (
     SparkRelativeEncoder,
     SparkBaseConfig,
@@ -30,6 +31,7 @@ import numpy as np
 from wpimath.geometry import Pose2d, Translation3d, Translation2d, Rotation2d
 from ntcore import NetworkTableInstance
 from wpilib import DigitalInput
+from enum import Enum
 
 
 MAX_ROTATION = degreesToRadians(270)
@@ -52,9 +54,21 @@ Y_PASS: meters = GOAL_HEIGHT + Y_PASS_DIFF
 HUB_RADIUS: inches = 24.5 / 2
 X_PASS_DIFF: meters = inchesToMeters(HUB_RADIUS)
 
+FLYWHEEL_RADIUS: inches = 3  # diameter of the wheels build decides to use
+FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * PI
+GRAVITY = 9.80665
+
 MANUAL_SPEED: RPM = 120
 
+TURRET_DIST_FROM_CENTER: meters = inchesToMeters(10)  # TODO make correct
+TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
+
+
 # TODO add an enum for which position we are targeting, shuttle or scoring
+class TurretTarget(Enum):
+    HUB = 1
+    RIGHT_SHUTTLE = 2
+    LEFT_SHUTTLE = 3
 
 
 class Turret(Subsystem):
@@ -115,7 +129,7 @@ class Turret(Subsystem):
 
         self.homeSet: bool = False
         self.yawSetPoint = 0  # in relation to the field
-        self.target: Translation3d = Translation3d()
+        self.targetPos: Translation3d = Translation3d()
 
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chnage
@@ -165,8 +179,8 @@ class Turret(Subsystem):
 
     def automaticUpdate(self, robotState: RobotState):
 
-        self.targetPoint(self.target, robotState.pose, robotState)  # need odom
-        robotState.optimalTurretAngle = self.calculateAngle(robotState.hubDistance)
+        self.targetPoint(self.targetPos, robotState.pose, robotState)  # need odom
+        robotState.optimalTurretAngle = calculateAngle(robotState.hubDistance)
 
     def manualUpdate(self, setPoint: float):
 
@@ -190,6 +204,9 @@ class Turret(Subsystem):
 
         self.yawVelocity *= MANUAL_SPEED
         self.pitchVelocity *= MANUAL_SPEED
+
+    def compensateSetpoint(self, time, roboLinV, roboOmegaV):  # TODO finish
+        turretRotV = roboOmegaV * TURRET_PATH_CIRCUMFRENCE / ROBOT_RADIUS
 
     def disabled(self):
         self.yawMotor.stopMotor()
@@ -253,15 +270,6 @@ class Turret(Subsystem):
                 self.pitchEncoder.setPosition(0)
                 self.homeSet = True
 
-    def calculateAngle(self, d: meters) -> radians:
-        xPass = d - X_PASS_DIFF
-        h = GOAL_HEIGHT
-
-        numerator = Y_PASS * d**2 - xPass**2 * h
-        denom = d * (xPass * d - xPass**2)
-
-        return math.atan(numerator / denom)
-
 
 class TurretOdometry:
     def __init__(self):
@@ -288,11 +296,8 @@ class Shooter(Subsystem):
 
     def __init__(self):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-        self.grav = 9.80665
 
         self.hubDistance = 0  # hypotenuse of odometry and the Hub position
-        self.wheelDiam: inches = 3  # radius of the wheels build decides to use
-        self.wheelCirc: meters = inchesToMeters(self.wheelDiam) * PI
 
         self.kickMotor = RevMotor(deviceID=14)
         self.kickMotorEncoder = self.kickMotor.getEncoder()
@@ -314,7 +319,7 @@ class Shooter(Subsystem):
         self.revingMotorBottom.setVelocity(self.revingSpeed)
 
         if robotState.revShooter > 0.1:
-            self.revingSpeed = self._calculateVelocity(
+            self.revingSpeed = _calculateVelocity(
                 robotState.optimalTurretAngle, robotState.hubDistance
             )
         elif robotState.shootShooter == 1:
@@ -324,18 +329,6 @@ class Shooter(Subsystem):
 
         return robotState
 
-    def _calculateVelocity(self, turretAngle, hubDistance) -> float:
-
-        self.velocityMps = math.sqrt(
-            (self.grav * turretAngle**2)
-            / (
-                2
-                * math.cos(turretAngle)
-                * (hubDistance * math.tan(turretAngle) - 0.9652)
-            )
-        )
-        return self.velocityMps / self.wheelCirc * 60
-
     def disabled(self) -> None:
         self.kickMotor.setVelocity(0)
         self.revingSpeed = 0
@@ -343,3 +336,30 @@ class Shooter(Subsystem):
     def publish(self):
         self.table.putNumber("revShooter", self.revingSpeed)
         self.table.putNumber("shootShooter", self.shooterSpeed)
+
+
+def calculateAngle(d: meters) -> radians:
+    xPass = d - X_PASS_DIFF
+    h = GOAL_HEIGHT
+
+    numerator = Y_PASS * d**2 - xPass**2 * h
+    denom = d * (xPass * d - xPass**2)
+
+    return math.atan(numerator / denom)
+
+
+def _calculateVelocity(turretAngle, hubDistance) -> float:
+
+    velocityMps = math.sqrt(
+        (GRAVITY * turretAngle**2)
+        / (
+            2
+            * math.cos(turretAngle)
+            * (hubDistance * math.tan(turretAngle) - GOAL_HEIGHT)
+        )
+    )
+    return velocityMps / FLYWHEEL_CIRCUMFRENCE * 60
+
+
+def calculateTime(velocity, distance):
+    return distance / velocity
