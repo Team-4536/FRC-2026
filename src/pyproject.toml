@@ -34,5 +34,6 @@ requires = [
     "robotpy-rev",
     "phoenix6",
     "photonlibpy",
-    "mypy"
+    "mypy",
+    "limelightlib-python"
 ]

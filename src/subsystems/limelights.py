@@ -113,13 +113,19 @@ class llCams(Subsystem):
     def _init_(self) -> None:  # gets shown only when in robot.py
         self.llTable = NetworkTableInstance.getDefault().getTable("limelight")
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-        self.table.putNumber("limelight txp", self.llTable.getNumber("txp", 0))
+        self.table.putNumber("limelight tx", self.llTable.getNumber("tx", 0))
+        self.table.putNumber("limelight tx", self.llTable.getNumber("ty", 0))
+        self.table.putNumber("limelight t6r_fs", self.llTable.getValue("t6r_fs", 0))
 
     def init(self) -> None:
         pass
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        pass
+        self.llTable = NetworkTableInstance.getDefault().getTable("limelight")
+        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.table.putNumber("limelight tx", self.llTable.getNumber("tx", 0))
+        self.table.putNumber("limelight tx", self.llTable.getNumber("ty", 0))
+        self.table.putNumber("limelight t6r_fs", self.llTable.getValue("t6r_fs", 0))
 
     def disabled(self) -> None:
         pass
