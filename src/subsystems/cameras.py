@@ -58,6 +58,16 @@ class photonCameraClass:
                     self.result
                 )
                 if self.camEstPose != None:
+                    self.camEstTrans = wpimath.geometry.Translation2d(
+                        self.camEstPose.estimatedPose.X(),
+                        self.camEstPose.estimatedPose.Y(),
+                    )
+                    self.camEstRot = wpimath.geometry.Rotation2d(
+                        self.camEstPose.estimatedPose.rotation().Z()
+                    )
+                    self.camEstPose2d = wpimath.geometry.Pose2d(
+                        self.camEstTrans, self.camEstRot
+                    )
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
                     self.robotZ = self.camEstPose.estimatedPose.Z()
@@ -72,21 +82,29 @@ class photonCameraClass:
 class CameraManager(Subsystem):
     def __init__(self):
         self.photonCameraRight = photonCameraClass(
-            "Camera1", 30, 0.28575, -0.028575, 1.0922
+            "Camera1", 30, 0.24765, 0.3683, 0.1857
         )
         self.photonCameraLeft = photonCameraClass(
-            "Camera2", -30, 0.28575, 0.03175, 1.0922
+            "Camera2", -30, 0.18415, 0.3683, 0.1857
         )
         self.photonCameraMiddle = photonCameraClass(
-            "longCam", 0, 0.27305, -0.003175, 1.13665
+            "longCam", 0, 0.21431, 0.3048, 0.019865
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.camXList = []
         self.camYList = []
         self.camRotList = []
+        self.camZList = []
         self.aveX = -1
         self.aveY = -1
         self.aveRot = -1
+        self.aveZ = -1
+        self.aveTranslation3d = wpimath.geometry.Translation3d(0, 0, 0)
+        self.aveRotation3d = wpimath.geometry.Rotation3d(0, 0, 0)
+
+        self.avePose = wpimath.geometry.Pose3d(
+            self.aveTranslation3d, self.aveRotation3d
+        )
 
     def init(self):
         self.photonCameraRight = photonCameraClass(
@@ -106,57 +124,31 @@ class CameraManager(Subsystem):
         self.aveX = -1
         self.aveY = -1
         self.aveRot = -1
-        self.aveZ = -1
-        self.aveTranslation3d = wpimath.geometry.Translation3d(0, 0, 0)
-        self.aveRotation3d = wpimath.geometry.Rotation3d(0, 0, 0)
 
-        self.avePose = wpimath.geometry.Pose3d(
-            self.aveTranslation3d, self.aveRotation3d
+        self.aveTranslation2d = wpimath.geometry.Translation2d(0, 0)
+        self.aveRotation2d = wpimath.geometry.Rotation2d(0, 0)
+
+        self.avePose = wpimath.geometry.Pose2d(
+            self.aveTranslation2d, self.aveRotation2d
         )
 
     def periodic(self, robotState):
-        self.avePose = None
-        self.camXList = []
-        self.camYList = []
-        self.camZList = []
-        self.camRotList = []
-        self.aveX = -1
-        self.aveY = -1
-        self.aveRot = -1
-        self.aveZ = -1
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
         self.photonCameraMiddle.update()
         if self.photonCameraLeft.trustworthy:
-            self.camXList.append(self.photonCameraLeft.robotX)
-            self.camYList.append(self.photonCameraLeft.robotY)
-            self.camRotList.append(self.photonCameraLeft.robotAngle)
-            self.camZList.append(self.photonCameraLeft.robotZ)
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraLeft.camEstPose2d, wpilib.getTime()
+            )
         if self.photonCameraMiddle.trustworthy:
-            self.camXList.append(self.photonCameraMiddle.robotX)
-            self.camYList.append(self.photonCameraMiddle.robotY)
-            self.camRotList.append(self.photonCameraMiddle.robotAngle)
-            self.camZList.append(self.photonCameraMiddle.robotZ)
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraMiddle.camEstPose2d, wpilib.getTime()
+            )
         if self.photonCameraRight.trustworthy:
-            self.camXList.append(self.photonCameraRight.robotX)
-            self.camYList.append(self.photonCameraRight.robotY)
-            self.camRotList.append(self.photonCameraRight.robotAngle)
-            self.camZList.append(self.photonCameraRight.robotZ)
-        if len(self.camXList) > 0:
-            self.aveX = self.average(self.camXList)
-            self.aveY = self.average(self.camYList)
-            self.aveZ = self.average(self.camZList)
-            self.aveRot = self.average(self.camRotList)
-        if not (self.aveX == -1 and self.aveY == -1 and self.aveZ == -1):
-            self.aveTranslation3d = wpimath.geometry.Translation3d(
-                self.aveX, self.aveY, self.aveZ
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraRight.camEstPose2d, wpilib.getTime()
             )
-            self.aveRotation3d = wpimath.geometry.Rotation3d(self.aveRot, 0, 0)
-            self.avePose = wpimath.geometry.Pose3d(
-                self.aveTranslation3d, self.aveRotation3d
-            )
-        if self.avePose != None:
-            robotState.camPos = self.avePose
+
         return robotState
 
     def disabled(self):
@@ -184,10 +176,3 @@ class CameraManager(Subsystem):
         self.table.putNumber("leftCamY", self.photonCameraLeft.robotY)
         self.table.putNumber("leftCamZ", self.photonCameraLeft.robotZ)
         self.table.putNumber("leftCamRot", self.photonCameraLeft.robotAngle)
-
-    def average(self, vals: list) -> float:
-        temp = 0
-        for i in vals:
-            temp += vals[i]
-        temp = temp / len(vals)
-        return temp

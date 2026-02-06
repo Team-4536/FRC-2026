@@ -16,6 +16,7 @@ from wpimath.kinematics import (
     SwerveModulePosition,
     SwerveModuleState,
 )
+from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import meters, radiansToRotations, feetToMeters
 
@@ -130,8 +131,12 @@ class SwerveModules(NamedTuple):
         return tuple(m.modulePosition for m in self)  # type: ignore[return-value]
 
 
-class SwerveDrive(Subsystem):
-    def __init__(self) -> None:
+class SwerveDrive(
+    Subsystem,
+):
+    def __init__(
+        self,
+    ) -> None:
         super().__init__()
 
         WHEEL_DISTANCE: meters = feetToMeters(1)
@@ -172,36 +177,29 @@ class SwerveDrive(Subsystem):
         self._kinematics = SwerveDrive4Kinematics(*self._modules.positions)
         self.gyro = AHRS(AHRS.NavXComType.kMXP_SPI)
 
-        self.odometry = SwerveDrive4Odometry(
-            self._kinematics,
-            self.gyro.getRotation2d(),
-            self._modules.modulePositions,
-            self.initPos,
-        )
-
     def init(self) -> None:
-        # self.configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
+        self.configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
         self.configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
 
-        self._modules.frontRight.driveMotor.configure(
-            config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(True))
-        )
-        self._modules.backRight.driveMotor.configure(
-            config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(True))
-        )
-        self._modules.frontLeft.driveMotor.configure(
-            config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(False))
-        )
-        self._modules.backLeft.driveMotor.configure(
-            config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(False))
-        )
+        # self._modules.frontRight.driveMotor.configure(
+        #     config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(True))
+        # )
+        # self._modules.backRight.driveMotor.configure(
+        #     config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(True))
+        # )
+        # self._modules.frontLeft.driveMotor.configure(
+        #     config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(False))
+        # )
+        # self._modules.backLeft.driveMotor.configure(
+        #     config=RevMotor.DRIVE_CONFIG.apply(SparkBaseConfig().inverted(False))
+        # )
 
         for module in self._modules:
             module.driveEncoder.setPosition(0)
             module.azimuthEncoder.setPosition(module.absoluteAzimuthRotation)
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        robotState.pose = self.odometry.update(
+        robotState.odometry.update(
             self.gyro.getRotation2d(),
             self._modules.modulePositions,
         )

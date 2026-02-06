@@ -6,6 +6,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import List, NamedTuple
 from subsystems.cameras import CameraManager
+from wpimath.estimator import SwerveDrive4PoseEstimator
 
 robotState: RobotState = None  # type: ignore
 
@@ -66,5 +67,11 @@ class SubsystemManager(NamedTuple):
 
         if robotState == None:
             robotState = self.inputs.robotState
+            robotState.odometry = SwerveDrive4PoseEstimator(
+                self.swerveDrive._kinematics,
+                self.swerveDrive.gyro.getRotation2d(),
+                self.swerveDrive._modules.modulePositions,
+                self.swerveDrive.initPos,
+            )
 
         return robotState

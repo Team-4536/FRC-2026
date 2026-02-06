@@ -3,7 +3,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.geometry import Pose2d, Pose3d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
-
+from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.units import metersToFeet
 
 
@@ -12,7 +12,7 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     pose: Pose2d
-    camPos: Pose3d
+    odometry: SwerveDrive4PoseEstimator
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -35,10 +35,15 @@ class RobotState(NetworkTablesMixin):
         self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishDouble("omega", self.fieldSpeeds.omega, "FieldSpeeds")
 
-        if self.pose:
-            self.publishDouble("x", metersToFeet(self.pose.X()), "odom")
-            self.publishDouble("y", metersToFeet(self.pose.Y()), "odom")
-            self.publishDouble("angle", self.pose.rotation().degrees(), "odom")
+        self.publishDouble(
+            "x", metersToFeet(self.odometry.getEstimatedPosition().X()), "odom"
+        )
+        self.publishDouble(
+            "y", metersToFeet(self.odometry.getEstimatedPosition().Y()), "odom"
+        )
+        self.publishDouble(
+            "angle", self.odometry.getEstimatedPosition().rotation().degrees(), "odom"
+        )
 
     @classmethod
     def empty(cls, **kwargs):
