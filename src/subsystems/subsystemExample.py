@@ -2,29 +2,34 @@ from subsystems.subsystem import Subsystem
 from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
 
-# all RPM values must be tested on the robot and adjusted acoringly
-
 class SubsystemExample(Subsystem):
 
-    def __init__(self, motorDevID: int):
-        super().__init__(self)
-        self.subsystemMotor = RevMotor(deviceID=motorDevID) 
+    isDisabled: bool = True
+    isStarted: bool = False
+    message: str = ""
+    origMessage: str = None
+
+    def __init__(self, message: str = "helloWorld"):
+        super().__init__()
+        self.origMessage = message
        
 
     def phaseInit(self) -> None:
-        pass
+        if(self.isDisabled == True and self.isStarted == False):
+            self.isStarted = True 
+            self.isDisabled = False
+            self.message = self.origMessage
+           
 
     def periodic(self, rs: RobotState) -> RobotState:
-        self.desMotorState = rs.desMotorSpeed
-        if rs.desMotorSpeed > 0.1:
-            self.subsystemMotor.setVelocity(120)
-        else:
-            self.disabled()
-
+        self.message = self.message + "."
         return rs
 
     def disabled(self) -> None:
-        self.subsystemMotor.setVelocity(0)
+        if(self.isStarted == True and self.isDisabled == False):
+            self.isStarted = False
+            self.isDisabled = True
+            self.message = "done"
 
     def publish(self):
-        self.publishFloat("revMotor", self.desMotorState)
+        self.publishString("message", self.message)
