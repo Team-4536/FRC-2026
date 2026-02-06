@@ -1,35 +1,30 @@
 from subsystems.subsystem import Subsystem
 from subsystems.motor import RevMotor
-from subsystems.desiredState import DesiredState
-from ntcore import NetworkTableInstance
+from subsystems.robotState import RobotState
 
-# motor vars do not include real device id at this time (1-13)
 # all RPM values must be tested on the robot and adjusted acoringly
-
 
 class SubsystemExample(Subsystem):
 
-    def __init__(self):
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-
-
-        self.subsystemMotor = RevMotor(deviceID=8)
+    def __init__(self, motorDevID: int):
+        super().__init__(self)
+        self.subsystemMotor = RevMotor(deviceID=motorDevID) 
        
 
-    def init(self) -> None:
+    def phaseInit(self) -> None:
         pass
 
-    def periodic(self, ds: DesiredState) -> None:
-        self.table.putNumber("revMotorr", ds.revMotor)
-        
-
-        if ds.revMotor > 0.1:
+    def periodic(self, rs: RobotState) -> RobotState:
+        self.desMotorState = rs.desMotorSpeed
+        if rs.desMotorSpeed > 0.1:
             self.subsystemMotor.setVelocity(120)
         else:
             self.disabled()
+
+        return rs
 
     def disabled(self) -> None:
         self.subsystemMotor.setVelocity(0)
 
     def publish(self):
-        pass
+        self.publishFloat("revMotor", self.desMotorState)
