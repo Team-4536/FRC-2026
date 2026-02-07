@@ -76,6 +76,9 @@ class Turret(Subsystem):
     # pitch is vertical
 
     def __init__(self, yawMotorID, pitchMotorID):
+
+        super().__init__()
+
         self.yawMotor = RevMotor(
             deviceID=yawMotorID
         )  # get right ID, motor for turning horizontally
@@ -122,11 +125,11 @@ class Turret(Subsystem):
 
         self.odom = TurretOdometry()
 
-        self.table = NetworkTableInstance.getDefault().getTable("telementry")
+        # self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
 
-        self.homeSet: bool = False
+        self.homeSet: bool = True
         self.yawSetPoint = 0  # in relation to the field
         self.targetPos: Translation3d = Translation3d()
 
@@ -134,54 +137,77 @@ class Turret(Subsystem):
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chnage
 
         self.manualMode = False
+        self.manualToggle = False
         # these velocity values are only used when in manual mode
         self.yawVelocity = 0
         self.pitchVelocity = 0
 
+        self.turretAutoDepedencies: tuple = (None,)
+        self.turretManDependencies: tuple = (None,)
+        self.turretGenDepedencies: tuple = (None,)
+
     def init(self):
-        self.homeSet: bool = False
+        self.homeSet: bool = True  # TODO change back to false
         self.yawSetPoint = 0  # in relation to the field
 
+        self.turretAutoDepedencies: tuple = (None,)
+        self.turretManDependencies: tuple = (None,)
+        self.turretGenDepedencies: tuple = (None,)
+
     def periodic(self, robotState: RobotState) -> RobotState:
+
+        self.turretAutoDepedencies: tuple = (
+            robotState.optimalTurretAngle,
+            robotState.hubDistance,
+        )
+        self.turretManDependencies: tuple = (robotState.turretManualSetpoint,)
+        self.turretGenDepedencies: tuple = (robotState.pose,)
+
+        self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
+        self.pitchPos = rotationsToRadians(self.pitchEncoder.getPosition())
 
         if not self.homeSet:
             self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
             return robotState
 
+        self.manualToggle = robotState.turretManualToggle
+        if robotState.turretManualToggle:
+            self.manualMode = not self.manualMode
+            robotState.turretManulMode = self.manualMode
+
+        if not checkDependencies(self.turretGenDepedencies):
+            return robotState
+
         robotYaw = robotState.pose.rotation().radians()
         self.odom.updateWithEncoder(robotYaw, self.yawEncoder)
 
-        if robotState.turretManualToggle:
-            self.manualMode = not self.manualMode
-
         if self.manualMode:
-            self.manualUpdate(robotState.turretManualSetpoint)
+            self.manualUpdate(robotState)
 
         else:
             self.automaticUpdate(robotState)
 
-        self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
-        self.pitchPos = rotationsToRadians(self.pitchEncoder.getPosition())
-
         self.maintainRotation(robotYaw)  # these go last
-        self.dontOverdoIt()
-
-        if self.manualMode:
-            self.yawMotor.setVelocity(self.yawVelocity)
-            self.pitchMotor.setVelocity(self.pitchVelocity)
-
-        else:
-            self.yawMotor.setPosition(self.yawSetPoint * YAW_GEARING)
-            self.pitchMotor.setPosition(robotState.optimalTurretAngle * PITCH_GEARING)
-
-        return robotState
 
     def automaticUpdate(self, robotState: RobotState):
+
+        if not checkDependencies(self.turretAutoDepedencies):
+            return
 
         self.targetPoint(self.targetPos, robotState.pose, robotState)  # need odom
         robotState.optimalTurretAngle = calculateAngle(robotState.hubDistance)
 
-    def manualUpdate(self, setPoint: float):
+        self.dontOverdoIt()
+
+        self.yawMotor.setPosition(self.yawSetPoint * YAW_GEARING)
+        self.pitchMotor.setPosition(robotState.optimalTurretAngle * PITCH_GEARING)
+
+    def manualUpdate(self, robotState: RobotState):
+
+        if not checkDependencies(self.turretManDependencies):
+            return
+
+        setPoint = robotState.turretManualSetpoint
 
         self.yawVelocity = 0
         self.pitchVelocity = 0
@@ -204,6 +230,11 @@ class Turret(Subsystem):
         self.yawVelocity *= MANUAL_SPEED
         self.pitchVelocity *= MANUAL_SPEED
 
+        self.dontOverdoIt()
+
+        self.yawMotor.setVelocity(self.yawVelocity)
+        self.pitchMotor.setVelocity(self.pitchVelocity)
+
     def compensateSetpoint(self, time, roboLinV, roboOmegaV):  # TODO finish
         turretRotV = roboOmegaV * TURRET_PATH_CIRCUMFRENCE / ROBOT_RADIUS
 
@@ -215,30 +246,31 @@ class Turret(Subsystem):
         self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
         # do we need these .configure lines when revmotor allready does this?
 
-        self.homeSet = False
+        self.homeSet = True
 
     def publish(self):
 
-        self.table.putBoolean("Turret Home Set", self.homeSet)
-        self.table.putNumber("Turret Yaw Setpoint", self.yawSetPoint)
-        self.table.putNumber(
+        self.publishBoolean("Turret Home Set", self.homeSet)
+        self.publishDouble("Turret Yaw Setpoint", self.yawSetPoint)
+        self.publishDouble(
             "Turret Yaw Actual Motor Setpoint", self.yawSetPoint * YAW_GEARING
         )
-        self.table.putNumber(
+        self.publishDouble(
             "Turret Yaw Feild Relative Rotation", self.odom.feildRelativeRot
         )
-        self.table.putNumber(
+        self.publishDouble(
             "Turret Yaw Feild Relative Rotation Wrapped", self.odom.wrappedFRR
         )
-        self.table.putNumber("Turret Yaw Encoder Motor Pos", self.yawPos)
-        self.table.putNumber("Turret Yaw Actual Encoder Pos", self.yawPos / YAW_GEARING)
-        self.table.putNumber("Turret Yaw Encoder Motor Pos", self.yawPos)
-        self.table.putNumber(
+        self.publishDouble("Turret Yaw Encoder Motor Pos", self.yawPos)
+        self.publishDouble("Turret Yaw Actual Encoder Pos", self.yawPos / YAW_GEARING)
+        self.publishDouble("Turret Yaw Encoder Motor Pos", self.yawPos)
+        self.publishDouble(
             "Turret Yaw Actual Encoder Pos", self.pitchPos / PITCH_GEARING
         )
-        self.table.putNumber("Manual Yaw Velocity", self.yawVelocity)
-        self.table.putNumber("Manual Pitch Velocity", self.pitchVelocity)
-        self.table.putBoolean("Manual Mode Active", self.manualMode)
+        self.publishDouble("Manual Yaw Velocity", self.yawVelocity)
+        self.publishDouble("Manual Pitch Velocity", self.pitchVelocity)
+        self.publishBoolean("Turret Manual Mode Active", self.manualMode)
+        self.publishBoolean("Turret Manual Toggle Button", self.manualToggle)
 
     def maintainRotation(self, robotYaw):
         self.yawSetPoint -= self.odom.getGyroChange(robotYaw)
@@ -294,7 +326,7 @@ class TurretOdometry:
 class Shooter(Subsystem):
 
     def __init__(self):
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        # self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
         self.hubDistance = 0  # hypotenuse of odometry and the Hub position
 
@@ -304,37 +336,77 @@ class Shooter(Subsystem):
         self.revingSpeed: RPM = 0
         self.shooterSpeed: RPM = self.kickMotorEncoder.getPosition()
 
-        self.revingMotorTop = RevMotor(deviceID=11)
-        self.revingMotorBottom = RevMotor(deviceID=12)
+        self.revingMotorTop: RevMotor = RevMotor(deviceID=11)
+        self.revingMotorBottom: RevMotor = RevMotor(deviceID=12)
+
+        self.revTopEncoder = self.revingMotorTop.getEncoder()
+        self.revBottomEncoder = self.revingMotorBottom.getEncoder()
+
+        self.manualMode: bool = False
+        self.manualRevSpeed: RPM = 0
+        self.manualKickSpeed: RPM = 0
+
+        self.dependencies: tuple = (None,)
 
         super().__init__()
 
     def init(self) -> None:
-        pass
+        self.dependencies: tuple = (None,)
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
-        self.revingMotorTop.setVelocity(self.revingSpeed)
-        self.revingMotorBottom.setVelocity(self.revingSpeed)
+        self.manualMode = self.getBoolean("shooter manual", default=False)
+        if self.manualMode:
+            self.manualUpdate()
+            return robotState
+
+        self.dependencies = (
+            robotState.revShooter,
+            robotState.shootShooter,
+            robotState.optimalTurretAngle,
+        )
+        if not checkDependencies(self.dependencies):
+            return robotState
 
         if robotState.revShooter > 0.1:
             self.revingSpeed = _calculateVelocity(
                 robotState.optimalTurretAngle, robotState.hubDistance
             )
         elif robotState.shootShooter == 1:
-            self.kickMotor.setVelocity(1)
+            self.kickMotor.setVelocity(50)
         else:
             self.disabled()
+        self.revingMotorTop.setVelocity(self.revingSpeed)
+        self.revingMotorBottom.setVelocity(self.revingSpeed)
 
         return robotState
+
+    def manualUpdate(self):
+
+        self.manualRevSpeed = self.getDouble("manual shooter rpm", default=0)
+        self.revingMotorTop.setVelocity(self.manualRevSpeed)
+        self.revingMotorBottom.setVelocity(self.manualRevSpeed)
+        self.manualKickSpeed = self.getDouble("manual kick speed", default=0)
+        self.kickMotor.setVelocity(self.manualKickSpeed)
 
     def disabled(self) -> None:
         self.kickMotor.setVelocity(0)
         self.revingSpeed = 0
 
     def publish(self):
-        self.table.putNumber("revShooter", self.revingSpeed)
-        self.table.putNumber("shootShooter", self.shooterSpeed)
+        self.publishBoolean("shooter manual", self.manualMode)
+        self.publishDouble("revMotor set speed", self.revingSpeed)
+        self.publishDouble("manual shooter rpm", self.manualRevSpeed)
+        self.publishDouble("manual kick rpm", self.manualKickSpeed)
+        self.publishDouble(
+            "Kick motor encoder rpm", self.kickMotorEncoder.getVelocity()
+        )
+        self.publishDouble(
+            "top reving motor encoder rpm", self.revTopEncoder.getVelocity()
+        )
+        self.publishDouble(
+            "bottom reving motor encoder rpm", self.revBottomEncoder.getVelocity()
+        )
 
 
 def calculateAngle(d: meters) -> radians:
@@ -362,3 +434,12 @@ def _calculateVelocity(turretAngle, hubDistance) -> float:
 
 def calculateTime(velocity, distance):
     return distance / velocity
+
+
+def checkDependencies(depends: tuple) -> bool:
+
+    for var in depends:
+        if var is None:
+            return False
+
+    return True

@@ -15,8 +15,8 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
-    shooter: Shooter
     turret: Turret
+    shooter: Shooter
 
     def init(self) -> None:
         for s in self.dependantSubsytems:
@@ -29,6 +29,8 @@ class SubsystemManager(NamedTuple):
     def robotPeriodic(self) -> None:
         self.time.periodic(self.robotState)
         self.robotState.publish()
+        self.shooter.publish()
+        self.turret.publish()
 
     def autonomousPeriodic(self) -> None:
         global robotState
@@ -59,6 +61,7 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
+            self.turret,
             self.shooter,
         ]
 

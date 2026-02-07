@@ -24,6 +24,7 @@ class RobotState(NetworkTablesMixin):
     hubDistance: meters
 
     turretManualToggle: bool
+    turretManulMode: bool
     turretManualSetpoint: float
 
     robotOmegaVelocity: MPS
@@ -33,6 +34,7 @@ class RobotState(NetworkTablesMixin):
         super().__init__()
 
     def publish(self) -> None:
+        self.publishBoolean("Turret Manual", self.turretManualToggle)
         for field in fields(self):
             name = field.name
             value = getattr(self, name)

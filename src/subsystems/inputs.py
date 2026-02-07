@@ -42,7 +42,9 @@ class Inputs(Subsystem):
         self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
         self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
 
-    def periodic(self) -> None:
+    def periodic(self, robotState: RobotState) -> RobotState:
+        self.robotState = robotState
+
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.turretSpeed = self._linearScalar(self._mechCtrl.getLeftX() * 30)
         self.robotState.motorDesiredState = self._linearScalar(
@@ -52,14 +54,14 @@ class Inputs(Subsystem):
         self.robotState.motorDesiredState = self._linearScalar(
             self._mechCtrl.getRightY()
         )
-        self.robotState.turretManualToggle = self._mechCtrl.getYButtonPressed() # TODO assign button for manual toggle
-        self.robotState.turretManualSetpoint = self._mechCtrl.getPOV()
-
-    def periodic(self, robotState: RobotState) -> RobotState:
-        self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.revShooter = self._mechCtrl.getRightTriggerAxis()
         self.robotState.kickShooter = self._mechCtrl.getRightBumper()
-        return robotState
+        self.robotState.turretManualToggle = (
+            self._mechCtrl.getYButtonPressed()
+        )  # TODO assign button for manual toggle
+        self.robotState.turretManualSetpoint = self._mechCtrl.getPOV()
+
+        return self.robotState
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
