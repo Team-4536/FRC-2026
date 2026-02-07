@@ -13,6 +13,10 @@ class RobotState(NetworkTablesMixin):
     abtainableMaxSpeed: MPS
     resetGyro: bool
     pose: Pose2d
+    intakeManualButton: bool
+    intakeSensorTest: bool #temporary
+    intakeEjectButton: bool
+    intakePosAxis: float = 0.0
 
     def __post_init__(self) -> None:
         super().__init__()

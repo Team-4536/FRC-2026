@@ -48,7 +48,8 @@ class Inputs(Subsystem):
 
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
-
+        self.robotState.intakePosAxis = self._mechCtrlr.getRawAxis(5) # right stick vertical axis
+        
         return robotState
 
     def disabled(self) -> None:
