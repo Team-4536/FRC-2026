@@ -189,6 +189,8 @@ class Turret(Subsystem):
 
         self.maintainRotation(robotYaw)  # these go last
 
+        return robotState
+
     def automaticUpdate(self, robotState: RobotState):
 
         if not checkDependencies(self.turretAutoDepedencies):
@@ -251,24 +253,24 @@ class Turret(Subsystem):
     def publish(self):
 
         self.publishBoolean("Turret Home Set", self.homeSet)
-        self.publishDouble("Turret Yaw Setpoint", self.yawSetPoint)
-        self.publishDouble(
+        self.publishFloat("Turret Yaw Setpoint", self.yawSetPoint)
+        self.publishFloat(
             "Turret Yaw Actual Motor Setpoint", self.yawSetPoint * YAW_GEARING
         )
-        self.publishDouble(
+        self.publishFloat(
             "Turret Yaw Feild Relative Rotation", self.odom.feildRelativeRot
         )
-        self.publishDouble(
+        self.publishFloat(
             "Turret Yaw Feild Relative Rotation Wrapped", self.odom.wrappedFRR
         )
-        self.publishDouble("Turret Yaw Encoder Motor Pos", self.yawPos)
-        self.publishDouble("Turret Yaw Actual Encoder Pos", self.yawPos / YAW_GEARING)
-        self.publishDouble("Turret Yaw Encoder Motor Pos", self.yawPos)
-        self.publishDouble(
+        self.publishFloat("Turret Yaw Encoder Motor Pos", self.yawPos)
+        self.publishFloat("Turret Yaw Actual Encoder Pos", self.yawPos / YAW_GEARING)
+        self.publishFloat("Turret Yaw Encoder Motor Pos", self.yawPos)
+        self.publishFloat(
             "Turret Yaw Actual Encoder Pos", self.pitchPos / PITCH_GEARING
         )
-        self.publishDouble("Manual Yaw Velocity", self.yawVelocity)
-        self.publishDouble("Manual Pitch Velocity", self.pitchVelocity)
+        self.publishFloat("Manual Yaw Velocity", self.yawVelocity)
+        self.publishFloat("Manual Pitch Velocity", self.pitchVelocity)
         self.publishBoolean("Turret Manual Mode Active", self.manualMode)
         self.publishBoolean("Turret Manual Toggle Button", self.manualToggle)
 
@@ -357,12 +359,12 @@ class Shooter(Subsystem):
 
         self.manualMode = self.getBoolean("shooter manual", default=False)
         if self.manualMode:
-            self.manualUpdate()
+            self.manualUpdate(robotState)
             return robotState
 
         self.dependencies = (
             robotState.revShooter,
-            robotState.shootShooter,
+            robotState.kickShooter,
             robotState.optimalTurretAngle,
         )
         if not checkDependencies(self.dependencies):
@@ -372,7 +374,7 @@ class Shooter(Subsystem):
             self.revingSpeed = _calculateVelocity(
                 robotState.optimalTurretAngle, robotState.hubDistance
             )
-        elif robotState.shootShooter == 1:
+        elif robotState.kickShooter == 1:
             self.kickMotor.setVelocity(50)
         else:
             self.disabled()
@@ -381,12 +383,13 @@ class Shooter(Subsystem):
 
         return robotState
 
-    def manualUpdate(self):
+    def manualUpdate(self, robotState: RobotState):
 
-        self.manualRevSpeed = self.getDouble("manual shooter rpm", default=0)
+        # self.manualRevSpeed = self.getFloat("manual shooter rpm", default=0)
+        self.manualRevSpeed = robotState.revSpeed
         self.revingMotorTop.setVelocity(self.manualRevSpeed)
         self.revingMotorBottom.setVelocity(self.manualRevSpeed)
-        self.manualKickSpeed = self.getDouble("manual kick speed", default=0)
+        self.manualKickSpeed = self.getFloat("manual kick rpm", default=0)
         self.kickMotor.setVelocity(self.manualKickSpeed)
 
     def disabled(self) -> None:
@@ -395,16 +398,14 @@ class Shooter(Subsystem):
 
     def publish(self):
         self.publishBoolean("shooter manual", self.manualMode)
-        self.publishDouble("revMotor set speed", self.revingSpeed)
-        self.publishDouble("manual shooter rpm", self.manualRevSpeed)
-        self.publishDouble("manual kick rpm", self.manualKickSpeed)
-        self.publishDouble(
-            "Kick motor encoder rpm", self.kickMotorEncoder.getVelocity()
-        )
-        self.publishDouble(
+        self.publishFloat("revMotor set speed", self.revingSpeed)
+        self.publishFloat("manual shooter rpm", self.manualRevSpeed)
+        self.publishFloat("manual kick rpm", self.manualKickSpeed)
+        self.publishFloat("Kick motor encoder rpm", self.kickMotorEncoder.getVelocity())
+        self.publishFloat(
             "top reving motor encoder rpm", self.revTopEncoder.getVelocity()
         )
-        self.publishDouble(
+        self.publishFloat(
             "bottom reving motor encoder rpm", self.revBottomEncoder.getVelocity()
         )
 
