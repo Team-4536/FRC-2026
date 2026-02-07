@@ -24,7 +24,9 @@ class Subsystem(NetworkTablesMixin):
         pass
 
     def _warn(self, method: Callable[..., Optional[RobotState]]) -> None:
-        methodName = getattr(method, "__name__", "<unknown>")
-        raise SubsystemMethodError(
-            f"{methodName} method required in {self.__class__.__name__}"
-        )  # how to tell typing that i know method with have a .__name__
+
+        # methodName = getattr(method, "__name__", "<unknown>")
+        # raise SubsystemMethodError(
+        #     "{methodName} method required in {self.__class__.__name__}"
+        # )  # how to tell typing that i know method with have a .__name__
+        pass

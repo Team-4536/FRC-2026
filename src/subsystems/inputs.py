@@ -60,16 +60,17 @@ class Inputs(Subsystem):
 
     def periodic(self, rs: RobotState) -> None:
         self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.intakeManualButton = self._mechCtrl.getAButton()
-        self.robotState.intakeSensorTest = self._mechCtrl.getBButton()
-        self.robotState.intakeEjectButton = self._mechCtrl.getLeftBumper()
+        self.robotState.intakeManualButton = self._mechCtrlr.getAButton()
+        self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
+        self.robotState.intakeEjectButton = self._mechCtrlr.getLeftBumper()
+        self.robotState.intakePosButton = self._mechCtrlr.getRightBumper()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
 
     def _calculateDrive(self) -> ChassisSpeeds:
         vx, vy = self._circularScalar(
-            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+            x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
         vx, vy = self._circularScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
