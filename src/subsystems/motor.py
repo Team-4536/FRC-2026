@@ -101,3 +101,43 @@ class RevMotor:
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
     )
+
+    INTAKE_SPIN_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00019, 0, 0, 0.00205)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(2000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
+
+    INTAKE_RAISE_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00011, 0, 0, 0.00105)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(
+                    500, ClosedLoopSlot.kSlot0
+                )  # 0.4167 rps i think because of the gear ratio
+                .maxAcceleration(10000, ClosedLoopSlot.kSlot0)  # 8.333 rps maybe
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
