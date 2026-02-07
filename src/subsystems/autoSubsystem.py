@@ -9,6 +9,7 @@ class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
     DRIVE_FORWARD_TEST = "Drive Forward Test"
     DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
+    WONKY = "Wonky"
 
 
 class AutoSubsystem(Subsystem):
@@ -96,6 +97,15 @@ def routineChooser(selectedRoutine: AutoRoutines, isFlipped: bool):
             )
             routine["Backward"] = FollowTrajectory(
                 "Backward",
+                isFlipped,
+            )
+        case AutoRoutines.WONKY:
+            routine["Wonky 1"] = FollowTrajectory(
+                "Wonky 1",
+                isFlipped,
+            )
+            routine["Wonky 2"] = FollowTrajectory(
+                "Wonky 2",
                 isFlipped,
             )
 
