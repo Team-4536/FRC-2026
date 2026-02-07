@@ -15,7 +15,7 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
-            intake=Intake(10, 9, 11),
+            intake=Intake(10, 99, 9),
         )
 
     def robotPeriodic(self) -> None:

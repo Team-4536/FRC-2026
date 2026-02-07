@@ -18,16 +18,19 @@ class Intake(Subsystem):
         self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
 
     def phaseInit(self) -> None:
-        self.intakeVelManual = 0
-        self.intakeVelAutomatic = 0
+        self.manualThrottle = 0
+        self.automaticThrottle = 0
+        self.AUTOMATIC_MODE = False
         # TODO MAKE SURE THE RADIANS ON THIS ARE RIGHT!!!!
-
         self.intakePos = self.INTAKE_UP
         self.intakeMotorRaise.setPosition(self.INTAKE_UP)
         self.intakeSetPosition = self.INTAKE_UP
         # these set the speed of the intake motors:
-        self.velSetpoint = 1
-        self.ejectSetpoint = -5
+        self.velSetpoint = 0.5
+        self.ejectSetpoint = -0.5
+
+        # default 0
+        self.raiseThrottle = 0
 
         # TODO change this to an actual sensor when you have one
         # self.intakeSensor = sensing boi
@@ -38,58 +41,96 @@ class Intake(Subsystem):
         # ejectButton that controls eject
         # intakePosButton that controls up or down of intake
 
-        self.intakePos = self.intakeMotorRaise.getEncoder().getPosition()
+        if self.AUTOMATIC_MODE:
+            self.intakePos = self.intakeMotorRaise.getEncoder().getPosition()
 
-        if (
-            self.INTAKE_DOWN - 0.05 < self.intakePos < self.INTAKE_DOWN + 0.05
-        ):  # intake down
+            if (
+                self.INTAKE_DOWN - 0.05 < self.intakePos < self.INTAKE_DOWN + 0.05
+            ):  # intake down
+                if rs.intakeManualButton:
+                    self.manualThrottle = self.velSetpoint
+                else:
+                    self.manualThrottle = 0
+
+                # TODO change this as well when you have an actual sensor
+                if rs.intakeSensorTest:
+                    self.automaticThrottle = self.velSetpoint
+                else:
+                    self.automaticThrottle = 0
+
+                # emergency button in case a ball gets stuck
+                if rs.intakeEjectButton:
+                    self.manualThrottle = self.ejectSetpoint
+                    self.automaticThrottle = self.ejectSetpoint
+
+                if rs.intakePosButton:
+                    self.intakeSetPosition = self.INTAKE_UP
+                else:
+                    self.intakeSetPosition = self.INTAKE_DOWN
+
+            elif (
+                self.INTAKE_UP - 0.05 < self.intakePos < self.INTAKE_UP + 0.05
+            ):  # intake up
+                self.manualThrottle = 0
+                self.automaticThrottle = 0
+                if rs.intakePosButton:
+                    self.intakeSetPosition = self.INTAKE_DOWN
+                else:
+                    self.intakeSetPosition = self.INTAKE_UP
+
+            self.intakeMotorManual.setVelocity(self.manualThrottle)
+            self.intakeMotorAutomatic.setVelocity(self.automaticThrottle)
+            self.intakeMotorRaise.setPosition(self.intakeSetPosition)
+            self.intakePos = self.intakeSetPosition
+
+        if not self.AUTOMATIC_MODE:
+            if rs.intakePosAxis > 0.1:
+                self.raiseThrottle = rs.intakePosAxis * 0.2  # down
+            elif rs.intakePosAxis < -0.1:
+                self.raiseThrottle = rs.intakePosAxis * 0.5  # up
+            else:
+                self.raiseThrottle = 0  # dead
+
             if rs.intakeManualButton:
-                self.intakeVelManual = self.velSetpoint
+                self.manualThrottle = self.velSetpoint
             else:
-                self.intakeVelManual = 0
+                self.manualThrottle = 0
 
-            # TODO change this as well when you have an actual sensor
             if rs.intakeSensorTest:
-                self.intakeVelAutomatic = self.velSetpoint
+                self.automaticThrottle = self.velSetpoint
             else:
-                self.intakeVelAutomatic = 0
+                self.automaticThrottle = 0
 
-            # emergency button in case a ball gets stuck
             if rs.intakeEjectButton:
-                self.intakeVelManual = self.ejectSetpoint
-                self.intakeVelAutomatic = self.ejectSetpoint
+                self.manualThrottle = self.ejectSetpoint
+                self.automaticThrottle = self.ejectSetpoint
 
-            if rs.intakePosButton:
-                self.intakeSetPosition = self.INTAKE_UP
-            else:
-                self.intakeSetPosition = self.INTAKE_DOWN
+            self.intakeMotorAutomatic.setThrottle(self.automaticThrottle)
+            self.intakeMotorManual.setThrottle(self.manualThrottle)
+            self.intakeMotorRaise.setThrottle(self.raiseThrottle)
 
-        elif (
-            self.INTAKE_UP - 0.05 < self.intakePos < self.INTAKE_UP + 0.05
-        ):  # intake up
-            self.intakeVelManual = 0
-            self.intakeVelAutomatic = 0
-            if rs.intakePosButton:
-                self.intakeSetPosition = self.INTAKE_DOWN
-            else:
-                self.intakeSetPosition = self.INTAKE_UP
+        self.table.putNumber("intakeManualVel", self.manualThrottle)
+        self.table.putNumber("intakeAutoVel", self.automaticThrottle)
+        self.table.putNumber(
+            "intakePos", self.intakeMotorRaise.getEncoder().getPosition()
+        )
 
-        self.intakeMotorManual.setVelocity(self.intakeVelManual)
-        self.intakeMotorAutomatic.setVelocity(self.intakeVelAutomatic)
-        self.intakeMotorRaise.setPosition(self.intakeSetPosition)
-        self.intakePos = self.intakeSetPosition
+        self.table.putBoolean("intakeEjectButton", rs.intakeEjectButton)
+        self.table.putBoolean("intakeManualButton", rs.intakeManualButton)
+        self.table.putBoolean("intakePosAxis", rs.intakePosAxis)
+        self.table.putBoolean("intakeSensorTest", rs.intakeSensorTest)
 
         return rs
 
     def disabled(self):
         self.intakeMotorManual.setVelocity(0)
         self.intakeMotorAutomatic.setVelocity(0)
-        self.intakeVelManual = 0
-        self.intakeVelAutomatic = 0
+        self.manualThrottle = 0
+        self.automaticThrottle = 0
 
     def publish(self):
-        # self.publishFloat("manual velocity", self.intakeVelManual, "Intake")
-        # self.publishFloat("automatic velocity", self.intakeVelAutomatic, "Intake")
+        # self.publishFloat("manual velocity", self.manualThrottle, "Intake")
+        # self.publishFloat("automatic velocity", self.automaticThrottle, "Intake")
         # self.publishFloat(
         #     "intake raise encoder",
         #     self.intakeMotorRaise.getEncoder().getPosition(),
@@ -97,13 +138,4 @@ class Intake(Subsystem):
         # )
         # self.publishBoolean("intake sensor", self.intakeSensor, "Intake")
 
-        # self.table.putNumber("intakeManualVel", self.intakeVelManual)
-        # self.table.putNumber("intakeAutoVel", self.intakeVelAutomatic)
-        # self.table.putNumber("intakePos", self.intakePos)
-        # self.table.putNumber("intakeSetPosition", self.intakeSetPosition)
-
-        # self.table.putBoolean("intakeEjectButton", rs.intakeEjectButton)
-        # self.table.putBoolean("intakeManualButton", rs.intakeManualButton)
-        # self.table.putBoolean("intakePosButton", rs.intakePosButton)
-        # self.table.putBoolean("intakeSensorTest", rs.intakeSensorTest)
         pass

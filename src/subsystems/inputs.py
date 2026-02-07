@@ -63,7 +63,8 @@ class Inputs(Subsystem):
         self.robotState.intakeManualButton = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
         self.robotState.intakeEjectButton = self._mechCtrlr.getLeftBumper()
-        self.robotState.intakePosButton = self._mechCtrlr.getRightBumper()
+        self.robotState.intakePosButton = self._mechCtrlr.getYButton()
+        self.robotState.intakePosAxis = self._mechCtrlr.getLeftY()
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
