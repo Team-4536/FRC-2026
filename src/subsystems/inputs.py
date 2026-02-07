@@ -21,7 +21,7 @@ class Inputs(Subsystem):
         self._driveCtrlr = Ctrlr(drivePort)
         self._mechCtrlr = Ctrlr(mechPort)
 
-        self.robotState = RobotState.empty(abtainableMaxSpeed=5)
+        self.robotState = RobotState.empty(abtainableMaxSpeed=4)
 
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
@@ -45,18 +45,17 @@ class Inputs(Subsystem):
         self.robotState = robotState
 
         self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.revSpeed = self._linearScalar(self._mechCtrlr.getLeftX() * 30)
         self.robotState.motorDesiredState = self._linearScalar(
             self._mechCtrlr.getRightY()
         )
         self.robotState.motorDesiredState = self._linearScalar(
             self._mechCtrlr.getRightY()
         )
-        self.robotState.revShooter = self._mechCtrlr.getRightTriggerAxis()
+        # TODO change 4000 to maybe something else
+        self.robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis() * 4000
         self.robotState.kickShooter = self._mechCtrlr.getRightBumper()
-        self.robotState.turretManualToggle = (
-            self._mechCtrlr.getYButtonPressed()
-        )  # TODO assign button for manual toggle
+        # TODO assign button for manual toggle
+        self.robotState.turretManualToggle = self._mechCtrlr.getYButtonPressed()
         self.robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
 
         return self.robotState

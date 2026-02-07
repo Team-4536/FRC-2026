@@ -38,6 +38,9 @@ TURRET_GAP = math.tau - MAX_ROTATION
 YAW_GEARING = 12  # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 PITCH_GEARING = 2
 
+BATTERY_VOLTS: float = 12
+MAX_RPM: RPM = 5676
+
 # TODO find feild positions for each
 RED_RIGHT_SHUTTLE_POS: Translation3d = Translation3d()
 RED_LEFT_SHUTTLE_POS: Translation3d = Translation3d()
@@ -58,6 +61,7 @@ FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * PI
 GRAVITY = 9.80665
 
 MANUAL_SPEED: RPM = 120
+KICK_SPEED: RPM = 50
 
 TURRET_DIST_FROM_CENTER: meters = inchesToMeters(10)  # TODO make correct
 TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
@@ -85,36 +89,7 @@ class Turret(Subsystem):
 
         self.pitchMotor = RevMotor(deviceID=pitchMotorID)
 
-        self.yawMotor.AZIMUTH_CONFIG = (
-            SparkMaxConfig()
-            .smartCurrentLimit(40)
-            .inverted(True)
-            .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-            .apply(
-                LimitSwitchConfig()
-                .reverseLimitSwitchEnabled(True)
-                .forwardLimitSwitchEnabled(True)
-            )
-            .apply(
-                ClosedLoopConfig()
-                .pidf(0.15, 0, 0, 0)
-                .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-                .positionWrappingEnabled(False)
-                .apply(
-                    MAXMotionConfig()
-                    .maxVelocity(5000, ClosedLoopSlot.kSlot0)
-                    .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
-                    .allowedClosedLoopError(0.2)
-                )
-            )
-        )
-
-        self.pitchMotor.AZIMUTH_CONFIG.apply(
-            LimitSwitchConfig().reverseLimitSwitchEnabled(True)
-        )
-
-        self.yawMotor.configure(config=self.yawMotor.AZIMUTH_CONFIG)
+        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
         self.pitchMotor.configure(config=self.pitchMotor.AZIMUTH_CONFIG)
 
         self.yawEncoder = self.yawMotor.getEncoder()
@@ -136,7 +111,7 @@ class Turret(Subsystem):
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chnage
 
-        self.manualMode = False
+        self.manualMode = True
         self.manualToggle = False
         # these velocity values are only used when in manual mode
         self.yawVelocity = 0
@@ -146,7 +121,7 @@ class Turret(Subsystem):
         self.turretManDependencies: tuple = (None,)
         self.turretGenDepedencies: tuple = (None,)
 
-    def init(self):
+    def phaseInit(self):
         self.homeSet: bool = True  # TODO change back to false
         self.yawSetPoint = 0  # in relation to the field
 
@@ -155,6 +130,8 @@ class Turret(Subsystem):
         self.turretGenDepedencies: tuple = (None,)
 
     def periodic(self, robotState: RobotState) -> RobotState:
+
+        return robotState  # for hcpa TODO remove
 
         self.turretAutoDepedencies: tuple = (
             robotState.optimalTurretAngle,
@@ -166,14 +143,14 @@ class Turret(Subsystem):
         self.yawPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.pitchPos = rotationsToRadians(self.pitchEncoder.getPosition())
 
-        if not self.homeSet:
-            self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
-            return robotState
+        # if not self.homeSet:
+        #     self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
+        #     return robotState
 
-        self.manualToggle = robotState.turretManualToggle
-        if robotState.turretManualToggle:
-            self.manualMode = not self.manualMode
-            robotState.turretManulMode = self.manualMode
+        # self.manualToggle = robotState.turretManualToggle #TODO uncomment (was for testing)
+        # if robotState.turretManualToggle:
+        #     self.manualMode = not self.manualMode
+        #     robotState.turretManulMode = self.manualMode
 
         if not checkDependencies(self.turretGenDepedencies):
             return robotState
@@ -187,7 +164,7 @@ class Turret(Subsystem):
         else:
             self.automaticUpdate(robotState)
 
-        self.maintainRotation(robotYaw)  # these go last
+        # self.maintainRotation(robotYaw)  # these go last
 
         return robotState
 
@@ -234,8 +211,8 @@ class Turret(Subsystem):
 
         self.dontOverdoIt()
 
-        self.yawMotor.setVelocity(self.yawVelocity)
-        self.pitchMotor.setVelocity(self.pitchVelocity)
+        self.yawMotor.setVoltage(RPMToVolts(self.yawVelocity))
+        self.pitchMotor.setVoltage(RPMToVolts(self.pitchVelocity))
 
     def compensateSetpoint(self, time, roboLinV, roboOmegaV):  # TODO finish
         turretRotV = roboOmegaV * TURRET_PATH_CIRCUMFRENCE / ROBOT_RADIUS
@@ -295,8 +272,8 @@ class Turret(Subsystem):
     def reset(self, limit):
         if not self.homeSet:
 
-            self.yawMotor.setVelocity(-1)
-            self.pitchMotor.setVelocity(-1)
+            self.yawMotor.setVoltage(-1)
+            self.pitchMotor.setVoltage(-1)
 
             if limit:
                 self.yawEncoder.setPosition(0)
@@ -344,7 +321,7 @@ class Shooter(Subsystem):
         self.revTopEncoder = self.revingMotorTop.getEncoder()
         self.revBottomEncoder = self.revingMotorBottom.getEncoder()
 
-        self.manualMode: bool = False
+        self.manualMode: bool = True
         self.manualRevSpeed: RPM = 0
         self.manualKickSpeed: RPM = 0
 
@@ -352,48 +329,46 @@ class Shooter(Subsystem):
 
         super().__init__()
 
-    def init(self) -> None:
+    def phaseInit(self) -> None:
         self.dependencies: tuple = (None,)
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
         self.manualMode = self.getBoolean("shooter manual", default=False)
+
+        self.dependencies = (
+            robotState.revSpeed,
+            robotState.kickShooter,
+            robotState.optimalTurretAngle,
+        )
+
+        if not checkDependencies(self.dependencies):
+            return robotState
+
         if self.manualMode:
             self.manualUpdate(robotState)
             return robotState
 
-        self.dependencies = (
-            robotState.revShooter,
-            robotState.kickShooter,
-            robotState.optimalTurretAngle,
-        )
-        if not checkDependencies(self.dependencies):
-            return robotState
-
-        if robotState.revShooter > 0.1:
-            self.revingSpeed = _calculateVelocity(
-                robotState.optimalTurretAngle, robotState.hubDistance
-            )
-        elif robotState.kickShooter == 1:
-            self.kickMotor.setVelocity(50)
-        else:
-            self.disabled()
-        self.revingMotorTop.setVelocity(self.revingSpeed)
-        self.revingMotorBottom.setVelocity(self.revingSpeed)
+        # if robotState.revSpeed > 0.1:
+        #     self.revingSpeed = _calculateVelocity(
+        #         robotState.optimalTurretAngle, robotState.hubDistance
+        #     )
+        self.revingMotorTop.setVoltage(RPMToVolts(self.revingSpeed))
+        self.revingMotorBottom.setVoltage(RPMToVolts(self.revingSpeed))
 
         return robotState
 
     def manualUpdate(self, robotState: RobotState):
 
         # self.manualRevSpeed = self.getFloat("manual shooter rpm", default=0)
-        self.manualRevSpeed = robotState.revSpeed
-        self.revingMotorTop.setVelocity(self.manualRevSpeed)
-        self.revingMotorBottom.setVelocity(self.manualRevSpeed)
+        self.manualRevSpeed = RPMToVolts(robotState.revSpeed)
+        self.revingMotorTop.setVoltage(self.manualRevSpeed)
+        self.revingMotorBottom.setVoltage(self.manualRevSpeed)
         self.manualKickSpeed = self.getFloat("manual kick rpm", default=0)
-        self.kickMotor.setVelocity(self.manualKickSpeed)
+        self.kickMotor.setVoltage(RPMToVolts(self.manualKickSpeed))
 
     def disabled(self) -> None:
-        self.kickMotor.setVelocity(0)
+        self.kickMotor.setVoltage(0)
         self.revingSpeed = 0
 
     def publish(self):
@@ -444,3 +419,8 @@ def checkDependencies(depends: tuple) -> bool:
             return False
 
     return True
+
+
+def RPMToVolts(rpm: RPM) -> float:
+
+    return rpm / (MAX_RPM / BATTERY_VOLTS)
