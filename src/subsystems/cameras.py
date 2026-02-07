@@ -9,6 +9,7 @@ import robotpy
 import wpilib
 from photonlibpy import EstimatedRobotPose
 from subsystems.subsystem import Subsystem
+from subsystems.robotState import RobotState
 
 
 class photonCameraClass:
@@ -82,13 +83,13 @@ class photonCameraClass:
 class CameraManager(Subsystem):
     def __init__(self):
         self.photonCameraRight = photonCameraClass(
-            "Camera1", 30, 0.24765, 0.3683, 0.1857
+            "Camera1", 30, 0.257175, 0.3302, 0.1889125
         )
         self.photonCameraLeft = photonCameraClass(
-            "Camera2", -30, 0.18415, 0.3683, 0.1857
+            "Camera2", -30, 0.193675, 0.3302, 0.1889125
         )
         self.photonCameraMiddle = photonCameraClass(
-            "longCam", 0, 0.21431, 0.3048, 0.019865
+            "longCam", 0, 0.111125, 0.339725, 0.277815
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.camXList = []
@@ -132,7 +133,7 @@ class CameraManager(Subsystem):
             self.aveTranslation2d, self.aveRotation2d
         )
 
-    def periodic(self, robotState):
+    def periodic(self, robotState: RobotState) -> RobotState:
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
         self.photonCameraMiddle.update()

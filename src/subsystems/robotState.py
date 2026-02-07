@@ -5,6 +5,8 @@ from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.units import metersToFeet
+from wpilib import Field2d
+from wpilib import SmartDashboard
 
 
 @dataclass
@@ -15,6 +17,8 @@ class RobotState(NetworkTablesMixin):
     odometry: SwerveDrive4PoseEstimator
 
     def __post_init__(self) -> None:
+        self.myField: Field2d = Field2d()
+        SmartDashboard.putData("Field", self.myField)
         super().__init__()
 
     def publish(self) -> None:
@@ -34,6 +38,7 @@ class RobotState(NetworkTablesMixin):
         self.publishDouble("vx", self.fieldSpeeds.vx, "FieldSpeeds")
         self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishDouble("omega", self.fieldSpeeds.omega, "FieldSpeeds")
+        self.myField.setRobotPose(self.odometry.getEstimatedPosition())
 
         self.publishDouble(
             "x", metersToFeet(self.odometry.getEstimatedPosition().X()), "odom"
