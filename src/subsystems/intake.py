@@ -26,8 +26,8 @@ class Intake(Subsystem):
         self.intakeMotorRaise.setPosition(self.INTAKE_UP)
         self.intakeSetPosition = self.INTAKE_UP
         # these set the speed of the intake motors:
-        self.velSetpoint = 0.5
-        self.ejectSetpoint = -0.5
+        self.velSetpoint = -0.7  # flipped these to be in the correct orientation
+        self.ejectSetpoint = 0.5
 
         # default 0
         self.raiseThrottle = 0
