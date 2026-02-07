@@ -185,19 +185,8 @@ class SwerveDrive(Subsystem):
         self._gyro.reset()
 
     def phaseInit(self) -> None:
-        # TODO: remove for proper chassis
-        # self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
+        self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
         self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
-
-        # TODO: remove for proper chassis (all 4 lines below)
-        self._modules.frontLeft.configureDriveMotor(config=RevMotor.AZIMUTH_CONFIG)
-        self._modules.backLeft.configureDriveMotor(config=RevMotor.AZIMUTH_CONFIG)
-        self._modules.frontRight.configureDriveMotor(
-            config=RevMotor.AZIMUTH_CONFIG.apply(SparkBaseConfig().inverted(True))
-        )
-        self._modules.backRight.configureDriveMotor(
-            config=RevMotor.AZIMUTH_CONFIG.apply(SparkBaseConfig().inverted(True))
-        )
 
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:
