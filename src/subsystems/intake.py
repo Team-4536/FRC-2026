@@ -5,6 +5,7 @@ from ntcore import NetworkTableInstance
 
 
 class Intake(Subsystem):
+    # TODO make intake less terrible looking
 
     # RADIANSNNSNSNSNNS
     INTAKE_UP = 0
