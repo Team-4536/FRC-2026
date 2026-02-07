@@ -1,7 +1,6 @@
 from subsystems.motor import RevMotor
 from subsystems.subsystem import Subsystem
-from subsystems.robotState import RobotState
-from robotState import ROBOT_RADIUS, getTangentalVelocity
+from subsystems.robotState import RobotState, ROBOT_RADIUS, getTangentalVelocity
 from rev import (
     SparkRelativeEncoder,
     SparkBaseConfig,

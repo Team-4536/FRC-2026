@@ -1,13 +1,12 @@
 from math import pi as PI
 import math
-from robotState import ROBOT_RADIUS, getTangentalVelocity
 from navx import AHRS
 from phoenix6.hardware import CANcoder
 from phoenix6.units import rotation
 from rev import SparkBaseConfig
 from subsystems.motor import RevMotor
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from subsystems.robotState import RobotState
+from subsystems.robotState import RobotState, ROBOT_RADIUS, getTangentalVelocity
 from subsystems.subsystem import Subsystem
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
