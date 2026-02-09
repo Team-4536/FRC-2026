@@ -83,13 +83,25 @@ class photonCameraClass:
 class CameraManager(Subsystem):
     def __init__(self):
         self.photonCameraRight = photonCameraClass(
-            "Camera1", 30, 0.257175, 0.3302, 0.1889125
+            "Camera1",
+            30,
+            ((27 / 2) - (2 + 7 / 8)) * 0.0254,
+            ((27 / 2) - 1.25) * 0.0254,
+            ((8 + (3 / 8)) - 0.75) * 0.0254,
         )
         self.photonCameraLeft = photonCameraClass(
-            "Camera2", -30, 0.193675, 0.3302, 0.1889125
+            "Camera2",
+            -30,
+            ((27 / 2) - 4.75) * 0.0254,
+            ((27 / 2) - 1.25) * 0.0254,
+            ((8 + (3 / 8)) - 0.75) * 0.0254,
         )
         self.photonCameraMiddle = photonCameraClass(
-            "longCam", 0, 0.111125, 0.339725, 0.277815
+            "longCam",
+            0,
+            ((27 / 2) - (9 + (1 / 16))) * 0.0254,
+            (27 / 2) * 0.0254,
+            (10 + (7 / 8)) * 0.0254,
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.camXList = []
@@ -134,6 +146,7 @@ class CameraManager(Subsystem):
         )
 
     def periodic(self, robotState: RobotState) -> RobotState:
+        self.table.putBoolean("camera periodic running", True)
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
         self.photonCameraMiddle.update()
@@ -145,11 +158,12 @@ class CameraManager(Subsystem):
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraMiddle.camEstPose2d, wpilib.getTime()
             )
+
         if self.photonCameraRight.trustworthy:
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraRight.camEstPose2d, wpilib.getTime()
             )
-
+        # self.publish()
         return robotState
 
     def disabled(self):
@@ -165,15 +179,15 @@ class CameraManager(Subsystem):
 
         self.table.putNumber("midCamX", self.photonCameraMiddle.robotX)
         self.table.putNumber("midCamY", self.photonCameraMiddle.robotY)
-        self.table.putNumber("midCamZ", self.photonCameraMiddle.robotZ)
+        # self.table.putNumber("midCamZ", self.photonCameraMiddle.robotZ)
         self.table.putNumber("midCamRot", self.photonCameraMiddle.robotAngle)
 
         self.table.putNumber("rightCamX", self.photonCameraRight.robotX)
         self.table.putNumber("rightCamY", self.photonCameraRight.robotY)
-        self.table.putNumber("rightCamZ", self.photonCameraRight.robotZ)
+        # self.table.putNumber("rightCamZ", self.photonCameraRight.robotZ)
         self.table.putNumber("rightCamRot", self.photonCameraRight.robotAngle)
 
         self.table.putNumber("leftCamX", self.photonCameraLeft.robotX)
         self.table.putNumber("leftCamY", self.photonCameraLeft.robotY)
-        self.table.putNumber("leftCamZ", self.photonCameraLeft.robotZ)
+        # self.table.putNumber("leftCamZ", self.photonCameraLeft.robotZ)
         self.table.putNumber("leftCamRot", self.photonCameraLeft.robotAngle)
