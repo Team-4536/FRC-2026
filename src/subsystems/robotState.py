@@ -1,9 +1,10 @@
 from dataclasses import dataclass, fields
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
-
+from wpilib import SmartDashboard
+from wpilib import Field2d
 from wpimath.units import metersToFeet
 
 
@@ -12,8 +13,13 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
     pose: Pose2d
+    limelightPose: Field2d
+    target_x_degrees: float
+    target_y_degrees: float
 
     def __post_init__(self) -> None:
+        self.myField: Field2d = Field2d()
+        SmartDashboard.putData("Field", self.myField)
         super().__init__()
 
     def publish(self) -> None:
@@ -33,6 +39,11 @@ class RobotState(NetworkTablesMixin):
         self.publishDouble("vx", self.fieldSpeeds.vx, "FieldSpeeds")
         self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishDouble("omega", self.fieldSpeeds.omega, "FieldSpeeds")
+        self.myField.setRobotPose(
+            self.table.getNumber("limelight tx", 0),
+            self.table.getNumber("limelight ty", 0),
+            Rotation2d.fromDegrees(self.table.getNumber("limelight ta", 0)),
+        )
 
         if self.pose:
             self.publishDouble("x", metersToFeet(self.pose.X()), "odom")
