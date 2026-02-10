@@ -52,8 +52,8 @@ class Inputs(Subsystem):
             self._mechCtrlr.getRightY()
         )
         # TODO change 4000 to maybe something else
-        self.robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis() * 4000
-        self.robotState.kickShooter = self._mechCtrlr.getRightBumper()
+        self.robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
+        self.robotState.kickShooter = self._mechCtrlr.getRightBumperButton()
         # TODO assign button for manual toggle
         self.robotState.turretManualToggle = self._mechCtrlr.getYButtonPressed()
         self.robotState.turretManualSetpoint = self._mechCtrlr.getPOV()

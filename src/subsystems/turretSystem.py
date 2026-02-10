@@ -309,21 +309,21 @@ class Shooter(Subsystem):
 
         self.hubDistance = 0  # hypotenuse of odometry and the Hub position
 
-        self.kickMotor = RevMotor(deviceID=14)
+        self.kickMotor = RevMotor(deviceID=18)
         self.kickMotorEncoder = self.kickMotor.getEncoder()
 
         self.revingSpeed: RPM = 0
         self.shooterSpeed: RPM = self.kickMotorEncoder.getPosition()
 
-        self.revingMotorTop: RevMotor = RevMotor(deviceID=11)
-        self.revingMotorBottom: RevMotor = RevMotor(deviceID=12)
+        self.revingMotorTop: RevMotor = RevMotor(deviceID=12)
+        self.revingMotorBottom: RevMotor = RevMotor(deviceID=11)
 
         self.revTopEncoder = self.revingMotorTop.getEncoder()
         self.revBottomEncoder = self.revingMotorBottom.getEncoder()
 
         self.manualMode: bool = True
-        self.manualRevSpeed: RPM = 0
-        self.manualKickSpeed: RPM = 0
+        self.manualRevSpeed: RPM = 2500
+        self.manualKickSpeed: RPM = 50
 
         self.dependencies: tuple = (None,)
 
@@ -335,6 +335,10 @@ class Shooter(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
 
         self.manualMode = self.getBoolean("shooter manual", default=False)
+        self.manualRevSpeed = self.getFloat("Manual rev cap", default=0)
+        self.revingSpeed = RPMToVolts(robotState.revSpeed * self.manualRevSpeed)
+        self.manualUpdate(robotState)
+        return robotState
 
         self.dependencies = (
             robotState.revSpeed,
@@ -346,7 +350,7 @@ class Shooter(Subsystem):
             return robotState
 
         if self.manualMode:
-            self.manualUpdate(robotState)
+
             return robotState
 
         # if robotState.revSpeed > 0.1:
@@ -361,11 +365,13 @@ class Shooter(Subsystem):
     def manualUpdate(self, robotState: RobotState):
 
         # self.manualRevSpeed = self.getFloat("manual shooter rpm", default=0)
-        self.manualRevSpeed = RPMToVolts(robotState.revSpeed)
-        self.revingMotorTop.setVoltage(self.manualRevSpeed)
-        self.revingMotorBottom.setVoltage(self.manualRevSpeed)
+
+        self.revingMotorTop.setVoltage(-self.revingSpeed)  # TODO NO
+        self.revingMotorBottom.setVoltage(-self.revingSpeed)
         self.manualKickSpeed = self.getFloat("manual kick rpm", default=0)
-        self.kickMotor.setVoltage(RPMToVolts(self.manualKickSpeed))
+        self.kickMotor.setVoltage(
+            RPMToVolts(-self.manualKickSpeed * int(robotState.kickShooter))
+        )
 
     def disabled(self) -> None:
         self.kickMotor.setVoltage(0)
@@ -383,6 +389,7 @@ class Shooter(Subsystem):
         self.publishFloat(
             "bottom reving motor encoder rpm", self.revBottomEncoder.getVelocity()
         )
+        self.publishFloat("Manual rev cap", self.manualRevSpeed)
 
 
 def calculateAngle(d: meters) -> radians:
