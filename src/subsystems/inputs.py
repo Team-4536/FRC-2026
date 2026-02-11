@@ -6,7 +6,6 @@ from typing import Optional
 from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import radians_per_second as RPS
-from subsystems.robotState import RobotState
 
 
 class Inputs(Subsystem):
@@ -29,12 +28,6 @@ class Inputs(Subsystem):
 
         self._isTestMode: bool = False
 
-    def init(
-        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
-    ) -> None:
-        self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
-        self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
-
     def phaseInit(
         self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
     ) -> None:
@@ -55,24 +48,19 @@ class Inputs(Subsystem):
 
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
-
-        return robotState
-
-    def periodic(self, rs: RobotState) -> None:
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.intakeManualButton = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
         self.robotState.intakeEjectButton = self._mechCtrlr.getLeftBumper()
         self.robotState.intakePosButton = self._mechCtrlr.getYButton()
         self.robotState.intakePosAxis = self._mechCtrlr.getLeftY()
+        self.robotState.intakeMode = self._mechCtrlr.getRightBumperPressed()
+        return robotState
 
     def disabled(self) -> None:
         self.robotState.fieldSpeeds = ChassisSpeeds()
 
     def _calculateDrive(self) -> ChassisSpeeds:
-        vx, vy = self._circularScalar(
-            x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
-        )
         vx, vy = self._circularScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )

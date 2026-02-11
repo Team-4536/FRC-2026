@@ -16,6 +16,7 @@ class RobotState(NetworkTablesMixin):
     intakeEjectButton: bool
     intakePosButton: bool
     intakePosAxis: float
+    intakeMode: bool
     resetGyro: bool
     pose: Pose2d
 
