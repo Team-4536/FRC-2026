@@ -8,7 +8,13 @@ from phoenix6.units import rotation
 from rev import SparkBaseConfig
 from subsystems.motor import RevMotor
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from subsystems.robotState import RobotState, ROBOT_RADIUS, getTangentalVelocity
+from subsystems.robotState import (
+    RobotState,
+    ROBOT_RADIUS,
+    getTangentalVelocity,
+    getContributedRotation,
+    RPMToMPS,
+)
 from subsystems.subsystem import Subsystem
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
@@ -217,7 +223,7 @@ class SwerveDrive(Subsystem):
             attainableMaxSpeed=robotState.abtainableMaxSpeed,
         )
 
-        robotState.robotOmegaVelocity = self.getOmegaVelocity()
+        robotState.robotOmegaSpeed = self.getOmegaVelocity()
         robotState.robotLinearVelocity = self.getLinearVelocity()
 
         return robotState
@@ -240,11 +246,14 @@ class SwerveDrive(Subsystem):
         sum = 0
         for module in self._modules:
 
-            sum += getTangentalVelocity(
-                module._position.x,
-                module._position.y,
+            tanVel = getTangentalVelocity(
+                module._position,
+                self.getDriveVelocity(module).distance(Translation2d()),
+            )
+
+            sum += getContributedRotation(
+                tanVel,
                 rotationsToRadians(module._azimuthMotor.getEncoder().getPosition()),
-                getTranslationHyp(self.getDriveVelocity(module)),
             )
 
         return sum / 4 / ROBOT_RADIUS
@@ -359,13 +368,3 @@ class SwerveDrive(Subsystem):
         modules.symmetricPosition(xPos, yPos)
 
         return modules
-
-
-def RPMToMPS(speed: RPM, circ: meters):
-    return rotationsPerMinuteToRadiansPerSecond(speed) * circ
-
-
-def getTranslationHyp(translation: Translation2d) -> float:
-    x = translation.x
-    y = translation.y
-    return math.sqrt(x**2 + y**2)

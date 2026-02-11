@@ -6,7 +6,13 @@ from wpimath.geometry import Pose2d, Translation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import revolutions_per_minute as RPM
-from wpimath.units import metersToFeet, radians, meters, inchesToMeters
+from wpimath.units import (
+    metersToFeet,
+    radians,
+    meters,
+    inchesToMeters,
+    rotationsPerMinuteToRadiansPerSecond,
+)
 
 ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 from typing import Any, Self
@@ -23,13 +29,16 @@ class RobotState(NetworkTablesMixin):
     revSpeed: RPM
     kickShooter: RPM
     optimalTurretAngle: radians
-    hubDistance: meters
+    targetDistance: meters
+    targetHeight: meters
 
     turretManualToggle: bool
     turretManulMode: bool
     turretManualSetpoint: float
+    fullyreved: bool
+    targetLocked: bool
 
-    robotOmegaVelocity: MPS
+    robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
 
     def __post_init__(self) -> None:
@@ -61,12 +70,34 @@ class RobotState(NetworkTablesMixin):
         return cls(**data)  # type: ignore
 
 
-def getTangentalVelocity(
-    posX: meters, posY: meters, angle: radians, speed: MPS
-) -> MPS:  # TODO change to a translation2D for angle relative to feild
-    tangentAngle: radians = math.atan(posY / posX) + PI / 2
-    actualAngle: radians = math.cos(tangentAngle - angle)
+def getTangentalVelocity(posFromCenter: Translation2d, speed: MPS) -> Translation2d:
+    # TODO idk if this works
+    tangentAngle: radians = math.atan(posFromCenter.y / posFromCenter.x) + PI / 2
 
-    tangentvelocity: MPS = speed * actualAngle
+    tangentVelocity: Translation2d = Translation2d(
+        speed * math.cos(tangentAngle), speed * math.sin(tangentAngle)
+    )
 
-    return tangentvelocity
+    return tangentVelocity
+
+
+def getContributedRotation(tangentVel: Translation2d, angle: radians) -> MPS:
+    tangentAngle = tangentVel.angle().radians()
+    speed = tangentVel.distance(Translation2d())
+    contributedVector: radians = math.cos(tangentAngle - angle)
+
+    return speed * contributedVector
+
+
+def RPMToMPS(speed: RPM, circ: meters):
+    return rotationsPerMinuteToRadiansPerSecond(speed) * circ
+
+
+def scaleTranslation2D(translation: Translation2d, scalar) -> Translation2d:
+
+    angle = translation.angle().radians()
+    hyp = translation.distance(Translation2d())
+    xScale = hyp * math.cos(angle)
+    yScale = hyp * math.sin(angle)
+
+    return Translation2d(xScale, yScale)
