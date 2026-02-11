@@ -2,36 +2,35 @@ from enum import Enum
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.autoStages import AutoStages, FollowTrajectory
+from subsystems.autoRoutines import AutoRoutines
 import wpilib
 
 
-class AutoRoutines(Enum):
-    DO_NOTHING = "Do Nothing"
-    DRIVE_FORWARD_TEST = "Drive Forward Test"
-    DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
-    WONKY = "Wonky"
-
-
 class AutoSubsystem(Subsystem):
+    # Declare Variables
+    autoRoutineChooser: wpilib.SendableChooser = wpilib.SendableChooser()
+
+    autoSideChooser: wpilib.SendableChooser = wpilib.SendableChooser()
+
     def __init__(self):
         super().__init__()
 
         AUTO_SIDE_BLUE = "blue"
         AUTO_SIDE_RED = "red"
 
-        self.autoRoutineChooser = wpilib.SendableChooser()
         self.autoRoutineChooser.setDefaultOption(
             AutoRoutines.DRIVE_FORWARD_TEST.value,
             AutoRoutines.DRIVE_FORWARD_TEST,
         )
+
+        self.autoSideChooser.setDefaultOption(AUTO_SIDE_BLUE, AUTO_SIDE_BLUE)
+        self.autoSideChooser.addOption(AUTO_SIDE_RED, AUTO_SIDE_RED)
+
         for routine in AutoRoutines:
             self.autoRoutineChooser.addOption(routine.value, routine)
 
         wpilib.SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
 
-        self.autoSideChooser = wpilib.SendableChooser()
-        self.autoSideChooser.setDefaultOption(AUTO_SIDE_BLUE, AUTO_SIDE_BLUE)
-        self.autoSideChooser.addOption(AUTO_SIDE_RED, AUTO_SIDE_RED)
         wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
     def phaseInit(self) -> None:
