@@ -24,7 +24,7 @@ class Intake(Subsystem):
         )
 
         # these set the speed of the intake motors:
-        self.motorForwardSetpoint = -0.5
+        self.motorForwardSetpoint = -0.7
         self.motorReverseSetpoint = 0.5
         self.raiseUpSetpoint = 0.5
         self.raiseDownSetpoint = -0.5
