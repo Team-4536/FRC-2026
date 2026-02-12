@@ -2,7 +2,16 @@ from subsystems.subsystem import Subsystem
 from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
 from ntcore import NetworkTableInstance
+from enum import Enum
 import wpilib
+
+
+class IntakeState(Enum):
+    UP = 0
+    DOWN = 1
+    GOINGDOWN = 2
+    GOINGUP = 3
+    MANUAL = 99
 
 
 class Intake(Subsystem):
@@ -70,7 +79,7 @@ class Intake(Subsystem):
             else:
                 self.raiseThrottle = 0  # dead
             if rs.intakeMode:
-                self.AUTOMATIC_MODE = True
+                self.AUTOMATIC_MODE = False
                 self.raiseThrottle = 0
 
             self.intakeMotorRaise.setThrottle(self.raiseThrottle)
