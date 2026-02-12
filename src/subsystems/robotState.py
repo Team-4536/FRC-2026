@@ -13,6 +13,7 @@ class RobotState(NetworkTablesMixin):
     abtainableMaxSpeed: MPS
     resetGyro: bool
     pose: Pose2d
+    flyTest: bool
 
     def __post_init__(self) -> None:
         super().__init__()

@@ -6,6 +6,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
 from typing import List, NamedTuple
+from subsystems.flyTraj import FlyTraj
 
 robotState: RobotState = None  # type: ignore
 
@@ -16,6 +17,7 @@ class SubsystemManager(NamedTuple):
     swerveDrive: SwerveDrive
     time: TimeData
     autos: AutoSubsystem
+    flyTrajy: FlyTraj
 
     def init(self) -> None:
         for s in self.dependantSubsytems:

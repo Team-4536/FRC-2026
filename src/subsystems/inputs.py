@@ -6,6 +6,15 @@ from typing import Optional
 from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import radians_per_second as RPS
+import pathplannerlib
+from pathplannerlib import trajectory, path
+from pathplannerlib.path import PathPlannerPath
+from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
+from wpimath.units import meters_per_second as MPS
+from wpimath.units import radians_per_second as RPS
+from wpimath.units import feetToMeters, lbsToKilograms
+from wpimath.geometry import Translation2d
+import math
 
 
 class Inputs(Subsystem):
@@ -48,6 +57,7 @@ class Inputs(Subsystem):
 
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+        self.robotState.flyTest = self._driveCtrlr.getAButton()
 
         return robotState
 
@@ -62,3 +72,5 @@ class Inputs(Subsystem):
         omega: RPS = self._linearScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)
+    
+   

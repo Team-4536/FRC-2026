@@ -6,6 +6,7 @@ from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
 from wpilib import TimedRobot
 import wpilib
+from subsystems.flyTraj import FlyTraj
 
 
 class Robot(TimedRobot):
@@ -16,6 +17,7 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             autos=AutoSubsystem(),
+            flyTrajy=FlyTraj(),
         )
 
     def robotPeriodic(self) -> None:

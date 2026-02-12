@@ -56,6 +56,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
 
+
 class AutoStages:
     def __init__(self):
         pass
