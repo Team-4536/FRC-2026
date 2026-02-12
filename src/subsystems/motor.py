@@ -69,6 +69,25 @@ class RevMotor:
         )
     )
 
+    INTAKE_MOTOR_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(15)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00019, 0, 0, 0.00205)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(2000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
+
     AZIMUTH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)

@@ -19,7 +19,7 @@ class Inputs(Subsystem):
         self._driveCtrlr = Ctrlr(drivePort)
         self._mechCtrlr = Ctrlr(mechPort)
 
-        self.robotState = RobotState.empty(abtainableMaxSpeed=5)
+        self.robotState = RobotState.empty(abtainableMaxSpeed=1)
 
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
@@ -54,9 +54,8 @@ class Inputs(Subsystem):
         self.robotState.intakeManualButton = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
         self.robotState.intakeEjectButton = self._mechCtrlr.getLeftBumper()
-        self.robotState.intakePosButton = self._mechCtrlr.getYButton()
         self.robotState.intakePosAxis = self._mechCtrlr.getLeftY()
-        self.robotState.intakeMode = self._mechCtrlr.getRightBumperPressed()
+
         return robotState
 
     def disabled(self) -> None:
