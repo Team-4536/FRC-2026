@@ -9,7 +9,6 @@ import wpilib
 class AutoSubsystem(Subsystem):
     # Declare Variables
     autoRoutineChooser: wpilib.SendableChooser = wpilib.SendableChooser()
-
     autoSideChooser: wpilib.SendableChooser = wpilib.SendableChooser()
 
     def __init__(self):

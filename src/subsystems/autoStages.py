@@ -71,10 +71,18 @@ class AutoStages:
 
 
 class FollowTrajectory(AutoStages):
+    # Declare Variables
+
+    pathDone: bool
+    trajectory: PathPlannerTrajectory
+    robotState: RobotState
+    startTime: float
+    pathTime: float
+
     def __init__(self, pathName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(pathName, isFlipped)
         self.robotState = RobotState.empty()
-        self.done = False
+        self.pathDone = False
 
     def autoInit(self):
         self.startTime = wpilib.getTime()
@@ -109,7 +117,7 @@ class FollowTrajectory(AutoStages):
         print(self.trajectory.getTotalTimeSeconds())
 
         if self.pathTime > self.trajectory.getTotalTimeSeconds():
-            self.done = True
+            self.pathDone = True
             return True
         if max(currXPos, endXPos) - min(currXPos, endXPos) > posError:
             return False
@@ -121,5 +129,5 @@ class FollowTrajectory(AutoStages):
         ):
             return False
 
-        self.done = True
+        self.pathDone = True
         return True
