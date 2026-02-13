@@ -14,7 +14,6 @@ from wpimath.units import (
     radians,
     meters,
     inchesToMeters,
-    rotationsPerMinuteToRadiansPerSecond,
 )
 from typing import Any, Self
 
@@ -116,8 +115,12 @@ def getContributedRotation(tangentVel: Translation2d, angle: radians) -> MPS:
     return speed * contributedVector
 
 
-def RPMToMPS(speed: RPM, circ: meters):
-    return rotationsPerMinuteToRadiansPerSecond(speed) * circ
+def RPMToMPS(speed: RPM, circ: meters) -> MPS:
+    return speed / 60 * circ
+
+
+def MPSToRPM(speed: MPS, circ: meters) -> RPM:
+    return speed / circ * 60
 
 
 def scaleTranslation2D(translation: Translation2d, scalar) -> Translation2d:
