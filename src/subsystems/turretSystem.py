@@ -2,9 +2,13 @@ from subsystems.motor import RevMotor
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import (
     RobotState,
+    TeamSide,
+    TurretTarget,
+    TurretMode,
     ROBOT_RADIUS,
     getTangentalVelocity,
     scaleTranslation2D,
+    wrapAngle,
 )
 from rev import (
     SparkRelativeEncoder,
@@ -39,14 +43,15 @@ from wpilib import DigitalInput
 from enum import Enum
 
 
-MAX_ROTATION = degreesToRadians(270)
-TURRET_GAP = math.tau - MAX_ROTATION
+MAX_ROTATION: radians = degreesToRadians(270)
+TURRET_GAP: radians = math.tau - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
-ZERO_OFFSET = 0
-YAW_GEARING = 12  # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
-PITCH_GEARING = 2
+ZERO_OFFSET: radians = 0
+YAW_GEARING: float = (
+    12  # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
+)
+PITCH_GEARING: float = 2
 
-BATTERY_VOLTS: float = 12
 MAX_RPM: RPM = 5676
 
 # TODO find feild positions for each
@@ -70,9 +75,10 @@ SHUTTLE_X_PASS_DIFF: meters
 
 FLYWHEEL_RADIUS: inches = 3  # diameter of the wheels build decides to use
 FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * PI
-GRAVITY = 9.80665
+GRAVITY: MPS = 9.80665  # don't worry that it's positive
 
-MANUAL_SPEED: RPM = 120
+MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
+MANUAL_SPEED: RPM = 120  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 50
 
 TURRET_DIST_FROM_CENTER: meters = inchesToMeters(10)  # TODO make correct
@@ -80,10 +86,6 @@ TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
 
 
 # TODO add an enum for which position we are targeting, shuttle or scoring
-class TurretTarget(Enum):
-    HUB = 1
-    RIGHT_SHUTTLE = 2
-    LEFT_SHUTTLE = 3
 
 
 class Turret(Subsystem):
@@ -111,7 +113,8 @@ class Turret(Subsystem):
         self.pitchAngle = rotationsToRadians(self.pitchEncoder.getPosition())
 
         self.odom = TurretOdometry()
-        self.targetType: TurretTarget = TurretTarget.HUB
+        self.target: TurretTarget = TurretTarget.NONE
+        self.mode: TurretMode = TurretMode.MANUAL
 
         # self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
@@ -124,8 +127,6 @@ class Turret(Subsystem):
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chnage
 
-        self.manualMode = True
-        self.manualToggle = False
         # these velocity values are only used when in manual mode
         self.yawVelocity = 0
         self.pitchVelocity = 0
@@ -134,7 +135,7 @@ class Turret(Subsystem):
         self.turretManDependencies: tuple = (None,)
         self.turretGenDepedencies: tuple = (None,)
 
-        self.setPoint: Translation3d = Translation3d()
+        self.targetPos: Translation3d = Translation3d()
 
     def phaseInit(self):
         self.homeSet: bool = True  # TODO change back to false
@@ -144,9 +145,11 @@ class Turret(Subsystem):
         self.turretManDependencies: tuple = (None,)
         self.turretGenDepedencies: tuple = (None,)
 
-        self.setPoint: Translation3d = Translation3d()
+        self.targetPos: Translation3d = Translation3d()
 
     def periodic(self, robotState: RobotState) -> RobotState:
+
+        self.mode = self.getMode(robotState)
 
         self.turretAutoDepedencies: tuple = (
             robotState.optimalTurretAngle,
@@ -160,9 +163,6 @@ class Turret(Subsystem):
         #     return robotState
 
         # self.manualToggle = robotState.turretManualToggle #TODO uncomment (was for testing)
-        # if robotState.turretManualToggle:
-        #     self.manualMode = not self.manualMode
-        #     robotState.turretManulMode = self.manualMode
 
         if not checkDependencies(self.turretGenDepedencies):
             return robotState
@@ -172,13 +172,16 @@ class Turret(Subsystem):
         self.yawAngle = self.odom.pose.rotation().radians()
         self.pitchAngle = self.odom.pitch
 
-        if self.manualMode:
+        if self.mode == TurretMode.MANUAL:
             self.manualUpdate(robotState)
 
-        else:
+        elif self.mode == TurretMode.DYNAMIC:
+            self.target = self.getTarget(robotState)
+            self.targetPos = self.getTargetPos(self.target, robotState.teamSide)
             self.automaticUpdate(robotState)
 
-        # self.maintainRotation(robotYaw)  # these go last
+        elif self.mode == TurretMode.DISABLED:
+            self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
 
         return robotState
 
@@ -187,10 +190,13 @@ class Turret(Subsystem):
         if not checkDependencies(self.turretAutoDepedencies):
             return
 
-        h = self.setPoint.z
+        h = self.targetPos.z
         d = robotState.targetDistance
-        robotState.optimalTurretAngle = calculateAngle(
-            d, h, self.getXPass(d), self.getYPass()
+        angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
+        velocity = _calculateVelocity(angle, d, h)
+        time = calculateTime(velocity, d)
+        self.compensateSetpoint(
+            time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
         )
 
         self.targetPoint(self.targetPos, self.odom.pose, robotState)  # need odom
@@ -229,9 +235,76 @@ class Turret(Subsystem):
         self.pitchVelocity *= MANUAL_SPEED
 
         self.dontOverdoIt()
+        # self.maintainRotation(robotYaw) #TODO remake
 
-        self.yawMotor.setVelocity(RPMToVolts(self.yawVelocity))
-        self.pitchMotor.setVelocity(RPMToVolts(self.pitchVelocity))
+        self.yawMotor.setVelocity(self.yawVelocity)
+        self.pitchMotor.setVelocity(self.pitchVelocity)
+
+    def getMode(self, rs: RobotState) -> TurretMode:
+
+        mode = self.mode
+        if rs.putAwayTurret:
+            mode = (
+                TurretMode.DISABLED
+                if not (self.mode == TurretMode.DISABLED)
+                else self.mode
+            )
+            return mode
+
+        if rs.turretManualToggle:
+            mode = (
+                TurretMode.DYNAMIC
+                if (self.mode == TurretMode.MANUAL)
+                else TurretMode.MANUAL
+            )
+
+        return mode
+
+    def getTarget(self, rs: RobotState) -> TurretTarget:  # TODO
+
+        target: TurretTarget = self.target
+
+        if rs.turretSwitchTarget:
+            if not (self.target == TurretTarget.HUB):
+                target = TurretTarget.HUB
+
+        if not (target == TurretTarget.HUB):
+            pass  # TODO determine side of field
+
+        # TODO check if path will interfere with thing then
+
+        return target
+
+    def getTargetPos(self, target: TurretTarget, side: TeamSide) -> Translation3d:
+
+        pos: Translation3d = self.targetPos
+
+        if side == TeamSide.SIDE_BLUE:
+            match target:
+                case TurretTarget.HUB:
+                    return BLUE_SCORE_POS
+
+                case TurretTarget.SHUTTLE_RIGHT:
+                    return BLUE_RIGHT_SHUTTLE_POS
+
+                case TurretTarget.SHUTTLE_LEFT:
+                    return BLUE_LEFT_SHUTTLE_POS
+
+                case _:
+                    return pos
+        elif side == TeamSide.SIDE_RED:
+            match target:
+                case TurretTarget.HUB:
+                    return RED_SCORE_POS
+
+                case TurretTarget.SHUTTLE_RIGHT:
+                    return RED_RIGHT_SHUTTLE_POS
+
+                case TurretTarget.SHUTTLE_LEFT:
+                    return RED_LEFT_SHUTTLE_POS
+
+                case _:
+                    return pos
 
     def compensateSetpoint(
         self, time: float, roboLinV: Translation2d, roboOmegaSpeed: MPS
@@ -250,36 +323,7 @@ class Turret(Subsystem):
         compensateVector = scaleTranslation2D(compensateVector, time)
 
         # add in the opposite direction
-        self.setPoint.__add__(Translation3d(compensateVector.rotateBy(Rotation2d(PI))))
-
-    def disabled(self):
-        self.yawMotor.stopMotor()
-        self.pitchMotor.stopMotor()
-
-        self.yawMotor.configure(config=self.yawMotor.DISABLED_AZIMUTH_CONFIG)
-        self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
-        # do we need these .configure lines when revmotor allready does this?
-
-        self.homeSet = True
-
-    def publish(self):
-
-        self.publishBoolean("Turret Home Set", self.homeSet)
-        self.publishFloat("Turret Yaw Setpoint", self.yawSetPoint)
-        self.publishFloat(
-            "Turret Yaw Actual Motor Setpoint", self.yawSetPoint * YAW_GEARING
-        )
-        self.publishFloat(
-            "Turret Yaw Feild Relative Rotation", self.odom.pose.rotation().radians()
-        )
-        self.publishFloat("Turret Yaw Encoder Motor Pos", self.yawAngle)
-        self.publishFloat(
-            "Turret Yaw Actual Encoder Pos", self.pitchAngle / PITCH_GEARING
-        )
-        self.publishFloat("Manual Yaw Velocity", self.yawVelocity)
-        self.publishFloat("Manual Pitch Velocity", self.pitchVelocity)
-        self.publishBoolean("Turret Manual Mode Active", self.manualMode)
-        self.publishBoolean("Turret Manual Toggle Button", self.manualToggle)
+        self.targetPos.__add__(Translation3d(compensateVector.rotateBy(Rotation2d(PI))))
 
     def dontOverdoIt(self):
         if self.yawSetPoint > MAX_ROTATION + TURRET_GAP / 2:
@@ -320,8 +364,8 @@ class Turret(Subsystem):
         xPass = d - X_PASS_DIFF_HUB  # for hub
 
         if (
-            self.targetType == TurretTarget.LEFT_SHUTTLE
-            or self.targetType == TurretTarget.RIGHT_SHUTTLE
+            self.target == TurretTarget.SHUTTLE_LEFT
+            or self.target == TurretTarget.SHUTTLE_RIGHT
         ):
             xPass = d - SHUTTLE_X_PASS_DIFF  # for shuttle positions
 
@@ -330,14 +374,14 @@ class Turret(Subsystem):
     def getYPass(self) -> meters:
         yPass = Y_PASS_HUB
         if (
-            self.targetType == TurretTarget.LEFT_SHUTTLE
-            or self.targetType == TurretTarget.RIGHT_SHUTTLE
+            self.target == TurretTarget.SHUTTLE_LEFT
+            or self.target == TurretTarget.SHUTTLE_RIGHT
         ):
             yPass = SHUTTLE_Y_PASS
 
         return yPass
 
-    def reset(self, limit):
+    def reset(self, limit: bool):
         if not self.homeSet:
 
             self.yawMotor.setVelocity(-1)
@@ -347,6 +391,36 @@ class Turret(Subsystem):
                 self.yawEncoder.setPosition(0)
                 self.pitchEncoder.setPosition(0)
                 self.homeSet = True
+
+    def disabled(self):
+        self.yawMotor.stopMotor()
+        self.pitchMotor.stopMotor()
+
+        self.yawMotor.configure(config=self.yawMotor.DISABLED_AZIMUTH_CONFIG)
+        self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
+        # do we need these .configure lines when revmotor allready does this?
+
+        self.homeSet = True
+
+    def publish(self):
+
+        self.publishBoolean("Turret Home Set", self.homeSet)
+        self.publishFloat("Turret Yaw Setpoint", self.yawSetPoint)
+        self.publishFloat(
+            "Turret Yaw Actual Motor Setpoint", self.yawSetPoint * YAW_GEARING
+        )
+        self.publishFloat(
+            "Turret Yaw Feild Relative Rotation", self.odom.pose.rotation().radians()
+        )
+        self.publishFloat("Turret Yaw Encoder Motor Pos", self.yawAngle)
+        self.publishFloat(
+            "Turret Yaw Actual Encoder Pos", self.pitchAngle / PITCH_GEARING
+        )
+        self.publishFloat("Turret Manual Yaw Velocity", self.yawVelocity)
+        self.publishFloat("Turret Manual Pitch Velocity", self.pitchVelocity)
+        self.publishGeneric("Turret Mode", self.mode)
+        self.publishGeneric("Turret Target", self.target)
+        self.publishGeneric("Turret target Position", self.targetPos)
 
 
 class TurretOdometry:
@@ -408,11 +482,10 @@ class Shooter(Subsystem):
 
         self.dependencies: tuple = (None,)
 
+        super().__init__()
         self.publishFloat("Manual rev cap", self.manualRevSpeed)
         self.publishFloat("manual kick rpm", self.manualKickSpeed)
         self.publishBoolean("shooter manual", self.manualMode)
-
-        super().__init__()
 
     def phaseInit(self) -> None:
         self.dependencies: tuple = (None,)
@@ -421,7 +494,7 @@ class Shooter(Subsystem):
 
         self.manualMode = self.getBoolean("shooter manual", default=False)
         self.manualRevSpeed = self.getFloat("Manual rev cap", default=0)
-        self.revingSpeed = RPMToVolts(robotState.revSpeed * self.manualRevSpeed)
+        self.revingSpeed = robotState.revSpeed * self.manualRevSpeed
 
         self.dependencies = (
             robotState.revSpeed,
@@ -452,7 +525,9 @@ class Shooter(Subsystem):
             return
 
         self.revingSpeed: MPS = _calculateVelocity(
-            robotState.optimalTurretAngle, robotState.targetDistance
+            robotState.optimalTurretAngle,
+            robotState.targetDistance,
+            robotState.targetHeight,
         )
         self.revShooters(self.revingSpeed)
 
@@ -484,15 +559,11 @@ def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radian
     return math.atan(numerator / denom)
 
 
-def _calculateVelocity(turretAngle, hubDistance) -> MPS:
+def _calculateVelocity(turretAngle, hubDistance, height) -> MPS:
 
     velocityMps = math.sqrt(
         (GRAVITY * turretAngle**2)
-        / (
-            2
-            * math.cos(turretAngle)
-            * (hubDistance * math.tan(turretAngle) - GOAL_HEIGHT)
-        )
+        / (2 * math.cos(turretAngle) * (hubDistance * math.tan(turretAngle) - height))
     )
     return velocityMps / FLYWHEEL_CIRCUMFRENCE * 60
 
@@ -508,15 +579,3 @@ def checkDependencies(depends: tuple) -> bool:
             return False
 
     return True
-
-
-def RPMToVolts(rpm: RPM) -> float:
-
-    return rpm / (MAX_RPM / BATTERY_VOLTS)
-
-
-def wrapAngle(angle: radians) -> radians:
-
-    # mod only returns positive like a bum
-    wrappedAngle: radians = (angle % TAU) * np.sign(angle)
-    return wrappedAngle

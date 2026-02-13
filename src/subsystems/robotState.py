@@ -1,6 +1,9 @@
 from dataclasses import dataclass, fields
-from math import pi as PI
+from math import pi as PI, tau as TAU
+import numpy as np
 import math
+from enum import Enum
+
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.geometry import Pose2d, Translation2d
 from wpimath.kinematics import ChassisSpeeds
@@ -13,9 +16,28 @@ from wpimath.units import (
     inchesToMeters,
     rotationsPerMinuteToRadiansPerSecond,
 )
+from typing import Any, Self
 
 ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
-from typing import Any, Self
+BATTERY_VOLTS: float = 12
+
+
+class TeamSide(Enum):
+    SIDE_RED = 1
+    SIDE_BLUE = 2
+
+
+class TurretTarget(Enum):
+    NONE = 0
+    HUB = 1
+    SHUTTLE_RIGHT = 2
+    SHUTTLE_LEFT = 3
+
+
+class TurretMode(Enum):
+    DISABLED = 0
+    MANUAL = 1
+    DYNAMIC = 2
 
 
 @dataclass
@@ -33,13 +55,18 @@ class RobotState(NetworkTablesMixin):
     targetHeight: meters
 
     turretManualToggle: bool
-    turretManulMode: bool
     turretManualSetpoint: float
     fullyreved: bool
     targetLocked: bool
+    turretSwitchTarget: bool
+    putAwayTurret: bool
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
+
+    teamSide: TeamSide = TeamSide.SIDE_RED
+    turretTarget: TurretTarget = TurretTarget.NONE
+    turretMode: TurretMode = TurretMode.MANUAL
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -101,3 +128,15 @@ def scaleTranslation2D(translation: Translation2d, scalar) -> Translation2d:
     yScale = hyp * math.sin(angle)
 
     return Translation2d(xScale, yScale)
+
+
+def wrapAngle(angle: radians) -> radians:
+
+    # mod only returns positive like a bum
+    wrappedAngle: radians = (angle % TAU) * np.sign(angle)
+    return wrappedAngle
+
+
+def RPMToVolts(rpm: RPM, maxRPM) -> float:
+
+    return rpm / (maxRPM / BATTERY_VOLTS)
