@@ -11,6 +11,7 @@ dependencies = [
     "photonlibpy",
     "ty",
     "pre-commit",
+    "setuptools<82.0.0",
 ]
 
 
