@@ -58,6 +58,7 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
+            self.flyTrajy
         ]
 
     @property

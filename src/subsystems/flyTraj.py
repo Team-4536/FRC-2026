@@ -17,20 +17,23 @@ class FlyTraj(Subsystem):
 
     def __init__(self):
         self.manager = LocalADStar()
+        print("tick-")
 
     def phaseInit(self):
-        self.manager.setDynamicObstacles(list(tuple(Translation2d(2,2), Translation2d(4,4))))
+        print("tick+")
+        self.manager.setDynamicObstacles(obs=[Pose2d(2,2,0), Pose2d(4,4,0)], current_robot_pos=Translation2d(1.0,1.0))
         self.state = 0
 
     def periodic(self, robotState: RobotState):
-    
+        print("tick")
         if robotState.flyTest and self.state == 0:
             self.manager.setStartPosition(robotState.pose)
-            self.manager.setGoalPosition(Translation2d(0,0,0))
+            self.manager.setGoalPosition(Translation2d(0,0))
             self.state = 1
         
         if robotState.flyTest and self.state == 1:
-            p = self.manager.getCurrentPath(PathConstraints(5.0, 2.0, 0.3, 0.05, 12, True), Translation2d(0,0,0))
+    
+            p = self.manager.getCurrentPath(PathConstraints(5.0, 2.0, 0.3, 0.05, 12, True), Translation2d(0.0,0.0))
             nominalVoltage = 12.0
             stallTorque = 2.6
             stallCurrent = 105.0
@@ -66,6 +69,7 @@ class FlyTraj(Subsystem):
 
         if self.state == 3:
             startTime = wpilib.getTime()
+            print(self.t.getTotalTimeSeconds())
             self.state = 4
 
         if self.state == 4:
