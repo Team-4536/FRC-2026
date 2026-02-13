@@ -5,7 +5,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
-from typing import List, NamedTuple
+from typing import NamedTuple, Sequence
 
 robotState: RobotState = None  # type: ignore
 
@@ -38,20 +38,17 @@ class SubsystemManager(NamedTuple):
         robotState = self.inputs.periodic(self.robotState)
         self._periodic(self.robotState)
 
-    def _periodic(self, robotState: RobotState) -> None:
+    def _periodic(self, state: RobotState) -> None:
+        global robotState
         for s in self.dependantSubsytems:
-            s.periodic(robotState)
+            robotState = s.periodic(state)
 
     def disabled(self) -> None:
         for s in self:
             s.disabled()
 
     @property
-    def dependantSubsytems(
-        self,
-    ) -> List[
-        Subsystem
-    ]:  # dependant subsystems (I know how to remove this but I just didnt have enough time to)
+    def dependantSubsytems(self) -> Sequence[Subsystem]:  # dependant subsystems
         return [
             self.ledSignals,
             self.swerveDrive,

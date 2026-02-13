@@ -6,6 +6,10 @@ from wpilib import getTime
 from wpimath.units import seconds
 
 
+def lerp(x: float, y: float, t: float) -> float:
+    return x + t * (y - x)
+
+
 class TimeData(Subsystem):
     def __init__(self) -> None:
         super().__init__()
