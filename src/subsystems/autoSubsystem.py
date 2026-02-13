@@ -45,14 +45,10 @@ class AutoSubsystem(Subsystem):
         self.routineFinished = False
         self.routineKeys = list(self.routine.keys())
 
-        # print(self.routineKeys, "&^&^&^&^&^&^&^")
-
         wpilib.SmartDashboard.putStringArray("routineKeys", self.routineKeys)
 
         if self.routine:
             self.routine[self.routineKeys[self.currentPath]].autoInit()
-
-        # print(self.autoRoutineChooser.getSelected().value, ")(*&^%$#@!)")
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
