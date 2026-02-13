@@ -7,6 +7,7 @@ from subsystems.utils import TimeData
 from typing import List, NamedTuple
 from subsystems.cameras import CameraManager
 from wpimath.estimator import SwerveDrive4PoseEstimator
+from typing import NamedTuple, Sequence
 
 robotState: RobotState = None  # type: ignore
 
@@ -20,19 +21,17 @@ class SubsystemManager(NamedTuple):
 
     def init(self) -> None:
         for s in self.dependantSubsytems:
-            s.init()
-        self.inputs.init()
-
-    def robotInit(self) -> None:
-        self.time.init()
+            s.phaseInit()
+        self.inputs.phaseInit()
 
     def robotPeriodic(self) -> None:
-        self.time.periodic(self.robotState)
         self.robotState.publish()
+        for s in self:
+            s.publish()
 
     def autonomousPeriodic(self) -> None:
         global robotState
-        robotState = self.inputs.periodic(self.robotState)  # replace with auto manager
+        robotState = self.inputs.periodic(self.robotState)
         self._periodic(self.robotState)
 
     def teleopPeriodic(self) -> None:
@@ -40,32 +39,29 @@ class SubsystemManager(NamedTuple):
         robotState = self.inputs.periodic(self.robotState)
         self._periodic(self.robotState)
 
-    def _periodic(self, robotState: RobotState) -> None:
+    def _periodic(self, state: RobotState) -> None:
+        global robotState
         for s in self.dependantSubsytems:
-            s.periodic(robotState)
-        self.time.periodic(robotState)
+            robotState = s.periodic(state)
 
     def disabled(self) -> None:
         for s in self:
             s.disabled()
 
     @property
-    def dependantSubsytems(
-        self,
-    ) -> List[
-        Subsystem
-    ]:  # dependant subsystems (I know how to remove this but I just didnt have enough time to)
+    def dependantSubsytems(self) -> Sequence[Subsystem]:  # dependant subsystems
         return [
             self.ledSignals,
             self.swerveDrive,
             self.cameras,
+            self.time,
         ]
 
     @property
     def robotState(self) -> RobotState:
         global robotState
 
-        if robotState == None:
+        if not robotState:
             robotState = self.inputs.robotState
             robotState.odometry = SwerveDrive4PoseEstimator(
                 self.swerveDrive._kinematics,

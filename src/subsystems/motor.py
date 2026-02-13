@@ -2,7 +2,6 @@ from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
-    FeedForwardConfig,
     MAXMotionConfig,
     PersistMode,
     ResetMode,
@@ -55,7 +54,7 @@ class RevMotor:
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.00019, 0, 0, 0.00002)
+            .pidf(0.00019, 0, 0, 0.00205)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .apply(
@@ -64,7 +63,6 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
-            .apply(FeedForwardConfig().kV(0.00205))
         )
     )
 

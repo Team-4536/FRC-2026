@@ -1,5 +1,6 @@
 from dataclasses import dataclass, fields
 from subsystems.networkTablesMixin import NetworkTablesMixin
+from typing import Any, Self
 from wpimath.geometry import Pose2d, Pose3d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
@@ -7,12 +8,14 @@ from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.units import metersToFeet
 from wpilib import Field2d
 from wpilib import SmartDashboard
+from ntcore import NetworkTable
 
 
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
+    resetGyro: bool
     pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
 
@@ -51,7 +54,7 @@ class RobotState(NetworkTablesMixin):
         )
 
     @classmethod
-    def empty(cls, **kwargs):
+    def empty(cls, **kwargs: Any) -> Self:
         data = {f.name: None for f in fields(cls)}
 
         data.update(kwargs)

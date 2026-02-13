@@ -6,4 +6,6 @@ simgui*
 
 # virtual environment & uv
 .venv/
-uv.lock
+
+# misc
+.DS_STORE

@@ -1,6 +1,6 @@
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from typing import List, Optional
+from typing import Optional
 from warnings import warn
 from wpilib import CAN
 
@@ -14,7 +14,7 @@ class LEDSignals(Subsystem):
         self.apiID = 0
         self.can = CAN(deviceID)
 
-    def init(self) -> None:
+    def phaseInit(self) -> None:
         pass
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -22,9 +22,6 @@ class LEDSignals(Subsystem):
 
     def disabled(self) -> None:
         self.update(b8=0)  # EXAMPLE
-
-    def publish(self) -> None:
-        pass
 
     def update(
         self,
@@ -38,8 +35,8 @@ class LEDSignals(Subsystem):
         b7: Optional[int] = None,
         b8: Optional[int] = None,
     ) -> None:
-        rawBytes: List[Optional[int]] = [b1, b2, b3, b4, b5, b6, b7, b8]
-        bytes: List[int] = [b if b is not None else NONE for b in rawBytes]
+        rawBytes = [b1, b2, b3, b4, b5, b6, b7, b8]
+        bytes = [b if b is not None else NONE for b in rawBytes]
 
         try:
             byteArray = bytearray(bytes)
