@@ -34,22 +34,22 @@ class RobotState(NetworkTablesMixin):
             elif isinstance(value, str):
                 self.publishString(name, value)
             elif isinstance(value, float):
-                self.publishDouble(name, value)
+                self.publishFloat(name, value)
             elif isinstance(value, bool):
                 self.publishBoolean(name, value)
 
-        self.publishDouble("vx", self.fieldSpeeds.vx, "FieldSpeeds")
-        self.publishDouble("vy", self.fieldSpeeds.vy, "FieldSpeeds")
-        self.publishDouble("omega", self.fieldSpeeds.omega, "FieldSpeeds")
+        self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
+        self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
+        self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
         self.myField.setRobotPose(self.odometry.getEstimatedPosition())
 
-        self.publishDouble(
+        self.publishFloat(
             "x", metersToFeet(self.odometry.getEstimatedPosition().X()), "odom"
         )
-        self.publishDouble(
+        self.publishFloat(
             "y", metersToFeet(self.odometry.getEstimatedPosition().Y()), "odom"
         )
-        self.publishDouble(
+        self.publishFloat(
             "angle", self.odometry.getEstimatedPosition().rotation().degrees(), "odom"
         )
 

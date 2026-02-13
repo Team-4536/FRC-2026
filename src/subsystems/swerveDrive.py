@@ -177,13 +177,6 @@ class SwerveDrive(
         self._gyro = AHRS(AHRS.NavXComType.kMXP_SPI)
         self._gyro.reset()
 
-        self._odometry = SwerveDrive4Odometry(
-            self._kinematics,
-            self._gyro.getRotation2d(),
-            self._modules.modulePositions,
-            initPos,
-        )
-
         self._swerveStates = self._kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
@@ -198,16 +191,16 @@ class SwerveDrive(
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:
             self._gyro.reset()
-            self._odometry.resetPosition(
+            robotState.odometry.resetPosition(
                 self._gyro.getRotation2d(),
                 self._modules.modulePositions,
                 Pose2d(
-                    self._odometry.getPose().translation(),
+                    robotState.odometry.getEstimatedPosition().translation(),
                     Rotation2d(),
                 ),
             )
 
-        robotState._odometry.update(
+        robotState.odometry.update(
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
         )
