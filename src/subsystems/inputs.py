@@ -19,7 +19,7 @@ class Inputs(Subsystem):
     ) -> None:
         super().__init__()
 
-        self.robotState = RobotState.empty()
+        self.robotState = RobotState.empty(abtainableMaxSpeed=self.MAX_ABTAINABLE_SPEED)
 
         self._driveCtrlr = Ctrlr(drivePort)
         self._mechCtrlr = Ctrlr(mechPort)
