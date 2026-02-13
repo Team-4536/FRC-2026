@@ -102,8 +102,8 @@ class FollowTrajectory(AutoStages):
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
-        posError = 0.3  # TODO: change later
-        rotationError = 0.3  # TODO: change later
+        posError = 0.1  # TODO: change later
+        rotationError = 0.1  # TODO: change later
 
         print(endXPos, endYPos, endRotation, "end pos")
         print(self.trajectory.getTotalTimeSeconds())

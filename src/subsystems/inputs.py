@@ -19,7 +19,7 @@ class Inputs(Subsystem):
         self._driveCtrlr = Ctrlr(drivePort)
         self._mechCtrlr = Ctrlr(mechPort)
 
-        self.robotState = RobotState.empty(abtainableMaxSpeed=5)
+        self.robotState = RobotState.empty(abtainableMaxSpeed=2)
 
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
