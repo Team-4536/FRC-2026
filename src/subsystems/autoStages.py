@@ -133,19 +133,32 @@ class FollowTrajectory(AutoStages):
         return True
 
 
-class SpinIntake(AutoStages):
+class OperateIntake(AutoStages):
     robotState: RobotState
+    startTime: float
+    pathTime: float
+    runTime: float
+    pathDone: bool
 
-    def __init__(self):
-        pass
+    def __init__(self, runTime: float):
+        self.pathDone = False
+        self.runTime = runTime
 
     def autoInit(self):
-        pass
+        self.startTime = wpilib.getTime()
+        # self.robotState.intakeDown = True
 
     def run(self, robotState: RobotState) -> RobotState:
         self.robotState = robotState
 
+        # self.robotState.initialIntake = True
+
         return self.robotState
 
     def isDone(self) -> bool:
+
+        if self.pathTime < self.runTime:
+            return False
+
+        self.pathDone = True
         return True
