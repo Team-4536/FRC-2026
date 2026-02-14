@@ -47,18 +47,18 @@ class RobotState(NetworkTablesMixin):
     pose: Pose2d
     motorDesiredState: float
 
-    revSpeed: RPM
-    kickShooter: RPM
+    revSpeed: float
+    kickShooter: bool
     optimalTurretAngle: radians
     targetDistance: meters
     targetHeight: meters
 
-    turretManualToggle: bool
+    turretSwitchManual: bool
     turretManualSetpoint: float
     fullyreved: bool
     targetLocked: bool
     turretSwitchTarget: bool
-    putAwayTurret: bool
+    turretSwitchEnabled: bool
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
@@ -71,7 +71,7 @@ class RobotState(NetworkTablesMixin):
         super().__init__()
 
     def publish(self) -> None:
-        self.publishBoolean("Turret Manual", self.turretManualToggle)
+        self.publishBoolean("Turret Manual", self.turretSwitchManual)
         for field in fields(self):
             name = field.name
             value = getattr(self, name)

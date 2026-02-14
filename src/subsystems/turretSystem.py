@@ -88,7 +88,7 @@ YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
 
-TURRET_DIST_FROM_CENTER: meters = inchesToMeters(10)  # TODO make correct
+TURRET_DIST_FROM_CENTER: meters = inchesToMeters(7.5)  # TODO make correct
 TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
 
 
@@ -165,8 +165,6 @@ class Turret(Subsystem):
         if not self.homeSet:
             self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
             return robotState
-
-        # self.manualToggle = robotState.turretManualToggle #TODO uncomment (was for testing)
 
         if not checkDependencies(self.turretGenDepedencies):
             return robotState
@@ -254,7 +252,7 @@ class Turret(Subsystem):
     def getMode(self, rs: RobotState) -> TurretMode:
 
         mode = self.mode
-        if rs.putAwayTurret:
+        if rs.turretSwitchEnabled:
             mode = (
                 TurretMode.DISABLED
                 if not (self.mode == TurretMode.DISABLED)
@@ -262,7 +260,7 @@ class Turret(Subsystem):
             )
             return mode
 
-        if rs.turretManualToggle:
+        if rs.turretSwitchManual:
             mode = (
                 TurretMode.DYNAMIC
                 if (self.mode == TurretMode.MANUAL)
@@ -271,12 +269,14 @@ class Turret(Subsystem):
 
         return mode
 
-    def getTarget(self, rs: RobotState) -> TurretTarget:  # TODO
+    def getTarget(self, rs: RobotState) -> TurretTarget:
 
         target: TurretTarget = self.target
 
         if rs.turretSwitchTarget:
-            if not (self.target == TurretTarget.HUB):
+            if not (
+                self.target == TurretTarget.HUB
+            ):  # TODO it is a button rn but change to determine side of feild
                 target = TurretTarget.HUB
 
         if not (target == TurretTarget.HUB):
@@ -329,7 +329,7 @@ class Turret(Subsystem):
 
     def compensateSetpoint(
         self, time: float, roboLinV: Translation2d, roboOmegaSpeed: MPS
-    ):  # TODO finish
+    ):
 
         compensateVector: Translation2d = Translation2d()
 
