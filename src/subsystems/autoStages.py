@@ -140,7 +140,7 @@ class OperateIntake(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, runTime: float):
+    def __init__(self, runTime: float = 0):
         self.pathDone = False
         self.runTime = runTime
 
