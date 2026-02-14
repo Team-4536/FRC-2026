@@ -49,7 +49,7 @@ from enum import Enum
 MAX_ROTATION: radians = degreesToRadians(270)
 TURRET_GAP: radians = math.tau - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
-ZERO_OFFSET: radians = 0
+ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
 # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 YAW_GEARING: float = 100 / 3
 PITCH_GEARING: float = 2
