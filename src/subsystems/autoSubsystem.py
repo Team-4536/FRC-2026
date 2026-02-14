@@ -108,9 +108,9 @@ def routineChooser(
                 FollowTrajectory(
                     "right to balls",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
-            OperateIntake(5)
             routine["Back Under Left Trench"] = [
                 FollowTrajectory(
                     "back under left trench",
@@ -129,9 +129,9 @@ def routineChooser(
                 FollowTrajectory(
                     "left to balls",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
-            OperateIntake(10)
             routine["Back Under Right Trench"] = [
                 FollowTrajectory(
                     "back under right trench",
