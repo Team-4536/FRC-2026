@@ -82,16 +82,20 @@ class RobotState(NetworkTablesMixin):
         self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
 
+        x, y, angle = 0, 0, 0
         if self.pose:
-            self.publishFloat("x", metersToFeet(self.pose.X()), "odom")
-            self.publishFloat("y", metersToFeet(self.pose.Y()), "odom")
-            self.publishFloat("angle", self.pose.rotation().degrees(), "odom")
+            x = metersToFeet(self.pose.X())
+            y = metersToFeet(self.pose.Y())
+            angle = self.pose.rotation().degrees()
+        self.publishFloat("x", x, "odom")
+        self.publishFloat("y", y, "odom")
+        self.publishFloat("angle", angle, "odom")
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
         data = {f.name: None for f in fields(cls)}
 
-        data.update(kwargs)  # test
+        data.update(kwargs)
 
         return cls(**data)  # type: ignore
 
