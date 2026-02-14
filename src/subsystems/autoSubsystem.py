@@ -11,12 +11,8 @@ class AutoRoutines(Enum):
     DRIVE_FORWARD_TEST = "Drive Forward Test"
     DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
     WONKY = "Wonky"
-    UNDER_RIGHT_TRENCH = "Under Right Trench"
-    UNDER_LEFT_TRENCH = "Under Left Trench"
-    RIGHT_TO_BALLS = "Right To Balls"
-    LEFT_TO_BALLS = "Left To Balls"
-    BACK_UNDER_RIGHT_TRENCH = "Back Under Right Trench"
-    BACK_UNDER_LEFT_TRENCH = "Back Under Left Trench"
+    GET_BALLS_AND_BRING_BACK_RIGHT = "Get Balls And Bring Back Right"
+    GET_BALLS_AND_BRING_BACK_LEFT = "Get Balls And Bring Back Left"
 
 
 class AutoSubsystem(Subsystem):
@@ -101,47 +97,44 @@ def routineChooser(
                 )
             ]
 
-        case AutoRoutines.UNDER_RIGHT_TRENCH:
+        case AutoRoutines.GET_BALLS_AND_BRING_BACK_RIGHT:
             routine["Under Right Trench"] = [
                 FollowTrajectory(
                     "under right trench",
                     isFlipped,
                 )
             ]
-        case AutoRoutines.UNDER_LEFT_TRENCH:
+            routine["Right To Balls"] = [
+                FollowTrajectory(
+                    "right to balls",
+                    isFlipped,
+                )
+            ]
+            OperateIntake(5)
+            routine["Back Under Left Trench"] = [
+                FollowTrajectory(
+                    "back under left trench",
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.GET_BALLS_AND_BRING_BACK_LEFT:
             routine["Under Left Trench"] = [
                 FollowTrajectory(
                     "under left trench",
                     isFlipped,
                 )
             ]
-
-        case AutoRoutines.RIGHT_TO_BALLS:
-            routine["Right To Balls"] = [
+            routine["Left To Balls"] = [
                 FollowTrajectory(
-                    "right to balls",
+                    "left to balls",
                     isFlipped,
                 )
             ]
-        case AutoRoutines.LEFT_TO_BALLS:
-            routine["Right To Balls"] = [
-                FollowTrajectory(
-                    "right to balls",
-                    isFlipped,
-                )
-            ]
-
-        case AutoRoutines.BACK_UNDER_RIGHT_TRENCH:
+            OperateIntake(10)
             routine["Back Under Right Trench"] = [
                 FollowTrajectory(
                     "back under right trench",
-                    isFlipped,
-                )
-            ]
-        case AutoRoutines.BACK_UNDER_LEFT_TRENCH:
-            routine["Back Under Left Trench"] = [
-                FollowTrajectory(
-                    "back under left trench",
                     isFlipped,
                 )
             ]
