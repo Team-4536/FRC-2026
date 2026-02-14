@@ -2,8 +2,14 @@ from enum import Enum
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.autoStages import AutoStages, FollowTrajectory
-from subsystems.autoRoutines import AutoRoutines
 import wpilib
+
+
+class AutoRoutines(Enum):
+    DO_NOTHING = "Do Nothing"
+    DRIVE_FORWARD_TEST = "Drive Forward Test"
+    DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
+    WONKY = "Wonky"
 
 
 class AutoSubsystem(Subsystem):
@@ -21,12 +27,11 @@ class AutoSubsystem(Subsystem):
             AutoRoutines.DRIVE_FORWARD_TEST.value,
             AutoRoutines.DRIVE_FORWARD_TEST,
         )
+        for routine in AutoRoutines:
+            self.autoRoutineChooser.addOption(routine.value, routine)
 
         self.autoSideChooser.setDefaultOption(AUTO_SIDE_BLUE, AUTO_SIDE_BLUE)
         self.autoSideChooser.addOption(AUTO_SIDE_RED, AUTO_SIDE_RED)
-
-        for routine in AutoRoutines:
-            self.autoRoutineChooser.addOption(routine.value, routine)
 
         wpilib.SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
 
