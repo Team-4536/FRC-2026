@@ -21,7 +21,7 @@ class FlyTraj(Subsystem):
 
     def phaseInit(self):
         print("tick+")
-        self.manager.setDynamicObstacles(obs=[Pose2d(2,2,0), Pose2d(4,4,0)], current_robot_pos=Translation2d(1.0,1.0))
+        self.manager.setDynamicObstacles(obs=[(Translation2d(2,2), Translation2d(4,4))], current_robot_pos=Translation2d(1.0,1.0))
         self.state = 0
 
     def periodic(self, robotState: RobotState):
@@ -32,6 +32,8 @@ class FlyTraj(Subsystem):
             self.state = 1
         
         if robotState.flyTest and self.state == 1:
+
+            print("stage = 1")
     
             p = self.manager.getCurrentPath(PathConstraints(5.0, 2.0, 0.3, 0.05, 12, True), Translation2d(0.0,0.0))
             nominalVoltage = 12.0
