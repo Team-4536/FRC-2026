@@ -447,9 +447,9 @@ class Turret(Subsystem):
         )
         self.publishFloat("Turret Manual Yaw Velocity", self.yawVelocity)
         self.publishFloat("Turret Manual Pitch Velocity", self.pitchVelocity)
-        self.publishGeneric("Turret Mode", self.mode)
-        self.publishGeneric("Turret Target", self.target)
-        self.publishGeneric("Turret target Position", self.targetPos)
+        self.publishFloat("Turret Mode", self.mode.value)
+        self.publishFloat("Turret Target", self.target.value)
+        self.publishStruct("Turret target Position", self.targetPos)
         self.publishBoolean("Turret Target Locked", self.targetLocked)
 
 
