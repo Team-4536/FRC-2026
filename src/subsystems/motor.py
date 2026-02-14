@@ -154,7 +154,7 @@ class RevMotor:
         SparkMaxConfig()
         .smartCurrentLimit(40)
         .disableFollowerMode()
-        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
         .inverted(True)
         .apply(
             ClosedLoopConfig()
