@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, MISSING
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpimath.geometry import Pose2d
@@ -11,14 +11,14 @@ from wpimath.units import metersToFeet
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
-    initialIntake: bool
-    intakeSensorTest: bool
-    intakeEject: bool
-    intakePosYAxis: float
-    intakePos: bool
-    intakeMode: bool
     resetGyro: bool
     pose: Pose2d
+    initialIntake: bool = False  # TODO: change vals later, very temp
+    intakeSensorTest: bool = False
+    intakeEject: bool = False
+    intakePosYAxis: float = 1
+    intakePos: bool = False
+    intakeMode: bool = True
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -45,8 +45,14 @@ class RobotState(NetworkTablesMixin):
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
-        data = {f.name: None for f in fields(cls)}
-
-        data.update(kwargs)
-
+        data = {}
+        for f in fields(cls):
+            if f.name in kwargs:
+                data[f.name] = kwargs[f.name]
+            elif f.default is not MISSING:
+                data[f.name] = f.default
+            elif f.default_factory is not MISSING:
+                data[f.name] = f.default_factory()
+            else:
+                data[f.name] = None
         return cls(**data)  # type: ignore

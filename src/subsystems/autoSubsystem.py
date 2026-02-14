@@ -60,7 +60,7 @@ class AutoSubsystem(Subsystem):
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
-            self.robotState = self.routine[self.routineKeys[self.currentPath]].run(
+            robotState = self.routine[self.routineKeys[self.currentPath]].run(
                 robotState
             )
             if self.routine[self.routineKeys[self.currentPath]].isDone():
