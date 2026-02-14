@@ -131,3 +131,21 @@ class FollowTrajectory(AutoStages):
 
         self.pathDone = True
         return True
+
+
+class SpinIntake(AutoStages):
+    robotState: RobotState
+
+    def __init__(self):
+        pass
+
+    def autoInit(self):
+        pass
+
+    def run(self, robotState: RobotState) -> RobotState:
+        self.robotState = robotState
+
+        return self.robotState
+
+    def isDone(self) -> bool:
+        return True
