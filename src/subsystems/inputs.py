@@ -10,7 +10,7 @@ from math import pi as PI
 
 
 class Inputs(Subsystem):
-    MAX_ABTAINABLE_SPEED: float = 2.5
+    MAX_ABTAINABLE_SPEED: float = 4
     LOW_MAX_ABTAINABLE_SPEED: float = 1.5
 
     def __init__(

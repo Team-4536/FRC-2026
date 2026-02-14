@@ -11,6 +11,7 @@ from rev import (
     SparkRelativeEncoder,
     LimitSwitchConfig,
     SoftLimitConfig,
+    FeedForwardConfig,
 )
 from wpimath.units import radians
 from wpimath.units import revolutions_per_minute as RPM, radiansToRotations
@@ -142,6 +143,7 @@ class RevMotor:
                 .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(0.2)
             )
+            .apply(FeedForwardConfig().kA(0))
         )
     )
     TURRET_PITCH_CONFIG = AZIMUTH_CONFIG.apply(
@@ -173,7 +175,7 @@ class RevMotor:
         .smartCurrentLimit(40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-        .inverted(True)
+        .inverted(False)
         .apply(
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00205)
