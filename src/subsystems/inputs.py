@@ -74,6 +74,7 @@ class Inputs(Subsystem):
         self.robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         self.robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
         self.robotState.turretSwitchTarget = self._mechCtrlr.getBButtonPressed()
+        self.robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
 
         return robotState
 

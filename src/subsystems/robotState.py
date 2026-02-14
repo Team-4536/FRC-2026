@@ -59,6 +59,7 @@ class RobotState(NetworkTablesMixin):
     targetLocked: bool
     turretSwitchTarget: bool
     turretSwitchEnabled: bool
+    turretResetYawEncdoer: bool
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d

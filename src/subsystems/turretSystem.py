@@ -161,6 +161,9 @@ class Turret(Subsystem):
 
         self.mode = self.getMode(robotState)
 
+        if robotState.turretResetYawEncdoer:
+            self.yawEncoder.setPosition(0)
+
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
 
