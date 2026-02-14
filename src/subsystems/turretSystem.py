@@ -6,6 +6,7 @@ from subsystems.robotState import (
     TurretTarget,
     TurretMode,
     ROBOT_RADIUS,
+    RPMToVolts,
     getTangentalVelocity,
     scaleTranslation2D,
     wrapAngle,
@@ -13,13 +14,7 @@ from subsystems.robotState import (
 )
 from rev import (
     SparkRelativeEncoder,
-    SparkBaseConfig,
-    SparkMaxConfig,
-    ClosedLoopConfig,
-    MAXMotionConfig,
-    ClosedLoopSlot,
-    LimitSwitchConfig,
-    FeedbackSensor,
+    SoftLimitConfig,
 )
 from subsystems.inputs import Inputs
 from subsystems.robotState import RobotState
@@ -29,6 +24,7 @@ from wpimath.units import (
     degreesToRadians,
     rotationsToDegrees,
     inchesToMeters,
+    radiansToRotations,
     revolutions_per_minute as RPM,
     radians,
     meters,
@@ -46,7 +42,7 @@ from wpilib import DigitalInput
 from enum import Enum
 
 
-MAX_ROTATION: radians = degreesToRadians(270)
+MAX_ROTATION: radians = degreesToRadians(180)
 TURRET_GAP: radians = math.tau - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
 ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
@@ -80,8 +76,8 @@ FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 
 MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
-MANUAL_SPEED: RPM = 100  # TODO tune, for the pitch and yaw speed
-KICK_SPEED: RPM = 50
+MANUAL_SPEED: RPM = 10  # TODO tune, for the pitch and yaw speed
+KICK_SPEED: RPM = 1500
 
 REV_ALLOWED_ERROR: RPM = 10  # TODO fine tune all these
 YAW_ALLOWED_ERROR: radians = 0.05
@@ -124,7 +120,15 @@ class Turret(Subsystem):
 
     def phaseInit(self):
 
-        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
+        self.yawMotor.configure(
+            config=self.yawMotor.TURRET_YAW_CONFIG.apply(
+                SoftLimitConfig()
+                .forwardSoftLimit(radiansToRotations(MAX_ROTATION / TAU * YAW_GEARING))
+                .reverseSoftLimit(0)
+                .forwardSoftLimitEnabled(True)
+                .reverseSoftLimitEnabled(True)
+            )
+        )
         self.pitchMotor.configure(config=self.pitchMotor.TURRET_PITCH_CONFIG)
 
         self.homeSet: bool = True
@@ -238,15 +242,17 @@ class Turret(Subsystem):
             self.yawVelocity / 60 * timeDiff
         )  # ensures it spins at a consistant speed
         self.lastTime = time
-        self.limitedYawSetpoint = self.dontOverdoIt()
+
+        self.yawSetPoint = wrapAngle(self.yawSetPoint)
+        self.yawSetPoint = self.dontOverdoIt()
 
         self.relativeYawSetpoint = (
-            self.limitedYawSetpoint
+            self.yawSetPoint
             - wrapAngle(robotState.pose.rotation().radians())
             + ZERO_OFFSET
         )
 
-        self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
+        self.yawMotor.setPosition(self.limitedYawSetpoint * YAW_GEARING)
         self.pitchMotor.setVelocity(self.pitchVelocity)
 
     def getMode(self, rs: RobotState) -> TurretMode:
@@ -348,10 +354,12 @@ class Turret(Subsystem):
 
     def dontOverdoIt(self) -> radians:
 
-        if self.yawSetPoint > MAX_ROTATION + TURRET_GAP / 2:
+        if self.yawSetPoint > MAX_ROTATION + TURRET_GAP / 2 or (
+            self.yawSetPoint < 0 and self.yawSetPoint > 0 - TURRET_GAP / 2
+        ):
             return 0
 
-        elif self.yawSetPoint > MAX_ROTATION:
+        elif self.yawSetPoint > MAX_ROTATION or self.yawSetPoint < 0:
             return MAX_ROTATION
 
         return self.yawSetPoint
@@ -433,24 +441,21 @@ class Turret(Subsystem):
 
     def publish(self):
 
-        self.publishBoolean("Turret Home Set", self.homeSet)
-        self.publishFloat("Turret Yaw Setpoint", self.yawSetPoint)
+        self.publishBoolean("Home Set", self.homeSet)
+        self.publishFloat("Yaw Setpoint", self.yawSetPoint)
 
-        self.publishFloat("Turret Yaw Actual Motor Setpoint", self.relativeYawSetpoint)
+        self.publishFloat("Yaw Robot Relative Setpoint", self.relativeYawSetpoint)
         self.publishFloat(
-            "Turret Yaw Feild Relative Rotation", self.odom.pose.rotation().radians()
+            "Yaw Feild Relative Rotation", self.odom.pose.rotation().radians()
         )
-        self.publishFloat("Turret Yaw Encoder Motor Pos", self.yawAngle)
-        self.publishFloat(
-            "Turret Yaw Actual Encoder Pos",
-            rotationsToRadians(self.yawEncoder.getPosition()),
-        )
-        self.publishFloat("Turret Manual Yaw Velocity", self.yawVelocity)
-        self.publishFloat("Turret Manual Pitch Velocity", self.pitchVelocity)
-        self.publishFloat("Turret Mode", self.mode.value)
-        self.publishFloat("Turret Target", self.target.value)
-        self.publishStruct("Turret target Position", self.targetPos)
-        self.publishBoolean("Turret Target Locked", self.targetLocked)
+        self.publishFloat("Yaw Motor Pos", self.yawAngle)
+        self.publishFloat("Limited Yaw Setpoint", self.limitedYawSetpoint)
+        self.publishFloat("Manual Yaw Velocity", self.yawVelocity)
+        self.publishFloat("Manual Pitch Velocity", self.pitchVelocity)
+        self.publishFloat("Mode", self.mode.value)
+        self.publishFloat("Target", self.target.value)
+        self.publishStruct("target Position", self.targetPos)
+        self.publishBoolean("Target Locked", self.targetLocked)
 
 
 class TurretOdometry:
@@ -517,7 +522,12 @@ class Shooter(Subsystem):
         self.publishBoolean("shooter manual", self.manualMode)
 
     def phaseInit(self) -> None:
+
         self.dependencies: tuple = (None,)
+
+        self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
+        self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
+        self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
@@ -532,7 +542,7 @@ class Shooter(Subsystem):
         self.dependencies = (
             robotState.revSpeed,
             robotState.kickShooter,
-            robotState.optimalTurretAngle,
+            # robotState.optimalTurretAngle,
         )
 
         if not checkDependencies(self.dependencies):
@@ -548,7 +558,9 @@ class Shooter(Subsystem):
 
         self.revShooters(self.revingSetpoint)
 
-        self.kickMotor.setVelocity(self.manualKickSpeed * int(robotState.kickShooter))
+        self.kickMotor.setVoltage(
+            RPMToVolts(self.manualKickSpeed * int(robotState.kickShooter), MAX_RPM)
+        )
 
         return robotState
 
@@ -572,8 +584,8 @@ class Shooter(Subsystem):
         self.revingSetpoint: RPM = MPSToRPM(mpsSetpoint, FLYWHEEL_CIRCUMFRENCE)
 
     def revShooters(self, speed: RPM):
-        self.revingMotorBottom.setVelocity(speed)
-        self.revingMotorTop.setVelocity(speed)
+        self.revingMotorBottom.setMaxMotionVelocity(speed)
+        self.revingMotorTop.setMaxMotionVelocity(speed)
 
     def getFullyReved(self) -> bool:
 
@@ -586,7 +598,8 @@ class Shooter(Subsystem):
         return True
 
     def disabled(self) -> None:
-        self.kickMotor.setVelocity(0)
+        self.kickMotor.setVoltage(0)
+        self.revShooters(0)
         self.revingSetpoint = 0
 
     def publish(self):
@@ -599,7 +612,8 @@ class Shooter(Subsystem):
         self.publishFloat(
             "bottom reving motor encoder rpm", self.revBottomEncoder.getVelocity()
         )
-        self.publishBoolean("Turret Fully Reved", self.fullyReved)
+        self.publishBoolean("Fully Reved", self.fullyReved)
+        self.publishFloat("spin kick motor", self.manualKickSpeed)
 
 
 def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radians:
