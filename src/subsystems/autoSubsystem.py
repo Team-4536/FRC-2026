@@ -27,8 +27,8 @@ class AutoSubsystem(Subsystem):
         AUTO_SIDE_RED = "red"
 
         self.autoRoutineChooser.setDefaultOption(
-            AutoRoutines.DRIVE_FORWARD_TEST.value,
-            AutoRoutines.DRIVE_FORWARD_TEST,
+            AutoRoutines.DO_NOTHING.value,
+            AutoRoutines.DO_NOTHING,
         )
         for routine in AutoRoutines:
             self.autoRoutineChooser.addOption(routine.value, routine)
@@ -109,7 +109,7 @@ def routineChooser(
                     "right to balls",
                     isFlipped,
                 ),
-                OperateIntake(),
+                # OperateIntake(),
             ]
             routine["Back Under Left Trench"] = [
                 FollowTrajectory(
@@ -130,7 +130,7 @@ def routineChooser(
                     "left to balls",
                     isFlipped,
                 ),
-                OperateIntake(),
+                # OperateIntake(),
             ]
             routine["Back Under Right Trench"] = [
                 FollowTrajectory(
