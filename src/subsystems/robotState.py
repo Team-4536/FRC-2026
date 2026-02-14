@@ -136,7 +136,10 @@ def scaleTranslation2D(translation: Translation2d, scalar) -> Translation2d:
 def wrapAngle(angle: radians) -> radians:
 
     # mod only returns positive like a bum
-    wrappedAngle: radians = (angle % TAU) * np.sign(angle)
+    if angle == 0:
+        return 0
+
+    wrappedAngle: radians = angle % (TAU * (angle / abs(angle)))
     return wrappedAngle
 
 

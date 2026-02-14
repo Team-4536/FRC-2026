@@ -119,7 +119,7 @@ class SwerveModule(NetworkTablesMixin):
         self._driveMotor.setVelocity(motorRPM)
 
     def setAzimuth(self, angle: Rotation2d) -> None:
-        pos = self._azimuthGearing * radiansToRotations(angle.radians())
+        pos = self._azimuthGearing * angle.radians()
         self._azimuthMotor.setPosition(pos)
 
     def stopModule(self) -> None:

@@ -15,7 +15,7 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
-            turret=Turret(13, 17),
+            turret=Turret(14, 17),
             shooter=Shooter(),
         )
 

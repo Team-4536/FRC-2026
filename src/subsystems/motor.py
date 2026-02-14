@@ -12,7 +12,7 @@ from rev import (
     LimitSwitchConfig,
 )
 from wpimath.units import radians
-from wpimath.units import revolutions_per_minute as RPM
+from wpimath.units import revolutions_per_minute as RPM, radiansToRotations
 
 
 class RevMotor:
@@ -40,7 +40,7 @@ class RevMotor:
 
     def setPosition(self, rot: radians) -> None:
         self._ctrlr.getClosedLoopController().setReference(
-            setpoint=rot,
+            setpoint=radiansToRotations(rot),
             ctrl=SparkMax.ControlType.kPosition,
         )
 
@@ -118,10 +118,10 @@ class RevMotor:
         )
         .apply(
             ClosedLoopConfig()
-            .pidf(0.15, 0, 0, 0)
+            .pidf(0.039, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(5000, ClosedLoopSlot.kSlot0)
