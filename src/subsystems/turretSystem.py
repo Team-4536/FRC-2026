@@ -163,6 +163,7 @@ class Turret(Subsystem):
 
         if robotState.turretResetYawEncdoer:
             self.yawEncoder.setPosition(0)
+            self.yawSetPoint = 0
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
@@ -252,7 +253,6 @@ class Turret(Subsystem):
         self.lastTime = time
 
         self.yawSetPoint = wrapAngle(self.yawSetPoint)
-        self.yawSetPoint = self.dontOverdoIt()
 
         self.relativeYawSetpoint = (
             self.yawSetPoint
@@ -260,6 +260,7 @@ class Turret(Subsystem):
             + ZERO_OFFSET
         )
 
+        self.relativeYawSetpoint = self.dontOverdoIt(self.relativeYawSetpoint)
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
         self.pitchMotor.setVelocity(self.pitchVelocity * PITCH_GEARING)
 
@@ -360,17 +361,17 @@ class Turret(Subsystem):
         # add in the opposite direction
         self.targetPos.__add__(Translation3d(compensateVector.rotateBy(Rotation2d(PI))))
 
-    def dontOverdoIt(self) -> radians:
+    def dontOverdoIt(self, angle) -> radians:
 
-        if self.yawSetPoint > MAX_ROTATION + (TURRET_GAP / 2) or (
-            self.yawSetPoint < 0 and self.yawSetPoint > 0 - TURRET_GAP / 2
+        if angle > MAX_ROTATION + (TURRET_GAP / 2) or (
+            angle < 0 and angle > 0 - TURRET_GAP / 2
         ):
             return 0
 
-        elif self.yawSetPoint > MAX_ROTATION or self.yawSetPoint < 0:
+        elif angle > MAX_ROTATION or angle < 0:
             return MAX_ROTATION
 
-        return self.yawSetPoint
+        return angle
 
     def targetPoint(
         self, pointPose: Translation3d, turretPose: Pose2d, robotState: RobotState
@@ -382,7 +383,7 @@ class Turret(Subsystem):
 
         self.yawSetPoint = math.atan(xDiff / yDiff)  # gets the yaw angle
 
-        self.limitedYawSetpoint = self.dontOverdoIt()
+        self.limitedYawSetpoint = self.dontOverdoIt(self.limitedYawSetpoint)
 
         self.relativeYawSetpoint = (
             self.limitedYawSetpoint
