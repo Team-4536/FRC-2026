@@ -5,17 +5,19 @@ from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
+from subsystems.intake import Intake
 from typing import NamedTuple, Sequence
 
 robotState: RobotState = None  # type: ignore
 
 
 class SubsystemManager(NamedTuple):
-    inputs: Inputs
+    inputs: Inputs  # NOT A DEPENDANT SUBSYSTEM
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
     autos: AutoSubsystem
+    intake: Intake
 
     def init(self) -> None:
         for s in self.dependantSubsytems:
@@ -53,6 +55,7 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
+            self.intake,
         ]
 
     @property
