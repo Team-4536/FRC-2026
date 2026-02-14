@@ -4,6 +4,8 @@ from subsystems.LEDSignals import LEDSignals
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
+from subsystems.intake import Intake
+from subsystems.motor import RevMotor
 from wpilib import TimedRobot
 import wpilib
 
@@ -16,6 +18,7 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             autos=AutoSubsystem(),
+            intake=Intake(10, 99, 9),
         )
 
     def robotPeriodic(self) -> None:

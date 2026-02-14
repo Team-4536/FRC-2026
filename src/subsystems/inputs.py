@@ -24,6 +24,8 @@ class Inputs(Subsystem):
         self._driveCtrlr = Ctrlr(drivePort)
         self._mechCtrlr = Ctrlr(mechPort)
 
+        self.robotState = RobotState.empty(abtainableMaxSpeed=1)
+
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
@@ -43,6 +45,15 @@ class Inputs(Subsystem):
         )
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+
+        # def periodic(self, rs: RobotState) -> None:
+        self.robotState.fieldSpeeds = self._calculateDrive()
+        self.robotState.initialIntake = self._mechCtrlr.getAButton()
+        self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
+        self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()
+        self.robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
+        self.robotState.intakePos = self._mechCtrlr.getYButtonPressed()
+        self.robotState.intakeMode = self._mechCtrlr.getRightBumper()
 
         return robotState
 
