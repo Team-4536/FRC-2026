@@ -51,10 +51,12 @@ class Inputs(Subsystem):
 
         # def periodic(self, rs: RobotState) -> None:
         self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.intakeManualButton = self._mechCtrlr.getAButton()
+        self.robotState.initialIntake = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
-        self.robotState.intakeEjectButton = self._mechCtrlr.getLeftBumper()
-        self.robotState.intakePosAxis = self._mechCtrlr.getLeftY()
+        self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()
+        self.robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
+        self.robotState.intakePos = self._mechCtrlr.getYButtonPressed()
+        self.robotState.intakeMode = self._mechCtrlr.getRightBumper()
 
         return robotState
 

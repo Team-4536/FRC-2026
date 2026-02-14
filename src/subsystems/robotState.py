@@ -11,10 +11,12 @@ from wpimath.units import metersToFeet
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     abtainableMaxSpeed: MPS
-    intakeManualButton: bool
+    initialIntake: bool
     intakeSensorTest: bool
-    intakeEjectButton: bool
-    intakePosAxis: float
+    intakeEject: bool
+    intakePosYAxis: float
+    intakePos: bool
+    intakeMode: bool
     resetGyro: bool
     pose: Pose2d
 
