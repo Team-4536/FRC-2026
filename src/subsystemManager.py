@@ -16,8 +16,9 @@ class SubsystemManager(NamedTuple):
     time: TimeData
 
     def init(self) -> None:
+        global robotState
         for s in self.dependantSubsytems:
-            s.phaseInit()
+            s.phaseInit(self.robotState)
         self.inputs.phaseInit()
 
     def robotPeriodic(self) -> None:

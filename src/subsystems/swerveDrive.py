@@ -183,7 +183,7 @@ class SwerveDrive(Subsystem):
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotstate: RobotState) -> None:
         self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
         self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
 

@@ -22,7 +22,7 @@ class TimeData(Subsystem):
         self.initTime: seconds = time
         self.phaseInitTime: seconds = time
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotstate: RobotState) -> None:
         time = getTime()
         self.timeSincePhaseInit = 0
         self.phaseInitTime = time
