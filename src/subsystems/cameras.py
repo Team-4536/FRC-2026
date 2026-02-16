@@ -104,46 +104,9 @@ class CameraManager(Subsystem):
             (10 + (7 / 8)) * 0.0254,
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-        self.camXList = []
-        self.camYList = []
-        self.camRotList = []
-        self.camZList = []
-        self.aveX = -1
-        self.aveY = -1
-        self.aveRot = -1
-        self.aveZ = -1
-        self.aveTranslation3d = wpimath.geometry.Translation3d(0, 0, 0)
-        self.aveRotation3d = wpimath.geometry.Rotation3d(0, 0, 0)
 
-        self.avePose = wpimath.geometry.Pose3d(
-            self.aveTranslation3d, self.aveRotation3d
-        )
-
-    def init(self):
-        self.photonCameraRight = photonCameraClass(
-            "Camera1", 30, 0.28575, -0.028575, 1.0922
-        )
-        self.photonCameraLeft = photonCameraClass(
-            "Camera2", -30, 0.28575, 0.03175, 1.0922
-        )
-        self.photonCameraMiddle = photonCameraClass(
-            "longCam", 0, 0.27305, -0.003175, 1.13665
-        )
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-        self.camXList = []
-        self.camYList = []
-        self.camRotList = []
-        self.camZList = []
-        self.aveX = -1
-        self.aveY = -1
-        self.aveRot = -1
-
-        self.aveTranslation2d = wpimath.geometry.Translation2d(0, 0)
-        self.aveRotation2d = wpimath.geometry.Rotation2d(0, 0)
-
-        self.avePose = wpimath.geometry.Pose2d(
-            self.aveTranslation2d, self.aveRotation2d
-        )
+    def phaseInit(self):
+        pass
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self.table.putBoolean("camera periodic running", True)

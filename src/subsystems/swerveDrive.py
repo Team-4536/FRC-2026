@@ -172,7 +172,7 @@ class SwerveDrive(
             yPos=WHEEL_DISTANCE,
         )
 
-        initPos = Pose2d()
+        self.initPos = Pose2d()
         self._kinematics = SwerveDrive4Kinematics(*self._modules.positions)
         self._gyro = AHRS(AHRS.NavXComType.kMXP_SPI)
         self._gyro.reset()

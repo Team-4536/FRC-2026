@@ -65,7 +65,7 @@ class SubsystemManager(NamedTuple):
             robotState = self.inputs.robotState
             robotState.odometry = SwerveDrive4PoseEstimator(
                 self.swerveDrive._kinematics,
-                self.swerveDrive.gyro.getRotation2d(),
+                self.swerveDrive._gyro.getRotation2d(),
                 self.swerveDrive._modules.modulePositions,
                 self.swerveDrive.initPos,
             )
