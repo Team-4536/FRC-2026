@@ -94,7 +94,7 @@ class Turret(Subsystem):
     # yaw is horizontal rotation
     # pitch is vertical
 
-    def __init__(self, yawMotorID, pitchMotorID):
+    def __init__(self, yawMotorID: int, pitchMotorID: int):
 
         super().__init__()
 
@@ -660,7 +660,7 @@ def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radian
     return math.atan(numerator / denom)
 
 
-def _calculateVelocity(turretAngle, hubDistance, height) -> MPS:
+def _calculateVelocity(turretAngle: radians, hubDistance: meters, height: meters) -> MPS:
 
     velocityMps = math.sqrt(
         (GRAVITY * turretAngle**2)
@@ -669,7 +669,7 @@ def _calculateVelocity(turretAngle, hubDistance, height) -> MPS:
     return velocityMps / FLYWHEEL_CIRCUMFRENCE * 60
 
 
-def calculateTime(velocity, distance):
+def calculateTime(velocity: MPS, distance: meters):
     return distance / velocity
 
 
