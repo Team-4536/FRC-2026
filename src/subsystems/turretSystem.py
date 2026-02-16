@@ -512,8 +512,8 @@ class TurretOdometry:
         wrappedRoboYaw = wrapAngle(roboPose.rotation().radians())
         wrappedYaw = wrapAngle(yawAngle)
 
-        robotRelativeX = math.cos(wrappedRoboYaw) * TURRET_DIST_FROM_CENTER
-        robotRelativeY = math.sin(wrappedRoboYaw) * TURRET_DIST_FROM_CENTER
+        robotRelativeX = math.cos(wrappedRoboYaw + PI / 2 ) * TURRET_DIST_FROM_CENTER
+        robotRelativeY = math.sin(wrappedRoboYaw + PI / 2) * TURRET_DIST_FROM_CENTER
 
         self.robotRelativePos = Translation2d(robotRelativeX, robotRelativeY)
         feildPos: Translation2d = roboPose.translation().__add__(self.robotRelativePos)
