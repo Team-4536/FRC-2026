@@ -118,9 +118,9 @@ class Turret(Subsystem):
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chage to be correct
 
-        self.phaseInit()
+        self.phaseInit(None)
 
-    def phaseInit(self):
+    def phaseInit(self, rs: RobotState):
 
         self.yawMotor.configure(
             config=self.yawMotor.TURRET_YAW_CONFIG.apply(
@@ -546,13 +546,13 @@ class Shooter(Subsystem):
 
         self.fullyReved: bool = False
 
-        self.phaseInit()
+        self.phaseInit(None)
 
         self.publishFloat("Manual rev cap", self.manualRevSpeed)
         self.publishFloat("manual kick rpm", self.manualKickSpeed)
         self.publishBoolean("shooter manual", self.manualMode)
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, rs: RobotState) -> None:
 
         self.dependencies: tuple = (None,)
 
