@@ -116,8 +116,11 @@ class NetworkTablesMixin:
             pub = topic.genericPublish(typeStr)
             self._ntPersist[name] = pub
 
-        if type(pub) == GenericPublisher:
-            pub.set(Value.makeValue(value))  # type: ignore
+        try:
+            if type(pub) == GenericPublisher:
+                pub.set(Value.makeValue(value))  # type: ignore
+        except TypeError:
+            pass
 
     def publishSwerve(
         self,

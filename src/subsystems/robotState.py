@@ -84,14 +84,7 @@ class RobotState(NetworkTablesMixin):
             name = field.name
             value = getattr(self, name)
 
-            if isinstance(value, int):
-                self.publishInteger(name, value)
-            elif isinstance(value, str):
-                self.publishString(name, value)
-            elif isinstance(value, float):
-                self.publishFloat(name, value)
-            elif isinstance(value, bool):
-                self.publishBoolean(name, value)
+            self.publishGeneric(name, value)
 
         self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
         self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
