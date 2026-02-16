@@ -34,7 +34,7 @@ class Inputs(Subsystem):
         self._isTestMode: bool = False
 
     def phaseInit(
-        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
+        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None,
     ) -> None:
         self._driveCtrlr = Ctrlr(drivePort) if drivePort else self._driveCtrlr
         self._mechCtrlr = Ctrlr(mechPort) if mechPort else self._mechCtrlr

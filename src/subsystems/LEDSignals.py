@@ -14,7 +14,7 @@ class LEDSignals(Subsystem):
         self.apiID = 0
         self.can = CAN(deviceID)
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotstate: RobotState) -> None:
         pass
 
     def periodic(self, robotState: RobotState) -> RobotState:

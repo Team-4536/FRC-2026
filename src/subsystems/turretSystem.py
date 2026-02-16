@@ -173,7 +173,7 @@ class Turret(Subsystem):
             robotState.targetDistance,
         )
         self.turretManDependencies: tuple = (robotState.turretManualSetpoint,)
-        self.turretGenDepedencies: tuple = (robotState.pose,)
+        self.turretGenDepedencies: tuple = (robotState.odometry.getEstimatedPosition(),)
 
         if not self.homeSet:
             self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
@@ -182,7 +182,7 @@ class Turret(Subsystem):
         if not checkDependencies(self.turretGenDepedencies):
             return robotState
 
-        robotPose = robotState.pose
+        robotPose = robotState.odometry.getEstimatedPosition()
         self.odom.updateWithEncoder(robotPose, self.yawEncoder, self.pitchEncoder)
         self.yawAngle = self.odom.pose.rotation().radians()
         self.pitchAngle = self.odom.pitch
@@ -230,17 +230,21 @@ class Turret(Subsystem):
         self.yawVelocity = 0
         self.pitchVelocity = 0
 
-        if setPoint > 0 and setPoint < 180:
-            self.yawVelocity = 1
+        if not setPoint == -1:
+            if setPoint > 0 and setPoint < 180:
+                self.yawVelocity = 1
 
-        elif setPoint > 180 and setPoint < 360:
-            self.yawVelocity = -1
+            elif setPoint > 180 and setPoint < 360:
+                self.yawVelocity = -1
 
-        if setPoint > 270 or setPoint < 90:
-            self.pitchVelocity = 1
+            if setPoint > 270 or setPoint < 90:
+                self.pitchVelocity = 1
 
-        elif setPoint > 90 and setPoint < 270:
-            self.pitchVelocity = -1
+            elif setPoint > 90 and setPoint < 270:
+                self.pitchVelocity = -1
+        
+        if not self.yawVelocity == 0: # if we are manually moving interupt maintaining rotation in the turret gap
+            self.yawSetPoint = self.dontOverdoIt(self.yawSetPoint)
 
         self.yawVelocity *= MANUAL_SPEED
         self.pitchVelocity *= MANUAL_SPEED
@@ -256,7 +260,7 @@ class Turret(Subsystem):
 
         self.relativeYawSetpoint = (
             self.yawSetPoint
-            - wrapAngle(robotState.pose.rotation().radians())
+            - wrapAngle(robotState.odometry.getEstimatedPosition().rotation().radians())
             + ZERO_OFFSET
         )
 
@@ -387,7 +391,7 @@ class Turret(Subsystem):
 
         self.relativeYawSetpoint = (
             self.limitedYawSetpoint
-            - wrapAngle(robotState.pose.rotation().radians())
+            - wrapAngle(robotState.odometry.getEstimatedPosition().rotation().radians())
             + ZERO_OFFSET
         )
 

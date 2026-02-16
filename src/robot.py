@@ -6,6 +6,7 @@ from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from wpilib import TimedRobot
+from subsystems.cameras import CameraManager
 
 
 class Robot(TimedRobot):
@@ -17,6 +18,7 @@ class Robot(TimedRobot):
             time=TimeData(),
             turret=Turret(14, 17),
             shooter=Shooter(),
+            cameras=CameraManager(),
         )
 
     def robotPeriodic(self) -> None:
