@@ -40,6 +40,7 @@ from wpilib import getTime
 from ntcore import NetworkTableInstance
 from wpilib import DigitalInput
 from enum import Enum
+from typing import Optional
 
 
 MAX_ROTATION: radians = PI
@@ -120,7 +121,7 @@ class Turret(Subsystem):
 
         self.phaseInit(None)
 
-    def phaseInit(self, rs: RobotState):
+    def phaseInit(self, robotstate: Optional[RobotState]):
 
         self.yawMotor.configure(
             config=self.yawMotor.TURRET_YAW_CONFIG.apply(
@@ -552,7 +553,7 @@ class Shooter(Subsystem):
         self.publishFloat("manual kick rpm", self.manualKickSpeed)
         self.publishBoolean("shooter manual", self.manualMode)
 
-    def phaseInit(self, rs: RobotState) -> None:
+    def phaseInit(self, robotstate: Optional[RobotState]) -> None:
 
         self.dependencies: tuple = (None,)
 
