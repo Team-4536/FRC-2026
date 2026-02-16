@@ -53,6 +53,7 @@ PITCH_GEARING: float = 2
 MAX_RPM: RPM = 5676
 
 # TODO find feild positions for each
+# x and y should be the same as what the robot thinks those are, z is height (in meters)
 RED_RIGHT_SHUTTLE_POS: Translation3d = Translation3d()
 RED_LEFT_SHUTTLE_POS: Translation3d = Translation3d()
 RED_SCORE_POS: Translation3d = Translation3d()
@@ -69,14 +70,14 @@ X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
 SHUTTLE_Y_PASS_DIFF: meters = 0.3
 SHUTTLE_Y_PASS: meters = SHUTTLE_Y_PASS_DIFF
-SHUTTLE_X_PASS_DIFF: meters
+SHUTTLE_X_PASS_DIFF: meters # TODO the distance between where you want it to land and where you want it to clear
 
 FLYWHEEL_RADIUS: inches = 3  # diameter of the wheels build decides to use
 FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 
 MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
-MANUAL_SPEED: RPM = 100  # TODO tune, for the pitch and yaw speed
+MANUAL_SPEED: RPM = 70  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 1500
 
 REV_ALLOWED_ERROR: RPM = 10  # TODO fine tune all these
@@ -208,7 +209,7 @@ class Turret(Subsystem):
         h = self.targetPos.z
         d = robotState.targetDistance
         angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
-        velocity = _calculateVelocity(angle, d, h)
+        velocity = _calculateVelocity(degreesToRadians(80), d, h) #TODO change back from fixed angle
         time = calculateTime(velocity, d)
         self.compensateSetpoint(
             time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
@@ -217,6 +218,8 @@ class Turret(Subsystem):
         self.targetPoint(self.targetPos, self.odom.pose, robotState)  # need robot odom
 
         self.pitchSetpoint = robotState.optimalTurretAngle
+        self.relativeYawSetpoint = self.dontOverdoIt(self.relativeYawSetpoint)
+
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
         self.pitchMotor.setPosition(self.pitchSetpoint * PITCH_GEARING)
 
@@ -265,6 +268,7 @@ class Turret(Subsystem):
         )
 
         self.relativeYawSetpoint = self.dontOverdoIt(self.relativeYawSetpoint)
+
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
         self.pitchMotor.setVelocity(self.pitchVelocity * PITCH_GEARING)
 
@@ -279,7 +283,7 @@ class Turret(Subsystem):
             )
             return mode
 
-        if rs.turretSwitchManual:
+        if rs.turretSwitchMode:
             mode = (
                 TurretMode.DYNAMIC
                 if (self.mode == TurretMode.MANUAL)
@@ -387,13 +391,13 @@ class Turret(Subsystem):
 
         self.yawSetPoint = math.atan(xDiff / yDiff)  # gets the yaw angle
 
-        self.limitedYawSetpoint = self.dontOverdoIt(self.limitedYawSetpoint)
-
         self.relativeYawSetpoint = (
-            self.limitedYawSetpoint
+            self.yawSetPoint
             - wrapAngle(robotState.odometry.getEstimatedPosition().rotation().radians())
             + ZERO_OFFSET
         )
+
+        self.limitedYawSetpoint = self.dontOverdoIt(self.relativeYawSetpoint)
 
         robotState.targetDistance = math.sqrt(
             xDiff**2 + yDiff**2

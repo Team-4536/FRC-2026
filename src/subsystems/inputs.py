@@ -70,7 +70,7 @@ class Inputs(Subsystem):
         self.robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         self.robotState.kickShooter = self._mechCtrlr.getRightBumper()
 
-        self.robotState.turretSwitchManual = self._mechCtrlr.getYButtonPressed()
+        self.robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         self.robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         self.robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
         self.robotState.turretSwitchTarget = self._mechCtrlr.getBButtonPressed()

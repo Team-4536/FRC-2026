@@ -58,7 +58,7 @@ class RobotState(NetworkTablesMixin):
     targetDistance: meters
     targetHeight: meters
 
-    turretSwitchManual: bool
+    turretSwitchMode: bool
     turretManualSetpoint: float
     fullyreved: bool
     targetLocked: bool
@@ -80,7 +80,7 @@ class RobotState(NetworkTablesMixin):
         super().__init__()
 
     def publish(self) -> None:
-        self.publishBoolean("Turret Manual", self.turretSwitchManual)
+        self.publishBoolean("Turret Manual", self.turretSwitchMode)
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
