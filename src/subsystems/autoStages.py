@@ -8,7 +8,7 @@ from wpimath.kinematics import ChassisSpeeds
 from subsystems.robotState import RobotState
 import math
 import wpilib
-
+from typing import List
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
@@ -121,6 +121,5 @@ class FollowTrajectory(AutoStages):
             > rotationError
         ):
             return False
-
         self.done = True
         return True
