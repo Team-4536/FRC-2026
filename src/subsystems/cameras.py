@@ -105,8 +105,8 @@ class CameraManager(Subsystem):
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
-    def phaseInit(self, robotState: RobotState):
-        pass
+    def phaseInit(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self.table.putBoolean("camera periodic running", True)
