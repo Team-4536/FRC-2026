@@ -19,6 +19,7 @@ class RobotState(NetworkTablesMixin):
     pose: Pose2d
     flyTest: bool
     odometry: SwerveDrive4PoseEstimator
+    flyTestReset: bool
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()

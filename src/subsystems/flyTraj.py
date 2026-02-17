@@ -23,10 +23,9 @@ class FlyTraj(Subsystem):
         
         print("tick-")
 
-    def phaseInit(self):
+    def phaseInit(self, robotState: RobotState):
         print("tick+")
         self.manager.ensureInitialized()
-        self.manager.setDynamicObstacles(obs=[(Translation2d(2,2), Translation2d(4,4))], current_robot_pos=Translation2d(1.0,1.0))
         self.manager.setPathfinder(self.finder)
         self.state = 0
 
@@ -41,7 +40,8 @@ class FlyTraj(Subsystem):
 
             if self.manager.isNewPathAvailable():
                 print("stage = 1")
-                self.manager.setStartPosition(start_position=Translation2d(robotState.pose.X(), robotState.pose.Y()))
+                #self.manager.setStartPosition(start_position=Translation2d(robotState.pose.X(), robotState.pose.Y()))
+                self.manager.setStartPosition(start_position=Translation2d(7, 7))
                 self.manager.setGoalPosition(goal_position=Translation2d(0,0))
                 p: PathPlannerPath = self.manager.getCurrentPath(PathConstraints(5.0, 2.0, 0.3, 0.05, 12, True), GoalEndState(0, Rotation2d(0)))
                 
@@ -81,26 +81,32 @@ class FlyTraj(Subsystem):
                 ]
 
                 robotConfig = RobotConfig(robotMassKG, robotMOI, moduleConfig, moduleOffsets)
-                self.t = p.generateTrajectory(ChassisSpeeds(), robotState.pose.rotation(), robotConfig)
+                #self.t = p.generateTrajectory(ChassisSpeeds(), robotState.pose.rotation(), robotConfig)
+                self.t = p.generateTrajectory(ChassisSpeeds(), Rotation2d(0), robotConfig)
+                print("stage = 2")
                 self.state = 3
 
           
                
 
         if self.state == 3:
-            print("stage = 2")
+            print("stage = 3")
             self.startTime = wpilib.getTime()
-            print(self.t.getTotalTimeSeconds())
+            self.totalTIme = self.t.getTotalTimeSeconds()
+            print(self.totalTIme)
             self.state = 4
 
         if self.state == 4:
-            print("stage = 3")
             time = wpilib.getTime() - self.startTime
             goalState = self.t.sample(time)
             robotState.fieldSpeeds = goalState.fieldSpeeds
+            print(goalState.fieldSpeeds)
 
-            if time > self.t.getTotalTimeSeconds():
-                self.state = 0
+            if time > self.totalTIme:
+                self.state = 5
+
+        if self.state == 5:
+            pass
 
         return robotState
 
