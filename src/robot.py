@@ -8,6 +8,7 @@ from subsystems.intake import Intake
 from subsystems.motor import RevMotor
 from wpilib import TimedRobot
 import wpilib
+from subsystems.cameras import CameraManager
 
 
 class Robot(TimedRobot):
@@ -19,6 +20,7 @@ class Robot(TimedRobot):
             time=TimeData(),
             autos=AutoSubsystem(),
             intake=Intake(10, 99, 9),
+            cameras=CameraManager(),
         )
 
     def robotPeriodic(self) -> None:
