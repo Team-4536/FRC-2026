@@ -13,6 +13,7 @@ class Subsystem(NetworkTablesMixin):
 
     def phaseInit(self, robotState: RobotState) -> None:
         self._warn(self.phaseInit)
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self._warn(self.periodic)

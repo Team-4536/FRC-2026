@@ -181,12 +181,14 @@ class SwerveDrive(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
 
-    def phaseInit(self, robotstate: RobotState) -> None:
+    def phaseInit(self, robotState: RobotState) -> None:
         self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
         self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
 
         for m in self._modules:
             m.resetAzimuthEncoder()
+
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:

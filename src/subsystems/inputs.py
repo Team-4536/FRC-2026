@@ -34,6 +34,7 @@ class Inputs(Subsystem):
     ) -> None:
         self._driveCtrlr = Ctrlr(drivePort) if drivePort else self._driveCtrlr
         self._mechCtrlr = Ctrlr(mechPort) if mechPort else self._mechCtrlr
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self.robotState.abtainableMaxSpeed = lerp(
