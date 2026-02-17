@@ -6,6 +6,10 @@ from wpilib import getTime
 from wpimath.units import seconds
 
 
+def lerp(x: float, y: float, t: float) -> float:
+    return x + t * (y - x)
+
+
 class TimeData(Subsystem):
     def __init__(self) -> None:
         super().__init__()
@@ -18,7 +22,7 @@ class TimeData(Subsystem):
         self.initTime: seconds = time
         self.phaseInitTime: seconds = time
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotstate: RobotState) -> None:
         time = getTime()
         self.timeSincePhaseInit = 0
         self.phaseInitTime = time

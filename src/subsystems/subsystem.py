@@ -8,14 +8,15 @@ class SubsystemMethodError(Exception):
 
 
 class Subsystem(NetworkTablesMixin):
-    def __init__(self, *, instance: Optional[str] = None):
-        super().__init__(instance=instance)
+    def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
+        super().__init__(table=table, instance=instance)
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotstate: RobotState) -> None:
         self._warn(self.phaseInit)
 
-    def periodic(self, robotState: RobotState) -> RobotState:  # type: ignore
+    def periodic(self, robotState: RobotState) -> RobotState:
         self._warn(self.periodic)
+        return robotState
 
     def disabled(self) -> None:
         self._warn(self.disabled)
@@ -24,9 +25,7 @@ class Subsystem(NetworkTablesMixin):
         pass
 
     def _warn(self, method: Callable[..., Optional[RobotState]]) -> None:
-
-        # methodName = getattr(method, "__name__", "<unknown>")
-        # raise SubsystemMethodError(
-        #     "{methodName} method required in {self.__class__.__name__}"
-        # )  # how to tell typing that i know method with have a .__name__
-        pass
+        methodName = getattr(method, "__name__", "<unknown>")
+        raise SubsystemMethodError(
+            f"{methodName} method required in {self.__class__.__name__}"
+        )
