@@ -102,7 +102,7 @@ class FollowTrajectory(AutoStages):
         if self.robotState.pose == None:
             self.robotState.pose = Pose2d()
 
-        print(self.robotState.pose, "robot pose")
+        # print(self.robotState.pose, "robot pose")
 
         currXPos = self.robotState.pose.x
         currYPos = self.robotState.pose.y
@@ -113,8 +113,8 @@ class FollowTrajectory(AutoStages):
         posError = 0.1  # TODO: change later
         rotationError = 0.1  # TODO: change later
 
-        print(endXPos, endYPos, endRotation, "end pos")
-        print(self.trajectory.getTotalTimeSeconds())
+        # print(endXPos, endYPos, endRotation, "end pos")
+        # print(self.trajectory.getTotalTimeSeconds())
 
         if self.pathTime > self.trajectory.getTotalTimeSeconds():
             self.pathDone = True

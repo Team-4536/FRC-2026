@@ -7,7 +7,6 @@ from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.intake import Intake
 from typing import List, NamedTuple
-from subsystems.cameras import CameraManager
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from typing import NamedTuple, Sequence
 
@@ -21,7 +20,6 @@ class SubsystemManager(NamedTuple):
     time: TimeData
     autos: AutoSubsystem
     intake: Intake
-    cameras: CameraManager
 
     def init(self) -> None:
         global robotState
@@ -59,7 +57,6 @@ class SubsystemManager(NamedTuple):
         return [
             self.ledSignals,
             self.swerveDrive,
-            self.cameras,
             self.time,
             self.intake,
         ]
