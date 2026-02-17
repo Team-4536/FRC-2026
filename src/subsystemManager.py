@@ -23,7 +23,7 @@ class SubsystemManager(NamedTuple):
         global robotState
         for s in self.dependantSubsytems:
             s.phaseInit(self.robotState)
-        self.inputs.phaseInit()
+        self.inputs.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
         self.robotState.publish()
