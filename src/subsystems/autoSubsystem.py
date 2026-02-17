@@ -37,7 +37,7 @@ class AutoSubsystem(Subsystem):
 
         wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotState: RobotState) -> None:
         print(self.autoRoutineChooser.getSelected(), "value to test")
         self.routine: dict[str, AutoStages] = routineChooser(
             self.autoRoutineChooser.getSelected(),
