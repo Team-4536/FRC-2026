@@ -60,7 +60,7 @@ class AutoStages:
     def __init__(self):
         pass
 
-    def autoInit(self, robotState: RobotState):
+    def autoInit(self):
         pass
 
     def run(self, robotState: RobotState) -> RobotState:
@@ -84,10 +84,7 @@ class FollowTrajectory(AutoStages):
         self.robotState = RobotState.empty()
         self.pathDone = False
 
-    def autoInit(self, robotState: RobotState):
-
-        self.robotState = robotState
-
+    def autoInit(self):
         self.startTime = wpilib.getTime()
 
     def run(self, robotState: RobotState):
@@ -143,11 +140,11 @@ class OperateIntake(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, runTime: float):
+    def __init__(self, runTime: float = 0):
         self.pathDone = False
         self.runTime = runTime
 
-    def autoInit(self, robotState: RobotState):
+    def autoInit(self):
         self.startTime = wpilib.getTime()
         # self.robotState.intakeDown = True
 
