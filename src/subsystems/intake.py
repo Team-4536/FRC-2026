@@ -32,7 +32,7 @@ class Intake(Subsystem):
         self.forwardLimitSwitch = False
         self.backLimitSwitch = True
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotState: RobotState) -> None:
 
         # these set the speed of the intake motors:
         self.motorForwardSetpoint = -0.7

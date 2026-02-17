@@ -53,7 +53,7 @@ class AutoSubsystem(Subsystem):
         wpilib.SmartDashboard.putStringArray("routineKeys", self.routineKeys)
 
         if self.routine:
-            self.routine[self.routineKeys[self.currentPath]].autoInit()
+            self.routine[self.routineKeys[self.currentPath]].autoInit(robotState)
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
@@ -67,7 +67,9 @@ class AutoSubsystem(Subsystem):
                 self.currentPath += 1
                 self.routineFinished = self.currentPath >= len(self.routineKeys)
                 if not self.routineFinished:
-                    self.routine[self.routineKeys[self.currentPath]].autoInit()
+                    self.routine[self.routineKeys[self.currentPath]].autoInit(
+                        robotState
+                    )
 
         return robotState
 

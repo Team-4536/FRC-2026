@@ -105,7 +105,7 @@ class CameraManager(Subsystem):
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
 
-    def phaseInit(self, robotstate: RobotState):
+    def phaseInit(self, robotState: RobotState):
         pass
 
     def periodic(self, robotState: RobotState) -> RobotState:
