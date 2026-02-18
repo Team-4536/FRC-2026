@@ -41,8 +41,6 @@ class TurretMode(Enum):
     DYNAMIC = 2
 
 
-
-
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
@@ -65,6 +63,7 @@ class RobotState(NetworkTablesMixin):
     turretSwitchTarget: bool
     turretSwitchEnabled: bool
     turretResetYawEncdoer: bool
+    dontShoot: bool
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
@@ -72,7 +71,6 @@ class RobotState(NetworkTablesMixin):
     teamSide: TeamSide = TeamSide.SIDE_RED
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
-
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
