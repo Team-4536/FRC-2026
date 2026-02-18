@@ -248,6 +248,7 @@ class SwerveDrive(Subsystem):
             self.publishFloat(
                 f"{name}_speed_delta", state.speed - module.driveVelocity, "drive"
             )
+            self.publishFloat(f"{name}_position", module.driveDistance, "drive")
 
             self.publishFloat(
                 f"{name}_desired_angle", state.angle.radians() / tau, "azimuth"

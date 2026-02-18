@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, MISSING
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
@@ -29,8 +29,16 @@ class RobotState(NetworkTablesMixin):
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
-        data = {f.name: None for f in fields(cls)}
+        data = {}
 
-        data.update(kwargs)
+        for f in fields(cls):
+            if f.name in kwargs:
+                data[f.name] = kwargs[f.name]
+            elif f.default is not MISSING:
+                data[f.name] = f.default
+            elif f.default_factory is not MISSING:
+                data[f.name] = f.default_factory()
+            else:
+                data[f.name] = None
 
         return cls(**data)  # type: ignore
