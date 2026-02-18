@@ -32,7 +32,10 @@ class Inputs(Subsystem):
         )
 
     def phaseInit(
-        self, robotState: RobotState, drivePort: Optional[int] = None, mechPort: Optional[int] = None,
+        self,
+        robotState: RobotState,
+        drivePort: Optional[int] = None,
+        mechPort: Optional[int] = None,
     ) -> RobotState:
         self._driveCtrlr = Ctrlr(drivePort) if drivePort else self._driveCtrlr
         self._mechCtrlr = Ctrlr(mechPort) if mechPort else self._mechCtrlr
