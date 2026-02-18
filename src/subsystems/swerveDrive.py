@@ -1,3 +1,5 @@
+from math import pi as PI
+import math
 from math import cos, pi, sin, tau
 from navx import AHRS
 from numpy import sign
@@ -6,7 +8,13 @@ from phoenix6.units import rotation
 from rev import SparkBaseConfig
 from subsystems.motor import RevMotor
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from subsystems.robotState import RobotState
+from subsystems.robotState import (
+    RobotState,
+    ROBOT_RADIUS,
+    getTangentalVelocity,
+    getContributedRotation,
+    RPMToMPS,
+)
 from subsystems.subsystem import Subsystem
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
@@ -16,8 +24,18 @@ from wpimath.kinematics import (
     SwerveDrive4Odometry,
     SwerveModulePosition,
 )
+from wpimath.units import (
+    meters_per_second as MPS,
+    rotationsPerMinuteToRadiansPerSecond,
+    revolutions_per_minute as RPM,
+    meters,
+    radiansToRotations,
+    feetToMeters,
+    radians,
+    rotationsToRadians,
+    inchesToMeters,
+)
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.units import inchesToMeters, meters_per_second, meters
 
 
 class SwerveModule(NetworkTablesMixin):
@@ -56,7 +74,7 @@ class SwerveModule(NetworkTablesMixin):
         )
 
     @property
-    def driveVelocity(self) -> meters_per_second:
+    def driveVelocity(self) -> MPS:
         motorRPS = self._driveEncoder.getVelocity() / 60
         wheelRPS = motorRPS / self._driveGearing
         wheelMPS = wheelRPS * self._wheelCircumferance
@@ -93,14 +111,14 @@ class SwerveModule(NetworkTablesMixin):
     def setPosition(self, x: float, y: float) -> None:
         self._position = Translation2d(x, y)
 
-    def setDrive(self, velocity: meters_per_second) -> None:
+    def setDrive(self, velocity: MPS) -> None:
         wheelRPS = velocity / self._wheelCircumferance
         motorRPS = wheelRPS * self._driveGearing
         motorRPM = motorRPS * 60
         self._driveMotor.setVelocity(motorRPM)
 
     def setAzimuth(self, angle: Rotation2d) -> None:
-        pos = self._azimuthGearing * angle.radians() / tau
+        pos = self._azimuthGearing * angle.radians()
         self._azimuthMotor.setPosition(pos)
 
     def stopModule(self) -> None:
@@ -205,12 +223,19 @@ class SwerveDrive(
         robotState.odometry.update(
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
+        )  # UNUSED
+        self.drive(
+            fieldSpeeds=robotState.fieldSpeeds,
+            attainableMaxSpeed=robotState.abtainableMaxSpeed,
         )
 
         self.drive(
             fieldSpeeds=robotState.fieldSpeeds,
             attainableMaxSpeed=robotState.abtainableMaxSpeed,
         )
+
+        robotState.robotOmegaSpeed = self.getOmegaVelocity()
+        robotState.robotLinearVelocity = self.getLinearVelocity()
 
         return robotState
 
@@ -219,9 +244,41 @@ class SwerveDrive(
         self._configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
         self._configureAzimuthMotors(config=RevMotor.DISABLED_AZIMUTH_CONFIG)
 
-    def drive(
-        self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: meters_per_second
-    ) -> None:
+    def getLinearVelocity(self) -> Translation2d:
+        vector = Translation2d()
+
+        for module in self._modules:
+            vector = vector.__add__(self.getDriveVelocity(module))
+
+        return vector
+
+    def getOmegaVelocity(self) -> MPS:
+
+        sum = 0
+        for module in self._modules:
+
+            tanVel = getTangentalVelocity(
+                module._position,
+                self.getDriveVelocity(module).distance(Translation2d()),
+            )
+
+            sum += getContributedRotation(
+                tanVel,
+                rotationsToRadians(module._azimuthMotor.getEncoder().getPosition()),
+            )
+
+        return sum / 4 / ROBOT_RADIUS
+
+    def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
+        rpm: RPM = module._driveMotor.getEncoder().getVelocity()
+        speed = RPMToMPS(rpm, self._modules[0]._wheelCircumferance)
+        angle: radians = rotationsToRadians(
+            module._azimuthMotor.getEncoder().getVelocity()
+        )
+        vector = Translation2d(speed * math.cos(angle), speed * math.sin(angle))
+        return vector
+
+    def drive(self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: MPS) -> None:
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             fieldSpeeds.vx,
             fieldSpeeds.vy,

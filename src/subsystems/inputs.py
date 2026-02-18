@@ -6,10 +6,11 @@ from typing import Optional
 from wpilib import XboxController as Ctrlr
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import radians_per_second as RPS
+from math import pi as PI
 
 
 class Inputs(Subsystem):
-    MAX_ABTAINABLE_SPEED: float = 2.5
+    MAX_ABTAINABLE_SPEED: float = 4
     LOW_MAX_ABTAINABLE_SPEED: float = 1.5
 
     def __init__(
@@ -18,6 +19,7 @@ class Inputs(Subsystem):
         mechPort: int = 1,
     ) -> None:
         super().__init__()
+        # self.turretSpeed: float = 0.0
 
         self.robotState = RobotState.empty(abtainableMaxSpeed=self.MAX_ABTAINABLE_SPEED)
 
@@ -29,6 +31,8 @@ class Inputs(Subsystem):
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
 
+        self._isTestMode: bool = False
+
     def phaseInit(
         self, robotState: RobotState, drivePort: Optional[int] = None, mechPort: Optional[int] = None,
     ) -> RobotState:
@@ -37,6 +41,18 @@ class Inputs(Subsystem):
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
+        self.robotState = robotState
+
+        if self._driveCtrlr.getBackButtonPressed():
+            self._isTestMode = not self._isTestMode
+
+        if self._isTestMode:
+            robotState.fieldSpeeds = ChassisSpeeds()
+            if self._driveCtrlr.getBButton():
+                robotState.fieldSpeeds = ChassisSpeeds(vx=5)
+            elif self._driveCtrlr.getXButton():
+                robotState.fieldSpeeds = ChassisSpeeds(omega=2)
+
         self.robotState.abtainableMaxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
@@ -44,6 +60,22 @@ class Inputs(Subsystem):
         )
         self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+
+        self.robotState.motorDesiredState = self._linearScalar(
+            self._mechCtrlr.getRightY()
+        )
+        self.robotState.motorDesiredState = self._linearScalar(
+            self._mechCtrlr.getRightY()
+        )
+
+        self.robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
+        self.robotState.kickShooter = self._mechCtrlr.getRightBumper()
+
+        self.robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
+        self.robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
+        self.robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
+        self.robotState.turretSwitchTarget = self._mechCtrlr.getBButtonPressed()
+        self.robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
 
         return robotState
 
