@@ -9,6 +9,7 @@ from wpimath.units import metersToFeet
 from wpilib import Field2d
 from wpilib import SmartDashboard
 from ntcore import NetworkTable
+from typing import Tuple
 
 
 @dataclass
@@ -24,7 +25,7 @@ class RobotState(NetworkTablesMixin):
     intakePosYAxis: float = 1
     intakePos: bool = False
     intakeMode: bool = True
-
+    gyroDegreesReset: Tuple[bool, float, Pose2d] = (False, 0, Pose2d())
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.myField)

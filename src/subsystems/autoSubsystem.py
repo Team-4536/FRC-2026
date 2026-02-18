@@ -55,7 +55,7 @@ class AutoSubsystem(Subsystem):
         if self.routine:
             self.routine[self.routineKeys[self.currentPath]].autoInit()
 
-        robotState.resetGyro = True
+        # robotState.resetGyro = True
 
         return robotState
 

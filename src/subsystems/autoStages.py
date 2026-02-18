@@ -10,6 +10,7 @@ import math
 import wpilib
 
 
+
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     nominalVoltage = 12.0
@@ -86,6 +87,7 @@ class FollowTrajectory(AutoStages):
 
     def autoInit(self):
         self.startTime = wpilib.getTime()
+        self.robotState.gyroDegreesReset = (True, self.trajectory.getInitialPose().rotation().degrees(), self.trajectory.getInitialPose())
 
     def run(self, robotState: RobotState):
         self.robotState = robotState
