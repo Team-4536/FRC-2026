@@ -73,6 +73,10 @@ class AutoSubsystem(Subsystem):
                     for path in self.routine[self.routineKeys[self.currentPath]]:
                         path.autoInit()
 
+        robotState.intakeMode = False
+
+        robotState.intakePosYAxis = 0.0
+
         return robotState
 
     def disabled(self) -> None:

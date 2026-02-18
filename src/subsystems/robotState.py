@@ -18,7 +18,7 @@ class RobotState(NetworkTablesMixin):
     intakeEject: bool = False
     intakePosYAxis: float = 1
     intakePos: bool = False
-    intakeMode: bool = True
+    intakeMode: bool = False  # True
 
     def __post_init__(self) -> None:
         super().__init__()
