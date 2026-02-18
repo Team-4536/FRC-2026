@@ -28,6 +28,9 @@ class RevMotor:
     def stopMotor(self) -> None:
         self._ctrlr.set(0)
 
+    def setThrottle(self, throttle: float) -> None:
+        self._ctrlr.setVoltage(throttle * 12.0)
+
     def setVelocity(self, rpm: RPM) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,
