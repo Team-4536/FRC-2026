@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, MISSING
 from math import pi as PI, tau as TAU
 import numpy as np
 import math
@@ -44,7 +44,6 @@ class TurretMode(Enum):
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
-    abtainableMaxSpeed: MPS
     resetGyro: bool
     pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
@@ -81,6 +80,7 @@ class RobotState(NetworkTablesMixin):
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
+            self.publishGeneric(name, value)
 
             self.publishGeneric(name, value)
 
@@ -89,21 +89,19 @@ class RobotState(NetworkTablesMixin):
         self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
         self.myField.setRobotPose(self.odometry.getEstimatedPosition())
 
-        self.publishFloat(
-            "x", metersToFeet(self.odometry.getEstimatedPosition().X()), "odom"
-        )
-        self.publishFloat(
-            "y", metersToFeet(self.odometry.getEstimatedPosition().Y()), "odom"
-        )
-        self.publishFloat(
-            "angle", self.odometry.getEstimatedPosition().rotation().degrees(), "odom"
-        )
-
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
-        data = {f.name: None for f in fields(cls)}
+        data = {}
 
-        data.update(kwargs)
+        for f in fields(cls):
+            if f.name in kwargs:
+                data[f.name] = kwargs[f.name]
+            elif f.default is not MISSING:
+                data[f.name] = f.default
+            elif f.default_factory is not MISSING:
+                data[f.name] = f.default_factory()
+            else:
+                data[f.name] = None
 
         return cls(**data)  # type: ignore
 
