@@ -196,6 +196,7 @@ class SwerveDrive(Subsystem):
                     Rotation2d(),
                 ),
             )
+            robotState.autosGyroResetToggle = False
 
         if robotState.autosGyroResetToggle:
             self._gyro.reset()

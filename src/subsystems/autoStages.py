@@ -63,8 +63,8 @@ class AutoStages:
     def __init__(self):
         pass
 
-    def autoInit(self):
-        pass
+    def autoInit(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         return robotState
@@ -88,13 +88,14 @@ class FollowTrajectory(AutoStages):
     
         self.pathDone = False
 
-    def autoInit(self):
+    def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
         self.robotState.autosGyroResetToggle = True
         self.robotState.autosGyroReset = self.trajectory.getInitialPose().rotation().degrees()
         self.robotState.autosInitPose = self.trajectory.getInitialPose()
+        return robotState
     def run(self, robotState: RobotState):
-        self.robotState.autosGyroResetToggle = False
+
         self.robotState = robotState
 
         self.pathTime = wpilib.getTime() - self.startTime
@@ -151,9 +152,11 @@ class OperateIntake(AutoStages):
         self.pathDone = False
         self.runTime = runTime
 
-    def autoInit(self):
+    def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
+
         # self.robotState.intakeDown = True
+        return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         self.robotState = robotState
