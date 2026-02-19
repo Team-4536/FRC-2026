@@ -3,11 +3,10 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.units import metersToFeet
+
 from wpilib import Field2d
 from wpilib import SmartDashboard
-from ntcore import NetworkTable
-from typing import Tuple
+
 from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 
@@ -18,13 +17,16 @@ class RobotState(NetworkTablesMixin):
     resetGyro: bool
     pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
+    autosInitPose: Pose2d
     initialIntake: bool = False  # TODO: change vals later, very temp
     intakeSensorTest: bool = False
     intakeEject: bool = False
-    intakePosYAxis: float = 1
+    intakePosYAxis: float = 0
     intakePos: bool = False
     intakeMode: bool = True
-    gyroDegreesReset: Tuple[bool, float, Pose2d] = (False, 0, Pose2d())
+    autosGyroResetToggle: bool = False
+    autosGyroReset: float = 0.0
+    
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.myField)

@@ -42,7 +42,7 @@ class Inputs(Subsystem):
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
         # def periodic(self, rs: RobotState) -> None:
-        self.robotState.fieldSpeeds = self._calculateDrive()
+        #self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.initialIntake = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
         self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()

@@ -17,7 +17,7 @@ class IntakeState(Enum):
 class Intake(Subsystem):
 
     # defines all motors that are used in the subsystem
-    def __init__(self, FrontMotorID, BackMotorID, RaiseMotorID):
+    def __init__(self, FrontMotorID: int, BackMotorID: int, RaiseMotorID:int):
         super().__init__()
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)

@@ -11,6 +11,8 @@ import wpilib
 
 
 
+
+
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     nominalVoltage = 12.0
@@ -83,13 +85,16 @@ class FollowTrajectory(AutoStages):
     def __init__(self, pathName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(pathName, isFlipped)
         self.robotState = RobotState.empty()
+    
         self.pathDone = False
 
     def autoInit(self):
         self.startTime = wpilib.getTime()
-        self.robotState.gyroDegreesReset = (True, self.trajectory.getInitialPose().rotation().degrees(), self.trajectory.getInitialPose())
-
+        self.robotState.autosGyroResetToggle = True
+        self.robotState.autosGyroReset = self.trajectory.getInitialPose().rotation().degrees()
+        self.robotState.autosInitPose = self.trajectory.getInitialPose()
     def run(self, robotState: RobotState):
+        self.robotState.autosGyroResetToggle = False
         self.robotState = robotState
 
         self.pathTime = wpilib.getTime() - self.startTime

@@ -197,13 +197,11 @@ class SwerveDrive(Subsystem):
                 ),
             )
 
-        if robotState.gyroDegreesReset[0]:
-            self.resetGyroToAngle(robotState.gyroDegreesReset[1])
-            robotState.odometry.resetPosition(
-                self._gyro.getRotation2d(),
-                self._modules.modulePositions,
-                robotState.gyroDegreesReset[2]
-            )
+        if robotState.autosGyroResetToggle:
+            self._gyro.reset()
+            self._gyro.setAngleAdjustment(robotState.autosGyroReset)
+            robotState.odometry.resetPose(robotState.autosInitPose)
+            
 
 
         robotState.odometry.update(
@@ -318,7 +316,7 @@ class SwerveDrive(Subsystem):
 
         return modules
     
-    def resetGyroToAngle(self, degrees)->None:
+    def resetGyroToAngle(self, degrees: float)->None:
         self._gyro.reset()
         self._gyro.setAngleAdjustment(degrees)
         pass
