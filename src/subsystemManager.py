@@ -1,3 +1,4 @@
+from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
 from subsystems.robotState import RobotState
@@ -9,6 +10,8 @@ from subsystems.intake import Intake
 from typing import List, NamedTuple
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from typing import NamedTuple, Sequence
+from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.kinematics import ChassisSpeeds
 
 robotState: RobotState = None  # type: ignore
 
@@ -66,7 +69,8 @@ class SubsystemManager(NamedTuple):
         global robotState
 
         if not robotState:
-            robotState = self.inputs.robotState
+            robotState = RobotState.empty()
+            robotState.fieldSpeeds = ChassisSpeeds()
             robotState.odometry = SwerveDrive4PoseEstimator(
                 self.swerveDrive._kinematics,
                 self.swerveDrive._gyro.getRotation2d(),

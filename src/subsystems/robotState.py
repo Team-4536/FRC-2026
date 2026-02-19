@@ -1,20 +1,15 @@
 from dataclasses import dataclass, fields, MISSING
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
-from wpimath.geometry import Pose2d, Pose3d
-from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import meters_per_second as MPS
+from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.units import metersToFeet
-from wpilib import Field2d
-from wpilib import SmartDashboard
-from ntcore import NetworkTable
+from wpimath.geometry import Pose2d
+from wpimath.kinematics import ChassisSpeeds
 
 
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
-    abtainableMaxSpeed: MPS
     resetGyro: bool
     pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
@@ -34,30 +29,9 @@ class RobotState(NetworkTablesMixin):
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
+            self.publishGeneric(name, value)
 
-            if isinstance(value, int):
-                self.publishInteger(name, value)
-            elif isinstance(value, str):
-                self.publishString(name, value)
-            elif isinstance(value, float):
-                self.publishFloat(name, value)
-            elif isinstance(value, bool):
-                self.publishBoolean(name, value)
-
-        self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
-        self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
-        self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
         self.myField.setRobotPose(self.odometry.getEstimatedPosition())
-
-        self.publishFloat(
-            "x", metersToFeet(self.odometry.getEstimatedPosition().X()), "odom"
-        )
-        self.publishFloat(
-            "y", metersToFeet(self.odometry.getEstimatedPosition().Y()), "odom"
-        )
-        self.publishFloat(
-            "angle", self.odometry.getEstimatedPosition().rotation().degrees(), "odom"
-        )
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
