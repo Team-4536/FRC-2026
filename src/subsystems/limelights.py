@@ -1,13 +1,16 @@
 import limelight
-from limelightresults import FiducialResult
-from ntcore import NetworkTableInstance
+import limelightresults
 from wpilib import Field2d
+from ntcore import NetworkTableInstance, NetworkTable
+from wpimath.units import degreesToRadians
+from wpimath.geometry import Pose2d, Rotation2d
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import RobotState
-import time
-import json
-from ntcore import NetworkTable, NetworkTableInstance
 
+
+# import time
+# import json
+# from ntcore import NetworkTable
 # from ntcore import NetworkTableInstance
 # from networkTablesMixin import NetworkTablesMixin
 
@@ -70,9 +73,9 @@ from ntcore import NetworkTable, NetworkTableInstance
 #         # self.points = fiducial_data["pts"]
 #         # self.skew = fiducial_data["skew"]
 #         # self.camera_pose_target_space = fiducial_data["t6c_ts"]
-#         self.robot_pose_field_space = fiducial_data["t6r_fs"] # and this
+#         # self.robot_pose_field_space = fiducial_data["t6r_fs"] # and this
 #         # self.robot_pose_target_space = fiducial_data["t6r_ts"]
-#         self.target_area = fiducial_data["ta"] # Front and back
+#         # self.target_area = fiducial_data["ta"]
 #         self.target_x_degrees = fiducial_data["tx"] # |
 #         self.target_x_pixels = fiducial_data["txp"] # These
 #         self.target_y_degrees = fiducial_data["ty"] # Too
@@ -107,43 +110,26 @@ from ntcore import NetworkTable, NetworkTableInstance
 
 class llCams(Subsystem):
 
-    discovered_limelights: list = None
-    ll: limelight = None
-
-    def __init__(self, fiducial_data) -> None:
-        self.llTable = NetworkTableInstance.getDefault().getTable("limelight-testbed")
+    def __init__(self) -> None:
+        self.llTable = NetworkTableInstance.getDefault().getTable("limelight")
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-
-        self.fiducial_id = fiducial_data["fID"]
-        self.robot_pose_field_space = fiducial_data["t6r_fs"]
-        self.target_area = fiducial_data["ta"]
-        self.target_x_degrees = fiducial_data["tx"]
-        self.target_x_degrees = self.llTable.getNumber("tx", 0)
-        self.target_y_degrees = self.llTable.getNumber("ty", 0)
-        self.table.putNumber("limelight ty", self.llTable.getNumber("ty", 0))
-        self.table.putNumber("limelight t6r_fs", self.llTable.getValue("t6r_fs", 0))
-        self.table.putNumber("limelight ta", self.llTable.getValue("ta", 0))
+        # self.table.putNumber("limelight tx", self.llTable.getNumber("tx", 0))
+        # self.table.putNumber("limelight tx", self.llTable.getNumber("ty", 0))
 
     def init(self) -> None:
         pass
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        self.target_x_degrees = self.llTable.getNumber("tx", 0)
-        self.target_y_degrees = self.llTable.getNumber("ty", 0)
-        robotState.target_x_degrees = self.target_x_degrees
-        # self.table.putNumber("limelight tx", self.llTable.getNumber("tx", 0))
-        # self.table.putNumber("limelight tx", self.llTable.getNumber("ty", 0))
-        # self.table.putNumber("limelight t6r_fs", self.llTable.getNumber("t6r_fs", 0))
-        robotState.limelightPose = Field2d(
-            NetworkTableInstance.getDefault()
-            .getTable("limelight-testbed")
-            .getEntry("tx"),
-            NetworkTableInstance.getDefault()
-            .getTable("limelight-testbed")
-            .getEntry("ty"),
-            NetworkTableInstance.getDefault()
-            .getTable("limelight-testbed")
-            .getEntry("ta"),
+        # botpose_wpiblue 4 is x, 5 is y, 9 is yaw
+        self.llTable.getDoubleArrayTopic("botpose_wpiblue")
+        robotState.limelightPose = Pose2d(
+            4,
+            5,
+            Rotation2d(
+                degreesToRadians(
+                    self.llTable.getEntry("botpose_wpiblue").getDoubleArray(9)
+                )
+            ),
         )
 
     def disabled(self) -> None:
