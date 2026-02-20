@@ -5,6 +5,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.limelights import llCams
 from wpilib import TimedRobot
+from subsystems.cameras import CameraManager
 from ntcore import NetworkTableInstance
 
 
@@ -16,8 +17,8 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
+            cameras=CameraManager(),
         )
-        self.subsystems.robotInit()
 
     def robotPeriodic(self) -> None:
         self.subsystems.robotPeriodic()
@@ -42,6 +43,3 @@ class Robot(TimedRobot):
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disabled()
-
-    def testInit(self) -> None:
-        llCams()

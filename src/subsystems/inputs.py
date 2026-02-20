@@ -1,55 +1,55 @@
-from math import tau as TAU
+from math import tau
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from subsystems.utils import CircularScalar, Scalar
-from typing import Optional
-from wpilib import XboxController as Ctrlr
-from wpimath.geometry import Pose2d
+from subsystems.utils import CircularScalar, lerp, Scalar
+from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import meters_per_second as MPS
-from wpimath.units import radians_per_second as RPS
+from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
+    MAX_ABTAINABLE_SPEED: float = 2.5
+    LOW_MAX_ABTAINABLE_SPEED: float = 1.5
+
     def __init__(
         self,
         drivePort: int = 0,
         mechPort: int = 1,
-        maxAngularVelocity: RPS = TAU,
     ) -> None:
         super().__init__()
 
-        self._driveCtrl = Ctrlr(drivePort)
-        self._mechCtrl = Ctrlr(mechPort)
+        self._driveCtrlr = XboxController(drivePort)
+        self._mechCtrlr = XboxController(mechPort)
 
-        self.robotState = RobotState.empty(abtainableMaxSpeed=5)
-
-        self._linearScalar: Scalar = Scalar(magnitude=maxAngularVelocity)
+        self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
-            magnitude=self.robotState.abtainableMaxSpeed
+            magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
 
-    def init(
-        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
-    ) -> None:
-        self._driveCtrl = Ctrlr(drivePort) if drivePort else self._driveCtrl
-        self._mechCtrl = Ctrlr(mechPort) if mechPort else self._mechCtrl
+    def phaseInit(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        self.robotState.fieldSpeeds = self._calculateDrive()
+        # Drive Controls
+        maxSpeed = lerp(
+            self.LOW_MAX_ABTAINABLE_SPEED,
+            self.MAX_ABTAINABLE_SPEED,
+            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 0.9),
+        )
+        robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
+        robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+
         return robotState
 
     def disabled(self) -> None:
-        self.robotState.fieldSpeeds = ChassisSpeeds()
+        pass
 
-    def publish(self) -> None:
-        self.robotState.publish()
-
-    def _calculateDrive(self) -> ChassisSpeeds:
+    def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
+        self._circularScalar.setMagnitude(maxSpeed)
         vx, vy = self._circularScalar(
-            x=-self._driveCtrl.getLeftY(), y=-self._driveCtrl.getLeftX()
+            x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
 
-        omega: RPS = self._linearScalar(-self._driveCtrl.getRightX())
+        omega = self._linearScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)

@@ -6,45 +6,49 @@ from wpilib import getTime
 from wpimath.units import seconds
 
 
+def lerp(x: float, y: float, t: float) -> float:
+    return x + t * (y - x)
+
+
 class TimeData(Subsystem):
     def __init__(self) -> None:
         super().__init__()
 
+        time = getTime()
         self.dt: seconds = 0
         self.timeSinceInit: seconds = 0
-        self.prevTime: seconds = 0
-        self.initTime: seconds = 0
+        self.timeSincePhaseInit: seconds = 0
+        self.prevTime: seconds = time
+        self.initTime: seconds = time
+        self.phaseInitTime: seconds = time
 
-    def init(self) -> None:
-        time: seconds = getTime()
+    def phaseInit(self, robotState: RobotState) -> RobotState:
+        time = getTime()
+        self.timeSincePhaseInit = 0
+        self.phaseInitTime = time
 
-        self.dt = 0
-        self.timeSinceInit = 0
-        self.prevTime = time
-        self.initTime = time
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         time = getTime()
-
         self.dt = time - self.prevTime
         self.timeSinceInit = time - self.initTime
+        self.timeSincePhaseInit = time - self.phaseInitTime
         self.prevTime = time
-
-        self.publish()
 
         return robotState
 
     def disabled(self) -> None:
         time = getTime()
-
-        self.dt = 0
+        self.dt = time - self.prevTime
         self.timeSinceInit = time - self.initTime
-
-        self.publish()
+        self.timeSincePhaseInit = 0
+        self.prevTime = time
 
     def publish(self) -> None:
-        self.publishDouble("delta_time", self.dt)
-        self.publishDouble("time_since_init", self.timeSinceInit)
+        self.publishFloat("delta_time", self.dt)
+        self.publishFloat("time_since_init", self.timeSinceInit)
+        self.publishFloat("time_since_phase_init", self.timeSincePhaseInit)
 
 
 class Scalar:
