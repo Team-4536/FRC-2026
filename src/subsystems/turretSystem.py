@@ -291,7 +291,7 @@ class Turret(Subsystem):
 
         self.lastTime = time
 
-        # self.yawSetPoint = wrapAngle(self.yawSetPoint)
+        self.yawSetPoint = wrapAngle(self.yawSetPoint)
 
         self.relativeYawSetpoint = (
             self.yawSetPoint
