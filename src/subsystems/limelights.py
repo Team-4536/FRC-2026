@@ -111,7 +111,11 @@ from subsystems.robotState import RobotState
 class llCams(Subsystem):
 
     def __init__(self) -> None:
-        self.llTable = NetworkTableInstance.getDefault().getTable("limelight")
+        self.llTable = (
+            NetworkTableInstance.getDefault()
+            .getTable("limelight")
+            .getEntry("botpose_wpiblue")
+        )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         # self.table.putNumber("limelight tx", self.llTable.getNumber("tx", 0))
         # self.table.putNumber("limelight tx", self.llTable.getNumber("ty", 0))
@@ -121,15 +125,11 @@ class llCams(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # botpose_wpiblue 4 is x, 5 is y, 9 is yaw
-        self.llTable.getDoubleArrayTopic("botpose_wpiblue")
+        self.llTable
         robotState.limelightPose = Pose2d(
-            self.llTable.getEntry("botpose_wpiblue").getDoubleArray(4),
-            self.llTable.getEntry("botpose_wpiblue").getDoubleArray(5),
-            Rotation2d(
-                degreesToRadians(
-                    self.llTable.getEntry("botpose_wpiblue").getDoubleArray(9)
-                )
-            ),
+            self.llTable.getDoubleArray(4),
+            self.llTable.getDoubleArray(5),
+            Rotation2d(degreesToRadians(self.llTable.getDoubleArray(9))),
         )
         return robotState
 
