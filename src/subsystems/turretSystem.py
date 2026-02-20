@@ -567,12 +567,12 @@ class TurretOdometry:
 
 class Shooter(Subsystem):
 
-    def __init__(self):
+    def __init__(self, kickerId, revTopId, revBottomId):
         super().__init__()
 
-        self.kickMotor = RevMotor(deviceID=18)
-        self.revingMotorTop: RevMotor = RevMotor(deviceID=12)
-        self.revingMotorBottom: RevMotor = RevMotor(deviceID=11)
+        self.kickMotor = RevMotor(deviceID=kickerId)
+        self.revingMotorTop: RevMotor = RevMotor(deviceID=revTopId)
+        self.revingMotorBottom: RevMotor = RevMotor(deviceID=revBottomId)
 
         self.kickMotorEncoder = self.kickMotor.getEncoder()
         self.revTopEncoder = self.revingMotorTop.getEncoder()
