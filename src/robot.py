@@ -16,7 +16,7 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
-            intake=Intake(10, 17, 9),
+            intake=Intake(10, 30, 9),
             cameras=CameraManager(),
         )
 

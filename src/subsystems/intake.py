@@ -21,11 +21,8 @@ class Intake(Subsystem):
         super().__init__()
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
-        self.intakeMotorManual.configure(config=RevMotor.INTAKE_MOTOR_CONFIG)
-        self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
-        self.intakeMotorAutomatic.configure(config=RevMotor.INTAKE_MOTOR_CONFIG)
         self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
-        self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
+        self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
 
         self.state = (
             IntakeState.UP
@@ -33,6 +30,10 @@ class Intake(Subsystem):
         self.AUTOMATIC_MODE = False
 
     def phaseInit(self, robotState: RobotState) -> None:
+
+        self.intakeMotorAutomatic.configure(config=RevMotor.INDEXER_MOTOR_CONFIG)
+        self.intakeMotorManual.configure(config=RevMotor.INTAKE_MOTOR_CONFIG)
+        self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
 
         # these set the speed of the intake motors (negative is forward...):
         self.motorForwardSetpoint = -0.7
@@ -49,6 +50,7 @@ class Intake(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
 
         if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
+            # change these values if you need to decrease/increase raise and lowering speed
             if robotState.intakePosYAxis < -0.1:
                 self.raiseThrottle = robotState.intakePosYAxis * 0.2  # down
             elif robotState.intakePosYAxis > 0.1:
@@ -92,15 +94,18 @@ class Intake(Subsystem):
             self.manualThrottle = 0
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
-        if robotState.intakeSensorTest:
+        if robotState.intakeIndexer:
             self.automaticThrottle = self.motorForwardSetpoint
         else:
             self.automaticThrottle = 0
 
         # makes both motors go backwards when something goes wrong
-        if robotState.intakeEject:
+        if robotState.ejectAll > 0.3:
             self.manualThrottle = self.motorReverseSetpoint
             self.automaticThrottle = self.motorReverseSetpoint
+
+        if robotState.intakeEject:
+            self.manualThrottle = self.motorReverseSetpoint
 
         self.intakeMotorAutomatic.setThrottle(self.automaticThrottle)
         self.intakeMotorManual.setThrottle(self.manualThrottle)

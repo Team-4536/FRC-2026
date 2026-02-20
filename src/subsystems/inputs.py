@@ -42,11 +42,12 @@ class Inputs(Subsystem):
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
         robotState.initialIntake = self._mechCtrlr.getAButton()
-        robotState.intakeSensorTest = self._mechCtrlr.getBButton()
-        robotState.intakeEject = self._mechCtrlr.getLeftBumper()
+        robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
+        robotState.intakeEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
         robotState.intakePos = self._mechCtrlr.getPOV()
-        robotState.intakeMode = self._mechCtrlr.getRightBumperPressed()
+        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
 
         return robotState
 

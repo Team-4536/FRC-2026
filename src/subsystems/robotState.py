@@ -11,14 +11,15 @@ from wpimath.kinematics import ChassisSpeeds
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     initialIntake: bool
-    intakeSensorTest: bool
+    intakeIndexer: bool
     intakeEject: bool
-    intakePosYAxis = 0.0
-    intakePos: bool
+    intakePos: int
     intakeMode: bool
     resetGyro: bool
     pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
+    ejectAll = 0.0
+    intakePosYAxis = 0.0
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
