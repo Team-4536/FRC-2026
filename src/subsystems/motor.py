@@ -118,7 +118,8 @@ class RevMotor:
 
     TURRET_YAW_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(10)
+        .secondaryCurrentLimit(10)
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
@@ -136,19 +137,20 @@ class RevMotor:
         )
         .apply(
             ClosedLoopConfig()
-            .pidf(0.039, 0, 0, 0.02)
+            .pidf(0.08, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
-                .maxVelocity(5000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
+                .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(500, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(0.2)
             )
             .apply(FeedForwardConfig().kA(0))
         )
     )
+
     TURRET_PITCH_CONFIG = AZIMUTH_CONFIG.apply(
         LimitSwitchConfig().reverseLimitSwitchEnabled(True)
     )

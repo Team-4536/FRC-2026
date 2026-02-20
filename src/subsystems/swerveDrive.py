@@ -9,6 +9,8 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import (
     RobotState,
     ROBOT_RADIUS,
+)
+from subsystems.utils import (
     getTangentalVelocity,
     getContributedRotation,
     RPMToMPS,

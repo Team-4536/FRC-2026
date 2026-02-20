@@ -6,6 +6,8 @@ from subsystems.robotState import (
     TurretTarget,
     TurretMode,
     ROBOT_RADIUS,
+)
+from subsystems.utils import (
     RPMToVolts,
     getTangentalVelocity,
     scaleTranslation2D,
@@ -51,6 +53,7 @@ ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
 # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 YAW_GEARING: float = 100 / 3
 PITCH_GEARING: float = 2
+TURRET_HEIGHT: meters = inchesToMeters(15)
 
 MAX_RPM: RPM = 5676
 
@@ -58,7 +61,11 @@ MAX_RPM: RPM = 5676
 # x and y should be the same as what the robot thinks those are, z is height (in meters)
 RED_RIGHT_SHUTTLE_POS: Translation3d = Translation3d()
 RED_LEFT_SHUTTLE_POS: Translation3d = Translation3d()
-RED_SCORE_POS: Translation3d = Translation3d()
+RED_SCORE_POS: Translation3d = Translation3d(
+    inchesToMeters(46911),
+    inchesToMeters(158.84),
+    inchesToMeters(73 - 15) - TURRET_HEIGHT,
+)
 BLUE_RIGHT_SHUTTLE_POS: Translation3d = Translation3d()
 BLUE_LEFT_SHUTTLE_POS: Translation3d = Translation3d()
 BLUE_SCORE_POS: Translation3d = Translation3d()
@@ -75,8 +82,9 @@ SHUTTLE_Y_PASS: meters = SHUTTLE_Y_PASS_DIFF
 SHUTTLE_X_PASS_DIFF: meters  # TODO the distance between where you want it to land and where you want it to clear
 
 FLYWHEEL_RADIUS: inches = 3  # diameter of the wheels build decides to use
-FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * PI
+FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * TAU
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
+VELOCITY_SCALAR = 1  # to account for slight air drag
 
 MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 70  # TODO tune, for the pitch and yaw speed
@@ -120,9 +128,9 @@ class Turret(Subsystem):
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chage to be correct
 
-        self.phaseInit()
+        self.phaseInit(RobotState.empty())
 
-    def phaseInit(self, robotstate: Optional[RobotState] = None):
+    def phaseInit(self, robotState: RobotState) -> RobotState:
 
         self.yawMotor.configure(
             config=self.yawMotor.TURRET_YAW_CONFIG.apply(
@@ -163,6 +171,8 @@ class Turret(Subsystem):
         self.impossibleDynamic = False
 
         self.lastTime: seconds = getTime()
+
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
@@ -255,16 +265,16 @@ class Turret(Subsystem):
 
         if not setPoint == -1:
             if setPoint > 0 and setPoint < 180:
-                self.yawVelocity = 1
-
-            elif setPoint > 180 and setPoint < 360:
                 self.yawVelocity = -1
 
+            elif setPoint > 180 and setPoint < 360:
+                self.yawVelocity = 1
+
             if setPoint > 270 or setPoint < 90:
-                self.pitchVelocity = 1
+                self.pitchVelocity = -1
 
             elif setPoint > 90 and setPoint < 270:
-                self.pitchVelocity = -1
+                self.pitchVelocity = 1
 
         if (
             not self.yawVelocity == 0
@@ -281,7 +291,7 @@ class Turret(Subsystem):
 
         self.lastTime = time
 
-        self.yawSetPoint = wrapAngle(self.yawSetPoint)
+        # self.yawSetPoint = wrapAngle(self.yawSetPoint)
 
         self.relativeYawSetpoint = (
             self.yawSetPoint
@@ -422,6 +432,8 @@ class Turret(Subsystem):
         robotState.targetHeight = pointPose.z
 
         self.yawSetPoint = math.atan(xDiff / yDiff)  # gets the yaw angle
+
+        # self.yawSetPoint = wrapAngle(self.yawSetPoint)
 
         self.relativeYawSetpoint = (
             self.yawSetPoint
@@ -577,13 +589,13 @@ class Shooter(Subsystem):
 
         self.fullyReved: bool = False
 
-        self.phaseInit()
+        self.phaseInit(RobotState.empty())
 
         self.publishFloat("Manual rev cap", self.manualRevSpeed)
         self.publishFloat("manual kick rpm", self.manualKickSpeed)
         self.publishFloat("shooter manual", self.mode.value)
 
-    def phaseInit(self, robotstate: Optional[RobotState] = None) -> None:
+    def phaseInit(self, robotState: RobotState) -> RobotState:
 
         self.dependencies: tuple = (None,)
 
@@ -595,6 +607,8 @@ class Shooter(Subsystem):
         self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
 
         self.dontShoot = False
+
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
@@ -661,6 +675,8 @@ class Shooter(Subsystem):
             robotState.targetDistance,
             robotState.targetHeight,
         )
+
+        mpsSetpoint *= VELOCITY_SCALAR
         # TODO add a constant scale value to the speed
         self.revingSetpoint: RPM = MPSToRPM(mpsSetpoint, FLYWHEEL_CIRCUMFRENCE)
 
