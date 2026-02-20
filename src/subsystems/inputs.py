@@ -2,10 +2,9 @@ from math import tau
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, lerp, Scalar
-from typing import Optional
-from wpilib import XboxController as Ctrlr
+from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import radians_per_second as RPS
+from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
@@ -19,10 +18,8 @@ class Inputs(Subsystem):
     ) -> None:
         super().__init__()
 
-        self.robotState = RobotState.empty(abtainableMaxSpeed=self.MAX_ABTAINABLE_SPEED)
-
-        self._driveCtrlr = Ctrlr(drivePort)
-        self._mechCtrlr = Ctrlr(mechPort)
+        self._driveCtrlr = XboxController(drivePort)
+        self._mechCtrlr = XboxController(mechPort)
 
         self.robotState = RobotState.empty(abtainableMaxSpeed=1)
 
@@ -31,23 +28,19 @@ class Inputs(Subsystem):
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
 
-    def phaseInit(
-        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None,
-    ) -> None:
-        self._driveCtrlr = Ctrlr(drivePort) if drivePort else self._driveCtrlr
-        self._mechCtrlr = Ctrlr(mechPort) if mechPort else self._mechCtrlr
+    def phaseInit(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        self.robotState.abtainableMaxSpeed = lerp(
+        # Drive Controls
+        maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            self._driveCtrlr.getRightTriggerAxis(),
+            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 0.9),
         )
-        self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+        robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
+        robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
-        # def periodic(self, rs: RobotState) -> None:
-        self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.initialIntake = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
         self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()
@@ -58,14 +51,14 @@ class Inputs(Subsystem):
         return robotState
 
     def disabled(self) -> None:
-        self.robotState.fieldSpeeds = ChassisSpeeds()
+        pass
 
-    def _calculateDrive(self) -> ChassisSpeeds:
-        self._circularScalar.setMagnitude(self.robotState.abtainableMaxSpeed)
+    def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
+        self._circularScalar.setMagnitude(maxSpeed)
         vx, vy = self._circularScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
 
-        omega: RPS = self._linearScalar(-self._driveCtrlr.getRightX())
+        omega = self._linearScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)
