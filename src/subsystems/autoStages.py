@@ -10,9 +10,6 @@ import math
 import wpilib
 
 
-
-
-
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     nominalVoltage = 12.0
@@ -22,7 +19,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     freeSpeed: RPS = (5676 * 2 * math.pi) / 60
 
     wheelRadiusMeters = 0.0508
-    maxVelocity: MPS = 2
+    maxVelocity: MPS = 3
     wheelCOF = 1
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
@@ -86,15 +83,18 @@ class FollowTrajectory(AutoStages):
     def __init__(self, pathName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(pathName, isFlipped)
         self.robotState = RobotState.empty()
-    
+
         self.pathDone = False
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
         robotState.autosGyroResetToggle = True
-        robotState.autosGyroReset = self.trajectory.getInitialPose().rotation().degrees()
+        robotState.autosGyroReset = (
+            self.trajectory.getInitialPose().rotation().degrees()
+        )
         robotState.autosInitPose = self.trajectory.getInitialPose()
         return robotState
+
     def run(self, robotState: RobotState):
 
         self.robotState = robotState
@@ -121,7 +121,7 @@ class FollowTrajectory(AutoStages):
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
-        posError = 0.1  # TODO: change later
+        posError = 0.02  # TODO: change later
         rotationError = 0.1  # TODO: change later
 
         # print(endXPos, endYPos, endRotation, "end pos")
@@ -158,13 +158,16 @@ class OperateIntake(AutoStages):
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
 
-        # self.robotState.intakeDown = True
         return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         self.robotState = robotState
+        self.pathTime = wpilib.getTime() - self.startTime
 
-        # self.robotState.initialIntake = True
+        if self.pathTime < 0.5:  # TODO: make this not work like this
+            self.robotState.intakePosYAxis = -1
+
+        self.robotState.initialIntake = True
 
         return self.robotState
 
