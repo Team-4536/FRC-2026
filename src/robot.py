@@ -12,11 +12,11 @@ from ntcore import NetworkTableInstance
 class Robot(TimedRobot):
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
-            llCam=llCams(),
             inputs=Inputs(),
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
+            llCam=llCams(),
             cameras=CameraManager(),
         )
 
@@ -43,3 +43,6 @@ class Robot(TimedRobot):
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disabled()
+
+    def testInit(self) -> None:
+        llCams()

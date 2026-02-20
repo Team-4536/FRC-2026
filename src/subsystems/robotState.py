@@ -12,6 +12,7 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     resetGyro: bool
     pose: Pose2d
+    limelightPose: Pose2d
     odometry: SwerveDrive4PoseEstimator
 
     def __post_init__(self) -> None:
@@ -25,7 +26,10 @@ class RobotState(NetworkTablesMixin):
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
-        self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        # self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        if self.limelightPose != None:
+            self.limelightPose
+            self.myField.setRobotPose(self.limelightPose)
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:

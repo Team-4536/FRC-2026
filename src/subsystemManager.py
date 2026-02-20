@@ -18,6 +18,8 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    llCam: llCams
+    cameras: CameraManager
 
     def init(self) -> None:
         global robotState
@@ -26,7 +28,7 @@ class SubsystemManager(NamedTuple):
         self.inputs.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
-        self.time.periodic(self.robotState)
+        self.llCam.periodic(self.robotState)
         self.robotState.publish()
         for s in self:
             s.publish()
@@ -56,6 +58,9 @@ class SubsystemManager(NamedTuple):
             self.inputs,
             self.ledSignals,
             self.swerveDrive,
+            self.cameras,
+            self.time,
+            self.llCam,
         ]
 
     @property
