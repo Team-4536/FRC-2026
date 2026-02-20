@@ -36,13 +36,12 @@ class Inputs(Subsystem):
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            self._driveCtrlr.getRightTriggerAxis(),
+            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 0.9),
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
         # def periodic(self, rs: RobotState) -> None:
-        #self.robotState.fieldSpeeds = self._calculateDrive()
         self.robotState.initialIntake = self._mechCtrlr.getAButton()
         self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
         self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()

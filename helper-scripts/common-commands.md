@@ -1,4 +1,4 @@
-<center> 
+<center>
 
 # Common commands and setup scripts
 ***
@@ -10,10 +10,10 @@
 ## Setting up your cloned repository [^1]
 [^1]: This will be using your newly installed uv
 
-<small> All of the following commands should be run while in your FRC-2026 folder/directory 
+<small> All of the following commands should be run while in your FRC-2026 folder/directory
 (generally in C:\repos\FRC-2026) </small>
 
-- **run once per cloned repository/FRC-2026 folder:** 
+- **run once per cloned repository/FRC-2026 folder:**
     <small>installs tool that checks for errors in code before commiting:</small>
         `uv tool run pre-commit`
     &#8201;
@@ -28,14 +28,14 @@
     `uv run robotpy --main src sync`
     <small>downloads and installs packages included in robotpy</small>
 
-**run simulation:** 
+**run simulation:**
     `uv run robotpy --main src sim`
     <small>simulates how the code would run if connected to the robot</small>
 
-**deploy code:** 
+**deploy code:**
     `uv run robotpy --main src deploy`
     <small>deploys the code to the robot</small>
 
-**undeploy code:** 
+**undeploy code:**
     `uv run robotpy --main src undeploy`
     <small>clears the code last deployed to the robot</small>
