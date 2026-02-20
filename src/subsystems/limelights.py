@@ -123,14 +123,15 @@ class llCams(Subsystem):
         # botpose_wpiblue 4 is x, 5 is y, 9 is yaw
         self.llTable.getDoubleArrayTopic("botpose_wpiblue")
         robotState.limelightPose = Pose2d(
-            4,
-            5,
+            self.llTable.getEntry("botpose_wpiblue").getDoubleArray(4),
+            self.llTable.getEntry("botpose_wpiblue").getDoubleArray(5),
             Rotation2d(
                 degreesToRadians(
                     self.llTable.getEntry("botpose_wpiblue").getDoubleArray(9)
                 )
             ),
         )
+        return robotState
 
     def disabled(self) -> None:
         pass

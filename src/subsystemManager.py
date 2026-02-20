@@ -27,6 +27,7 @@ class SubsystemManager(NamedTuple):
 
     def robotPeriodic(self) -> None:
         self.time.periodic(self.robotState)
+        self.llCam.periodic(self.robotState)
         self.robotState.publish()
 
     def autonomousPeriodic(self) -> None:

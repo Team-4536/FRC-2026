@@ -43,6 +43,7 @@ class RobotState(NetworkTablesMixin):
 
         if self.limelightPose != None:
             self.limelightPose
+            self.myField.setRobotPose(self.limelightPose)
 
         if self.pose:
             self.publishDouble("x", metersToFeet(self.pose.X()), "odom")
