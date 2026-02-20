@@ -48,7 +48,7 @@ class SubsystemManager(NamedTuple):
     def _periodic(self, state: RobotState) -> None:
         global robotState
         for s in self.dependantSubsytems:
-            robotState = s.periodic(state)
+            robotState = s.periodic(self.robotState)
 
     def disabled(self) -> None:
         for s in self:

@@ -41,12 +41,12 @@ class Inputs(Subsystem):
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
-        self.robotState.initialIntake = self._mechCtrlr.getAButton()
-        self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
-        self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()
-        self.robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
-        self.robotState.intakePos = self._mechCtrlr.getYButtonPressed()
-        self.robotState.intakeMode = self._mechCtrlr.getRightBumper()
+        robotState.initialIntake = self._mechCtrlr.getAButton()
+        robotState.intakeSensorTest = self._mechCtrlr.getBButton()
+        robotState.intakeEject = self._mechCtrlr.getLeftBumper()
+        robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
+        robotState.intakePos = self._mechCtrlr.getPOV()
+        robotState.intakeMode = self._mechCtrlr.getRightBumperPressed()
 
         return robotState
 
