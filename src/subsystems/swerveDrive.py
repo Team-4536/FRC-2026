@@ -175,6 +175,9 @@ class SwerveDrive(Subsystem):
         self._swerveStates = self._kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
+        self.odomX = 0.0
+        self.odomY = 0.0
+        self.odomZ = 0.0
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
@@ -201,7 +204,8 @@ class SwerveDrive(Subsystem):
         if robotState.autosGyroResetToggle:
             self._gyro.reset()
             self._gyro.setAngleAdjustment(robotState.autosGyroReset)
-            robotState.odometry.resetPose(robotState.autosInitPose)
+            robotState.odometry.resetPosition(self._gyro.getRotation2d(), self._modules.modulePositions, robotState.autosInitPose)
+            robotState.autosGyroResetToggle = False
             
 
 
@@ -214,6 +218,12 @@ class SwerveDrive(Subsystem):
             fieldSpeeds=robotState.fieldSpeeds,
             attainableMaxSpeed=self.MAX_MODULE_SPEED,
         )
+
+        #table vars
+
+        self.odomX = float(robotState.odometry.getEstimatedPosition().X())
+        self.odomY = float(robotState.odometry.getEstimatedPosition().Y())
+        self.odomZ = float(robotState.odometry.getEstimatedPosition().rotation().degrees())
 
         return robotState
 
@@ -272,6 +282,9 @@ class SwerveDrive(Subsystem):
                 "azimuth",
             )
 
+        self.publishFloat("_odom_x", self.odomX)
+        self.publishFloat("_odom_y", self.odomY)
+        self.publishFloat("_odom_z", self.odomZ)
     def _configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
         for module in self._modules:
             module.configureDriveMotor(config=config)

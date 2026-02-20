@@ -52,9 +52,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
         path = path.flipPath()
 
     startingPose = path.getStartingHolonomicPose()
-    startingRotation = Rotation2d()
+    startingRotation = Rotation2d(20)
     if startingPose:
         startingRotation = startingPose.rotation()
+        print(startingRotation)
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
@@ -90,9 +91,9 @@ class FollowTrajectory(AutoStages):
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
-        self.robotState.autosGyroResetToggle = True
-        self.robotState.autosGyroReset = self.trajectory.getInitialPose().rotation().degrees()
-        self.robotState.autosInitPose = self.trajectory.getInitialPose()
+        robotState.autosGyroResetToggle = True
+        robotState.autosGyroReset = self.trajectory.getInitialPose().rotation().degrees()
+        robotState.autosInitPose = self.trajectory.getInitialPose()
         return robotState
     def run(self, robotState: RobotState):
 
@@ -101,6 +102,8 @@ class FollowTrajectory(AutoStages):
         self.pathTime = wpilib.getTime() - self.startTime
 
         targetState = self.trajectory.sample(self.pathTime)
+
+        # print(f" pose: {targetState.pose}")
 
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
