@@ -118,10 +118,23 @@ class RevMotor:
 
     TURRET_YAW_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(20)
-        .secondaryCurrentLimit(10)
+        .smartCurrentLimit(20, 20)
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.08, 0, 0, 0.02)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .positionWrappingEnabled(False)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(500, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.2)
+            )
+            .apply(FeedForwardConfig().kA(0))
+        )
         .apply(
             LimitSwitchConfig().limitSwitchPositionSensor(
                 FeedbackSensor.kPrimaryEncoder
@@ -134,9 +147,16 @@ class RevMotor:
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
+    )
+
+    TURRET_PITCH_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(20, 20)
+        .inverted(True)
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.08, 0, 0, 0.02)
+            .pidf(0.035, 0, 0, 0.05)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(True)
@@ -146,16 +166,7 @@ class RevMotor:
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(0.2)
             )
-            .apply(FeedForwardConfig().kA(0))
         )
-    )
-
-    TURRET_PITCH_CONFIG = (
-        SparkMaxConfig()
-        .smartCurrentLimit(20)
-        .secondaryCurrentLimit(10)
-        .inverted(False)
-        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             LimitSwitchConfig().limitSwitchPositionSensor(
                 FeedbackSensor.kPrimaryEncoder
@@ -167,20 +178,6 @@ class RevMotor:
             .reverseSoftLimit(0)
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
-        )
-        .apply(
-            ClosedLoopConfig()
-            .pidf(0.08, 0, 0, 0.02)
-            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
-            .apply(
-                MAXMotionConfig()
-                .maxVelocity(1000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(500, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.2)
-            )
-            .apply(FeedForwardConfig().kA(0))
         )
     )
 
@@ -198,7 +195,7 @@ class RevMotor:
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(4000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(1000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(2000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
         )

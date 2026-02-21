@@ -113,9 +113,12 @@ class Turret(Subsystem):
 
         super().__init__()
 
-        self.yawMotor = RevMotor(deviceID=40)
+        self.yawMotor = RevMotor(deviceID=yawMotorID)
 
         self.pitchMotor = RevMotor(deviceID=pitchMotorID)
+
+        self.pitchMotor.configure(config=self.pitchMotor.TURRET_PITCH_CONFIG)
+        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
 
         self.yawEncoder = self.yawMotor.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
@@ -130,12 +133,6 @@ class Turret(Subsystem):
 
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chage to be correct
-
-        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
-        self.pitchMotor.configure(config=self.pitchMotor.TURRET_PITCH_CONFIG)
-
-        self.yawEncoder = self.yawMotor.getEncoder()
-        self.pitchEncoder = self.pitchMotor.getEncoder()
 
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
@@ -162,12 +159,6 @@ class Turret(Subsystem):
         self.lastTime: seconds = getTime()
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-
-        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
-        self.pitchMotor.configure(config=self.pitchMotor.TURRET_PITCH_CONFIG)
-
-        self.yawEncoder = self.yawMotor.getEncoder()
-        self.pitchEncoder = self.pitchMotor.getEncoder()
 
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
@@ -323,7 +314,7 @@ class Turret(Subsystem):
         self.relativeYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
 
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
-        self.pitchMotor.setVelocity(self.pitchVelocity * PITCH_GEARING)
+        # self.pitchMotor.setVelocity(self.pitchVelocity)
 
     def getMode(self, rs: RobotState) -> TurretMode:
 
@@ -513,9 +504,6 @@ class Turret(Subsystem):
     def disabled(self):
         self.yawMotor.stopMotor()
         self.pitchMotor.stopMotor()
-
-        self.yawMotor.configure(config=self.yawMotor.DISABLED_AZIMUTH_CONFIG)
-        self.pitchMotor.configure(config=self.pitchMotor.DISABLED_AZIMUTH_CONFIG)
         # do we need these .configure lines when revmotor allready does this?
 
         self.homeSet = True
@@ -595,6 +583,10 @@ class Shooter(Subsystem):
         self.revingMotorTop: RevMotor = RevMotor(deviceID=revTopId)
         self.revingMotorBottom: RevMotor = RevMotor(deviceID=revBottomId)
 
+        self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
+        self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
+        self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
+
         self.kickMotorEncoder = self.kickMotor.getEncoder()
         self.revTopEncoder = self.revingMotorTop.getEncoder()
         self.revBottomEncoder = self.revingMotorBottom.getEncoder()
@@ -615,9 +607,9 @@ class Shooter(Subsystem):
         self.kickSetPoint = 0
         self.kickShooter: bool = False
 
-        self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
-        self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
-        self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
+        # self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
+        # self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
+        # self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
 
         self.dontShoot = False
 
@@ -631,10 +623,6 @@ class Shooter(Subsystem):
 
         self.kickSetPoint = 0
         self.kickShooter: bool = False
-
-        self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
-        self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
-        self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
 
         self.dontShoot = False
 
