@@ -29,6 +29,7 @@ class Intake(Subsystem):
 
         self.publishFloat("intake_speed (0 to 1)", 0.2)
         self.publishFloat("reverse_speed (0 to 1)", 0.2)
+        self.publishFloat("indexer_speed (0 to 1)", 0.4)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
 
@@ -54,6 +55,9 @@ class Intake(Subsystem):
         )
         self.motorReverseSetpoint = max(
             min(self.getFloat("reverse_speed (0 to 1)", default=0.0), 1.0), 0
+        )
+        self.indexerSetpoint = max(
+            min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
         )
 
         if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
@@ -102,7 +106,7 @@ class Intake(Subsystem):
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:
-            self.automaticThrottle = self.motorForwardSetpoint * 2
+            self.automaticThrottle = self.indexerSetpoint
         else:
             self.automaticThrottle = 0
 
