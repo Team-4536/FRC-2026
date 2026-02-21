@@ -9,8 +9,8 @@ from math import pi as PI
 
 
 class Inputs(Subsystem):
-    MAX_ABTAINABLE_SPEED: float = 4
-    LOW_MAX_ABTAINABLE_SPEED: float = 1.5
+    MAX_ABTAINABLE_SPEED: float = 5
+    LOW_MAX_ABTAINABLE_SPEED: float = 2
 
     def __init__(
         self,
@@ -39,7 +39,7 @@ class Inputs(Subsystem):
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 0.9),
+            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
         )
 
         if self._driveCtrlr.getBackButtonPressed():
@@ -64,8 +64,14 @@ class Inputs(Subsystem):
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
-        robotState.turretSwitchTarget = self._mechCtrlr.getBButtonPressed()
         robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
+        robotState.initialIntake = self._mechCtrlr.getAButton()
+        robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
+        robotState.intakeEject = self._mechCtrlr.getBButton()
+        robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
+        robotState.intakePos = self._mechCtrlr.getPOV()
+        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
 
         return robotState
 

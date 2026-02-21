@@ -5,6 +5,7 @@ from subsystems.turretSystem import Shooter, Turret
 from subsystems.motor import RevMotor
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
+from subsystems.intake import Intake
 from wpilib import TimedRobot
 from subsystems.cameras import CameraManager
 
@@ -18,6 +19,7 @@ class Robot(TimedRobot):
             time=TimeData(),
             turret=Turret(yawMotorID=14, pitchMotorID=13),
             shooter=Shooter(kickerId=18, revTopId=12, revBottomId=11),
+            intake=Intake(10, 30, 9),
             cameras=CameraManager(),
         )
 
