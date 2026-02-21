@@ -102,7 +102,7 @@ class Intake(Subsystem):
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:
-            self.automaticThrottle = self.motorForwardSetpoint
+            self.automaticThrottle = self.motorForwardSetpoint * 2
         else:
             self.automaticThrottle = 0
 
