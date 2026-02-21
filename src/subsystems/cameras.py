@@ -8,6 +8,7 @@ import wpilib
 from photonlibpy import EstimatedRobotPose
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import RobotState
+from wpimath.units import inchesToMeters
 
 
 class photonCameraClass:
@@ -16,6 +17,7 @@ class photonCameraClass:
         self,
         cameraName: str,
         camPitch: float,
+        camYaw: float,
         intCamX: float,
         intCamY: float,
         intCamZ: float,
@@ -25,7 +27,7 @@ class photonCameraClass:
         self.camera = PhotonCamera(cameraName)
         kRobotToCam = wpimath.geometry.Transform3d(
             wpimath.geometry.Translation3d(intCamX, intCamY, intCamZ),
-            wpimath.geometry.Rotation3d.fromDegrees(0.0, 0.0, camPitch),
+            wpimath.geometry.Rotation3d.fromDegrees(0.0, camPitch, camYaw),
         )
         self.camPoseEst = PhotonPoseEstimator(
             AprilTagFieldLayout.loadField(AprilTagField.k2026RebuiltWelded),
@@ -97,24 +99,26 @@ class CameraManager(Subsystem):
         self.photonCameraRight = photonCameraClass(
             "Camera1",
             30,
-            ((27 / 2) - (3 + 5 / 16)) * 0.0254,
-            ((27 / 2) - 1) * 0.0254,
-            (8 + 5 / 16 + 26.5) * 0.0254,
+            15,
+            inchesToMeters(27 / 2) - 9.5 / 100,
+            inchesToMeters(27 / 2) - 4.5 / 100,
+            27.8 / 100,
         )
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             -30,
-            ((27 / 2) - (5 + 5 / 8)) * 0.0254,
-            ((27 / 2) - 1) * 0.0254,
-            (8 + 5 / 16 + 26.5) * 0.0254,
+            15,
+            inchesToMeters(27 / 2) - 16.4 / 100,
+            inchesToMeters(27 / 2) - 4.5 / 100,
+            27.8 / 100,
         )
-        self.photonCameraMiddle = photonCameraClass(
-            "longCam",
-            0,
-            ((27 / 2) - (4 + 3 / 8)) * 0.0254,
-            ((27 / 2) - 1 + 1 / 8) * 0.0254,
-            (10.5 + 26.5) * 0.0254,
-        )
+        # self.photonCameraMiddle = photonCameraClass(
+        #     "longCam",
+        #     0,
+        #     ((27 / 2) - (4 + 3 / 8)) * 0.0254,
+        #     ((27 / 2) - 1 + 1 / 8) * 0.0254,
+        #     (10.5 + 26.5) * 0.0254,
+        # )
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         return robotState
@@ -123,17 +127,17 @@ class CameraManager(Subsystem):
 
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
-        self.photonCameraMiddle.update()
+        # self.photonCameraMiddle.update()
 
         if self.photonCameraLeft.trustworthy:
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraLeft.camEstPose2d, wpilib.getTime()
             )
-        if self.photonCameraMiddle.trustworthy:
+        # if self.photonCameraMiddle.trustworthy:
 
-            robotState.odometry.addVisionMeasurement(
-                self.photonCameraMiddle.camEstPose2d, wpilib.getTime()
-            )
+        #     robotState.odometry.addVisionMeasurement(
+        #         self.photonCameraMiddle.camEstPose2d, wpilib.getTime()
+        #     )
 
         if self.photonCameraRight.trustworthy:
             robotState.odometry.addVisionMeasurement(
@@ -148,11 +152,11 @@ class CameraManager(Subsystem):
     def publish(self):
 
         self.publishBoolean("rightCam trustworthy", self.photonCameraRight.trustworthy)
-        self.publishBoolean("midCam trustworthy", self.photonCameraMiddle.trustworthy)
+        # self.publishBoolean("midCam trustworthy", self.photonCameraMiddle.trustworthy)
         self.publishBoolean("leftCam trustworthy", self.photonCameraLeft.trustworthy)
-        self.publishFloat("midCamX", self.photonCameraMiddle.robotX)
-        self.publishFloat("midCamY", self.photonCameraMiddle.robotY)
-        self.publishFloat("midCamRot", self.photonCameraMiddle.robotAngle)
+        # self.publishFloat("midCamX", self.photonCameraMiddle.robotX)
+        # self.publishFloat("midCamY", self.photonCameraMiddle.robotY)
+        # self.publishFloat("midCamRot", self.photonCameraMiddle.robotAngle)
         self.publishFloat("rightCamX", self.photonCameraRight.robotX)
         self.publishFloat("rightCamY", self.photonCameraRight.robotY)
         self.publishFloat("rightCamRot", self.photonCameraRight.robotAngle)
