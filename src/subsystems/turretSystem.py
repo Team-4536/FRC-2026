@@ -93,7 +93,7 @@ VELOCITY_SCALAR = 1  # to account for slight air drag
 
 MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
-KICK_SPEED: RPM = 1500
+KICK_SPEED: RPM = 2000
 
 REV_ALLOWED_ERROR: RPM = 10  # TODO fine tune all these
 YAW_ALLOWED_ERROR: radians = 0.05
@@ -289,10 +289,13 @@ class Turret(Subsystem):
             elif setPoint > 90 and setPoint < 270:
                 self.pitchVelocity = -1
 
-        if (
-            not self.yawVelocity == 0
+        if not (self.yawVelocity == 0) and not (
+            self.relativeYawSetpoint == self.dontOverdoItYaw(self.relativeYawSetpoint)
         ):  # if we are manually moving interupt maintaining rotation in the turret gap
-            self.yawSetPoint = self.dontOverdoItYaw(self.yawSetPoint)
+
+            self.yawSetPoint -= self.relativeYawSetpoint - self.dontOverdoItYaw(
+                self.relativeYawSetpoint
+            )
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
@@ -315,10 +318,10 @@ class Turret(Subsystem):
             + ZERO_OFFSET
         )
 
-        self.relativeYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
+        self.limitedYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
         self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
 
-        self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
+        self.yawMotor.setPosition(self.limitedYawSetpoint * YAW_GEARING)
         self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
 
     def getMode(self, rs: RobotState) -> TurretMode:
