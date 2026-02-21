@@ -109,6 +109,9 @@ class RobotState(NetworkTablesMixin):
         self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
         self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        self.publishFloat(
+            "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
+        )
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
