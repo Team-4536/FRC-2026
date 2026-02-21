@@ -118,19 +118,18 @@ class RevMotor:
 
     TURRET_YAW_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(10)
+        .smartCurrentLimit(20)
         .secondaryCurrentLimit(10)
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
-            LimitSwitchConfig()
-            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
-            .reverseLimitSwitchEnabled(True)
-            .forwardLimitSwitchEnabled(True)
+            LimitSwitchConfig().limitSwitchPositionSensor(
+                FeedbackSensor.kPrimaryEncoder
+            )
         )
         .apply(
             SoftLimitConfig()
-            .forwardSoftLimit(0)
+            .forwardSoftLimit(16.67)
             .reverseSoftLimit(0)
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
@@ -151,8 +150,38 @@ class RevMotor:
         )
     )
 
-    TURRET_PITCH_CONFIG = AZIMUTH_CONFIG.apply(
-        LimitSwitchConfig().reverseLimitSwitchEnabled(True)
+    TURRET_PITCH_CONFIG = (
+        SparkMaxConfig()
+        .smartCurrentLimit(20)
+        .secondaryCurrentLimit(10)
+        .inverted(False)
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            LimitSwitchConfig().limitSwitchPositionSensor(
+                FeedbackSensor.kPrimaryEncoder
+            )
+        )
+        .apply(
+            SoftLimitConfig()
+            .forwardSoftLimit(30)
+            .reverseSoftLimit(0)
+            .forwardSoftLimitEnabled(True)
+            .reverseSoftLimitEnabled(True)
+        )
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.08, 0, 0, 0.02)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .positionWrappingEnabled(True)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(500, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.2)
+            )
+            .apply(FeedForwardConfig().kA(0))
+        )
     )
 
     FLYWHEEL_CONFIG: SparkBaseConfig = (

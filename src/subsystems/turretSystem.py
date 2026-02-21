@@ -52,7 +52,12 @@ TURRET_GAP: radians = TAU - MAX_ROTATION
 ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
 # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 YAW_GEARING: float = 100 / 3
-PITCH_GEARING: float = 2
+PITCH_RADIUS: inches = 13
+LIL_PITCH_GEAR_RADIUS: inches = 1
+ARC_RATIO = (
+    PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
+)  # how many rotations of the smol ladder gear is 1 rotation of the pitch
+PITCH_GEARING: float = 25 * ARC_RATIO  # two 5:1 gearboxes make 25
 TURRET_HEIGHT: meters = inchesToMeters(15)
 
 MAX_RPM: RPM = 5676
@@ -108,9 +113,7 @@ class Turret(Subsystem):
 
         super().__init__()
 
-        self.yawMotor = RevMotor(
-            deviceID=yawMotorID
-        )  # get right ID, motor for turning horizontally
+        self.yawMotor = RevMotor(deviceID=40)
 
         self.pitchMotor = RevMotor(deviceID=pitchMotorID)
 
@@ -128,21 +131,39 @@ class Turret(Subsystem):
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chage to be correct
 
-        self.phaseInit(RobotState.empty())
+        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
+        self.pitchMotor.configure(config=self.pitchMotor.TURRET_PITCH_CONFIG)
+
+        self.yawEncoder = self.yawMotor.getEncoder()
+        self.pitchEncoder = self.pitchMotor.getEncoder()
+
+        self.homeSet: bool = True
+        self.yawSetPoint: radians = 0  # in relation to the field
+        self.limitedYawSetpoint: radians = 0
+        self.relativeYawSetpoint: radians = 0  # in relation to the robot
+        self.pitchSetpoint: radians = 0
+        self.targetPos: Translation3d = Translation3d()
+
+        self.targetLocked: bool = False
+
+        self.target: TurretTarget = TurretTarget.NONE
+        self.mode: TurretMode = TurretMode.MANUAL
+
+        self.turretAutoDepedencies: tuple = (None,)
+        self.turretManDependencies: tuple = (None,)
+        self.turretGenDepedencies: tuple = (None,)
+
+        # these velocity values are only used when in manual mode
+        self.yawVelocity: RPM = 0
+        self.pitchVelocity: RPM = 0
+
+        self.impossibleDynamic = False
+
+        self.lastTime: seconds = getTime()
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
 
-        self.yawMotor.configure(
-            config=self.yawMotor.TURRET_YAW_CONFIG.apply(
-                SoftLimitConfig()
-                .forwardSoftLimit(
-                    rotationsToRadians(MAX_ROTATION) * YAW_GEARING
-                )  # TODO this wasn't working last time so if it is yay
-                .reverseSoftLimit(0)
-                .forwardSoftLimitEnabled(True)
-                .reverseSoftLimitEnabled(True)
-            )
-        )
+        self.yawMotor.configure(config=self.yawMotor.TURRET_YAW_CONFIG)
         self.pitchMotor.configure(config=self.pitchMotor.TURRET_PITCH_CONFIG)
 
         self.yawEncoder = self.yawMotor.getEncoder()
@@ -589,7 +610,16 @@ class Shooter(Subsystem):
 
         self.fullyReved: bool = False
 
-        self.phaseInit(RobotState.empty())
+        self.dependencies: tuple = (None,)
+
+        self.kickSetPoint = 0
+        self.kickShooter: bool = False
+
+        self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
+        self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
+        self.revingMotorTop.configure(config=RevMotor.FLYWHEEL_CONFIG)
+
+        self.dontShoot = False
 
         self.publishFloat("Manual rev cap", self.manualRevSpeed)
         self.publishFloat("manual kick rpm", self.manualKickSpeed)

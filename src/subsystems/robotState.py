@@ -4,7 +4,7 @@ import numpy as np
 import math
 from enum import Enum
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpilib import Field2d, SmartDashboard
+from wpilib import Field2d, SmartDashboard, SendableChooser
 from ntcore import NetworkTable
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.geometry import Pose2d, Translation2d, Pose3d
@@ -74,7 +74,9 @@ class RobotState(NetworkTablesMixin):
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.myField)
+        # SendableChooser().addOption("SIDE_RED")
         super().__init__()
+        self.publish
 
     def publish(self) -> None:
         for field in fields(self):
