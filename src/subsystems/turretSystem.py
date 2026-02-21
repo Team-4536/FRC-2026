@@ -44,15 +44,15 @@ from wpilib import DigitalInput
 from enum import Enum
 from typing import Optional
 
-MAX_PITCH: radians = degreesToRadians(40)  # in relation to up
-MIN_PITCH: radians = degreesToRadians(0)
+MAX_PITCH: radians = degreesToRadians(80)  # in relation to up
+MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
 ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
 # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 YAW_GEARING: float = 100 / 3
-PITCH_RADIUS: inches = 13
+PITCH_RADIUS: inches = 9
 LIL_PITCH_GEAR_RADIUS: inches = 1
 ARC_RATIO = (
     PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
@@ -139,6 +139,7 @@ class Turret(Subsystem):
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
         self.pitchSetpoint: radians = 0
+        self.relativePitchSetpoint: radians = 0  # cuz zero points up
         self.targetPos: Translation3d = Translation3d()
 
         self.targetLocked: bool = False
@@ -315,9 +316,10 @@ class Turret(Subsystem):
         )
 
         self.relativeYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
+        self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
 
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
-        self.pitchMotor.setPosition(self.pitchSetpoint * PITCH_GEARING)
+        self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
 
     def getMode(self, rs: RobotState) -> TurretMode:
 
@@ -492,6 +494,9 @@ class Turret(Subsystem):
             yPass = SHUTTLE_Y_PASS
 
         return yPass
+
+    def getRelativePitchSetpoint(self, angle: radians) -> radians:
+        return (PI / 2) - angle
 
     def reset(self, limit: bool):
 
