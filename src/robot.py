@@ -4,7 +4,6 @@ from subsystems.LEDSignals import LEDSignals
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.intake import Intake
-from subsystems.motor import RevMotor
 from wpilib import TimedRobot
 from subsystems.cameras import CameraManager
 

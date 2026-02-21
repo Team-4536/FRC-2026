@@ -8,8 +8,8 @@ from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
-    MAX_ABTAINABLE_SPEED: float = 2.5
-    LOW_MAX_ABTAINABLE_SPEED: float = 1.5
+    MAX_ABTAINABLE_SPEED: float = 5
+    LOW_MAX_ABTAINABLE_SPEED: float = 2
 
     def __init__(
         self,
@@ -20,8 +20,6 @@ class Inputs(Subsystem):
 
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
-
-        self.robotState = RobotState.empty(abtainableMaxSpeed=1)
 
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
@@ -36,7 +34,7 @@ class Inputs(Subsystem):
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 0.9),
+            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
