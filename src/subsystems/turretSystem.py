@@ -44,7 +44,7 @@ from wpilib import DigitalInput
 from enum import Enum
 from typing import Optional
 
-MAX_PITCH: radians = degreesToRadians(80)  # in relation to up
+MAX_PITCH: radians = degreesToRadians(90)  # in relation to up
 MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
@@ -92,7 +92,7 @@ GRAVITY: MPS = 9.80665  # don't worry that it's positive
 VELOCITY_SCALAR = 1  # to account for slight air drag
 
 MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
-MANUAL_SPEED: RPM = 70  # TODO tune, for the pitch and yaw speed
+MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 1500
 
 REV_ALLOWED_ERROR: RPM = 10  # TODO fine tune all these
@@ -138,7 +138,7 @@ class Turret(Subsystem):
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
-        self.pitchSetpoint: radians = 0
+        self.pitchSetpoint: radians = PI / 2
         self.relativePitchSetpoint: radians = 0  # cuz zero points up
         self.targetPos: Translation3d = Translation3d()
 
@@ -165,7 +165,7 @@ class Turret(Subsystem):
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
-        self.pitchSetpoint: radians = 0
+        self.pitchSetpoint: radians = PI / 2
         self.targetPos: Translation3d = Translation3d()
 
         self.targetLocked: bool = False
@@ -548,7 +548,11 @@ class Turret(Subsystem):
             self.relativeYawSetpoint * YAW_GEARING / TAU,
         )
         self.publishFloat("pitch setpoint", self.pitchSetpoint)
-        self.publishFloat("pitch read angle", self.pitchAngle)
+        self.publishFloat("Relative pitch setpoint", self.relativePitchSetpoint)
+        self.publishFloat("pitch angle", self.pitchAngle)
+        self.publishFloat(
+            "Pitch motor pos", rotationsToRadians(self.pitchEncoder.getPosition())
+        )
 
 
 class TurretOdometry:

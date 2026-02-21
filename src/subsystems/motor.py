@@ -210,7 +210,7 @@ class RevMotor:
     TURRET_PITCH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(20, 20)
-        .inverted(False)
+        .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
@@ -232,7 +232,7 @@ class RevMotor:
         )
         .apply(
             SoftLimitConfig()
-            .forwardSoftLimit(30)
+            .forwardSoftLimit(29)
             .reverseSoftLimit(0)
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
