@@ -44,8 +44,8 @@ from wpilib import DigitalInput
 from enum import Enum
 from typing import Optional
 
-MAX_PITCH: radians = degreesToRadians(80)
-MIN_PITCH: radians = degreesToRadians(50)
+MAX_PITCH: radians = degreesToRadians(40)  # in relation to up
+MIN_PITCH: radians = degreesToRadians(0)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
@@ -293,12 +293,15 @@ class Turret(Subsystem):
         ):  # if we are manually moving interupt maintaining rotation in the turret gap
             self.yawSetPoint = self.dontOverdoItYaw(self.yawSetPoint)
 
+        self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
+
         self.yawVelocity *= MANUAL_SPEED
         self.pitchVelocity *= MANUAL_SPEED
 
         time = getTime()
         timeDiff = time - self.lastTime  # time since last update
         # ensures it spins at a consistant speed
+        self.pitchSetpoint += rotationsToRadians(self.pitchVelocity / 60 * timeDiff)
         self.yawSetPoint += rotationsToRadians(self.yawVelocity / 60 * timeDiff)
 
         self.lastTime = time
@@ -314,7 +317,7 @@ class Turret(Subsystem):
         self.relativeYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
 
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
-        # self.pitchMotor.setVelocity(self.pitchVelocity)
+        self.pitchMotor.setPosition(self.pitchSetpoint * PITCH_GEARING)
 
     def getMode(self, rs: RobotState) -> TurretMode:
 
@@ -539,6 +542,8 @@ class Turret(Subsystem):
             "(Rotations) Yaw Motor Actual Setpoint",
             self.relativeYawSetpoint * YAW_GEARING / TAU,
         )
+        self.publishFloat("pitch setpoint", self.pitchSetpoint)
+        self.publishFloat("pitch read angle", self.pitchAngle)
 
 
 class TurretOdometry:
