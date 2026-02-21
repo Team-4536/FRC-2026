@@ -5,6 +5,10 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
+from subsystems.intake import Intake
+from typing import List, NamedTuple
+from subsystems.cameras import CameraManager
+from wpimath.estimator import SwerveDrive4PoseEstimator
 from typing import NamedTuple, Sequence
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.kinematics import ChassisSpeeds
@@ -13,10 +17,11 @@ robotState: RobotState = None  # type: ignore
 
 
 class SubsystemManager(NamedTuple):
-    inputs: Inputs
+    inputs: Inputs  # NOT A DEPENDANT SUBSYSTEM
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    intake: Intake
     cameras: CameraManager
 
     def init(self) -> None:
@@ -43,7 +48,7 @@ class SubsystemManager(NamedTuple):
     def _periodic(self, state: RobotState) -> None:
         global robotState
         for s in self.dependantSubsytems:
-            robotState = s.periodic(state)
+            robotState = s.periodic(self.robotState)
 
     def disabled(self) -> None:
         for s in self:
@@ -56,6 +61,7 @@ class SubsystemManager(NamedTuple):
             self.swerveDrive,
             self.cameras,
             self.time,
+            self.intake,
         ]
 
     @property

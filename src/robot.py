@@ -3,6 +3,8 @@ from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
+from subsystems.intake import Intake
+from subsystems.motor import RevMotor
 from wpilib import TimedRobot
 from subsystems.cameras import CameraManager
 
@@ -14,6 +16,7 @@ class Robot(TimedRobot):
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
+            intake=Intake(10, 30, 9),
             cameras=CameraManager(),
         )
 

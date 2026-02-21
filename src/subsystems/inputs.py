@@ -21,6 +21,8 @@ class Inputs(Subsystem):
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
+        self.robotState = RobotState.empty(abtainableMaxSpeed=1)
+
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
@@ -38,6 +40,14 @@ class Inputs(Subsystem):
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+
+        robotState.initialIntake = self._mechCtrlr.getAButton()
+        robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
+        robotState.intakeEject = self._mechCtrlr.getBButton()
+        robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
+        robotState.intakePos = self._mechCtrlr.getPOV()
+        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
 
         return robotState
 
