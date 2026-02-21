@@ -49,8 +49,7 @@ MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
-ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
-# TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
+ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2 + (PI / 2)
 YAW_GEARING: float = 100 / 3
 PITCH_RADIUS: inches = 9
 LIL_PITCH_GEAR_RADIUS: inches = 1
