@@ -19,7 +19,6 @@ class Intake(Subsystem):
     # defines all motors that are used in the subsystem
     def __init__(self, FrontMotorID, BackMotorID, RaiseMotorID):
         super().__init__()
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
