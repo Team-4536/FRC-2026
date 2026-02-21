@@ -44,15 +44,15 @@ from wpilib import DigitalInput
 from enum import Enum
 from typing import Optional
 
-MAX_PITCH: radians = degreesToRadians(80)
-MIN_PITCH: radians = degreesToRadians(50)
+MAX_PITCH: radians = degreesToRadians(90)  # in relation to up
+MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # TODO offset in radians from the zero of the gyro and zero of the turret
 ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2
 # TODO: find correct drive gearing, gear for both motors. means you turn 12 times to make a full rotation
 YAW_GEARING: float = 100 / 3
-PITCH_RADIUS: inches = 13
+PITCH_RADIUS: inches = 9
 LIL_PITCH_GEAR_RADIUS: inches = 1
 ARC_RATIO = (
     PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
@@ -92,10 +92,10 @@ GRAVITY: MPS = 9.80665  # don't worry that it's positive
 VELOCITY_SCALAR = 1  # to account for slight air drag
 
 MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
-MANUAL_SPEED: RPM = 70  # TODO tune, for the pitch and yaw speed
+MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 1500
 
-REV_ALLOWED_ERROR: RPM = 10  # TODO fine tune all these
+REV_ALLOWED_ERROR: float = 10  # TODO fine tune all these
 YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
@@ -138,7 +138,8 @@ class Turret(Subsystem):
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
-        self.pitchSetpoint: radians = 0
+        self.pitchSetpoint: radians = PI / 2
+        self.relativePitchSetpoint: radians = 0  # cuz zero points up
         self.targetPos: Translation3d = Translation3d()
 
         self.targetLocked: bool = False
@@ -164,7 +165,7 @@ class Turret(Subsystem):
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
-        self.pitchSetpoint: radians = 0
+        self.pitchSetpoint: radians = PI / 2
         self.targetPos: Translation3d = Translation3d()
 
         self.targetLocked: bool = False
@@ -283,15 +284,17 @@ class Turret(Subsystem):
                 self.yawVelocity = 1
 
             if setPoint > 270 or setPoint < 90:
-                self.pitchVelocity = -1
+                self.pitchVelocity = 1
 
             elif setPoint > 90 and setPoint < 270:
-                self.pitchVelocity = 1
+                self.pitchVelocity = -1
 
         if (
             not self.yawVelocity == 0
         ):  # if we are manually moving interupt maintaining rotation in the turret gap
             self.yawSetPoint = self.dontOverdoItYaw(self.yawSetPoint)
+
+        self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
         self.yawVelocity *= MANUAL_SPEED
         self.pitchVelocity *= MANUAL_SPEED
@@ -299,6 +302,7 @@ class Turret(Subsystem):
         time = getTime()
         timeDiff = time - self.lastTime  # time since last update
         # ensures it spins at a consistant speed
+        self.pitchSetpoint += rotationsToRadians(self.pitchVelocity / 60 * timeDiff)
         self.yawSetPoint += rotationsToRadians(self.yawVelocity / 60 * timeDiff)
 
         self.lastTime = time
@@ -312,9 +316,10 @@ class Turret(Subsystem):
         )
 
         self.relativeYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
+        self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
 
         self.yawMotor.setPosition(self.relativeYawSetpoint * YAW_GEARING)
-        # self.pitchMotor.setVelocity(self.pitchVelocity)
+        self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
 
     def getMode(self, rs: RobotState) -> TurretMode:
 
@@ -490,6 +495,9 @@ class Turret(Subsystem):
 
         return yPass
 
+    def getRelativePitchSetpoint(self, angle: radians) -> radians:
+        return (PI / 2) - angle
+
     def reset(self, limit: bool):
 
         if limit:
@@ -538,6 +546,12 @@ class Turret(Subsystem):
         self.publishFloat(
             "(Rotations) Yaw Motor Actual Setpoint",
             self.relativeYawSetpoint * YAW_GEARING / TAU,
+        )
+        self.publishFloat("pitch setpoint", self.pitchSetpoint)
+        self.publishFloat("Relative pitch setpoint", self.relativePitchSetpoint)
+        self.publishFloat("pitch angle", self.pitchAngle)
+        self.publishFloat(
+            "Pitch motor pos", rotationsToRadians(self.pitchEncoder.getPosition())
         )
 
 
@@ -672,8 +686,8 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        if not self.dontShoot:
-            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+        # if not self.dontShoot:
+        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 
@@ -704,9 +718,17 @@ class Shooter(Subsystem):
 
     def getFullyReved(self) -> bool:
 
+        if self.revingSetpoint == 0:
+            return True
+
         if (
-            abs(self.revingSetpoint - self.revingSpeedTop) > REV_ALLOWED_ERROR
-            and abs(self.revingSetpoint - self.revingSpeedBottom) > REV_ALLOWED_ERROR
+            100
+            - (
+                abs(self.revingSetpoint - self.revingSpeedTop)
+                / self.revingSetpoint
+                * 100
+            )
+            > REV_ALLOWED_ERROR
         ):
             return False
 

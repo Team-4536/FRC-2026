@@ -232,7 +232,7 @@ class RevMotor:
         )
         .apply(
             SoftLimitConfig()
-            .forwardSoftLimit(30)
+            .forwardSoftLimit(29)
             .reverseSoftLimit(0)
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
