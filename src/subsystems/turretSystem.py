@@ -95,7 +95,7 @@ MANUAL_REV_SPEED: RPM = 3000  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 70  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 1500
 
-REV_ALLOWED_ERROR: RPM = 10  # TODO fine tune all these
+REV_ALLOWED_ERROR: float = 10  # TODO fine tune all these
 YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
@@ -672,8 +672,8 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        if not self.dontShoot:
-            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+        # if not self.dontShoot:
+        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 
@@ -704,9 +704,17 @@ class Shooter(Subsystem):
 
     def getFullyReved(self) -> bool:
 
+        if self.revingSetpoint == 0:
+            return True
+
         if (
-            abs(self.revingSetpoint - self.revingSpeedTop) > REV_ALLOWED_ERROR
-            and abs(self.revingSetpoint - self.revingSpeedBottom) > REV_ALLOWED_ERROR
+            100
+            - (
+                abs(self.revingSetpoint - self.revingSpeedTop)
+                / self.revingSetpoint
+                * 100
+            )
+            > REV_ALLOWED_ERROR
         ):
             return False
 
