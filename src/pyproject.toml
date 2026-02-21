@@ -35,5 +35,5 @@ requires = [
     "phoenix6",
     "photonlibpy",
     "mypy",
-    "limelightlib-python"
+    "limelightlib-python",
 ]

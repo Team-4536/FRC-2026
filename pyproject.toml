@@ -11,10 +11,9 @@ dependencies = [
     "photonlibpy",
     "ty",
     "pre-commit",
-    "setuptools<82.0.0",,
+    "setuptools<82.0.0",
     "ntcore",
-    "limelightlib-python",
-
+    "limelightlib-python"
 ]
 
 
