@@ -28,6 +28,8 @@ class Intake(Subsystem):
         )  # DO NOT put this in phaseInit. bad things will happen
         self.AUTOMATIC_MODE = False
 
+        self.publishFloat("intake_speed (0 to 1)", 0.7)
+
     def phaseInit(self, robotState: RobotState) -> None:
 
         self.intakeMotorAutomatic.configure(config=RevMotor.INDEXER_MOTOR_CONFIG)
@@ -35,7 +37,6 @@ class Intake(Subsystem):
         self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
 
         # these set the speed of the intake motors (negative is forward...):
-        self.motorForwardSetpoint = -0.7
         self.motorReverseSetpoint = 0.5
         self.raiseDownSetpoint = 0.2
         self.raiseUpSetpoint = -0.5
@@ -47,6 +48,9 @@ class Intake(Subsystem):
         self.automaticThrottle = 0
 
     def periodic(self, robotState: RobotState) -> RobotState:
+        self.motorForwardSetpoint = -max(
+            min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0
+        )
 
         if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
             # change these values if you need to decrease/increase raise and lowering speed
