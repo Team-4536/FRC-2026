@@ -1,7 +1,6 @@
 from subsystems.subsystem import Subsystem
 from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
-from ntcore import NetworkTableInstance
 from enum import Enum
 import wpilib
 
@@ -19,7 +18,6 @@ class Intake(Subsystem):
     # defines all motors that are used in the subsystem
     def __init__(self, FrontMotorID, BackMotorID, RaiseMotorID):
         super().__init__()
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
@@ -29,15 +27,17 @@ class Intake(Subsystem):
         )  # DO NOT put this in phaseInit. bad things will happen
         self.AUTOMATIC_MODE = False
 
-    def phaseInit(self, robotState: RobotState) -> None:
+        self.publishFloat("intake_speed (0 to 1)", 0.2)
+        self.publishFloat("reverse_speed (0 to 1)", 0.2)
+        self.publishFloat("indexer_speed (0 to 1)", 0.4)
+
+    def phaseInit(self, robotState: RobotState) -> RobotState:
 
         self.intakeMotorAutomatic.configure(config=RevMotor.INDEXER_MOTOR_CONFIG)
         self.intakeMotorManual.configure(config=RevMotor.INTAKE_MOTOR_CONFIG)
         self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
 
         # these set the speed of the intake motors (negative is forward...):
-        self.motorForwardSetpoint = -0.7
-        self.motorReverseSetpoint = 0.5
         self.raiseDownSetpoint = 0.2
         self.raiseUpSetpoint = -0.5
         self.raiseStayUpSetpoint = -0.150
@@ -47,7 +47,18 @@ class Intake(Subsystem):
         self.manualThrottle = 0
         self.automaticThrottle = 0
 
+        return robotState
+
     def periodic(self, robotState: RobotState) -> RobotState:
+        self.motorForwardSetpoint = -max(
+            min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0
+        )
+        self.motorReverseSetpoint = max(
+            min(self.getFloat("reverse_speed (0 to 1)", default=0.0), 1.0), 0
+        )
+        self.indexerSetpoint = max(
+            min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
+        )
 
         if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
             # change these values if you need to decrease/increase raise and lowering speed
@@ -95,7 +106,7 @@ class Intake(Subsystem):
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:
-            self.automaticThrottle = self.motorForwardSetpoint
+            self.automaticThrottle = self.indexerSetpoint
         else:
             self.automaticThrottle = 0
 

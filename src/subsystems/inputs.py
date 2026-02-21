@@ -39,7 +39,7 @@ class Inputs(Subsystem):
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
+            min(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
         )
 
         if self._driveCtrlr.getBackButtonPressed():
@@ -68,7 +68,7 @@ class Inputs(Subsystem):
         robotState.initialIntake = self._mechCtrlr.getAButton()
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
         robotState.intakeEject = self._mechCtrlr.getBButton()
-        robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
+        robotState.intakePosYAxis = self._mechCtrlr.getRightY()
         robotState.intakePos = self._mechCtrlr.getPOV()
         robotState.intakeMode = self._mechCtrlr.getLeftBumper()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
