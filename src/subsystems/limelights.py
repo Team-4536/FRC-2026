@@ -17,8 +17,6 @@ class llCams(Subsystem):
             .getEntry("botpose_wpiblue")
         )
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
-        # self.table.putNumber("limelight tx", self.llTable.getNumber("tx", 0))
-        # self.table.putNumber("limelight tx", self.llTable.getNumber("ty", 0))
 
     def init(self) -> None:
         pass
@@ -40,6 +38,41 @@ class llCams(Subsystem):
         pass
 
 
+# # X and Y are converted coordinates from inches to meters
+# aprilTagX = {
+#     11.8781,
+#     11.9155,
+#     11.3119,
+#     11.3119,
+#     11.9155,
+#     11.8781,
+#     11.9530,
+#     12.2710,
+#     12.5191,
+#     12.5191,
+#     12.2710,
+#     11.9530,
+#     16.5334,
+#     16.5334,
+#     16.5329,
+#     16.5329,
+#     4.6632,
+#     4.6257,
+#     5.2291,
+#     5.2291,
+#     4.6257,
+#     4.6632,
+#     4.5883,
+#     4.2699,
+#     4.0218,
+#     4.2018,
+#     4.2699,
+#     4.5883,
+#     0.0076,
+#     0.0076,
+#     0.0081,
+#     0.0081,
+# }
 # # X and Y are converted coordinates from inches to meters
 # aprilTagX = {
 #     11.8781,
