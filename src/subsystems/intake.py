@@ -28,6 +28,7 @@ class Intake(Subsystem):
         self.AUTOMATIC_MODE = False
 
         self.publishFloat("intake_speed (0 to 1)", 0.2)
+        self.publishFloat("reverse_speed (0 to 1)", 0.2)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
 
@@ -48,9 +49,12 @@ class Intake(Subsystem):
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        self.motorForwardSetpoint, self.motorReverseSetpoint = [
-            -max(min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0)
-        ] * 2
+        self.motorForwardSetpoint = -max(
+            min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0
+        )
+        self.motorReverseSetpoint = max(
+            min(self.getFloat("reverse_speed (0 to 1)", default=0.0), 1.0), 0
+        )
 
         if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
             # change these values if you need to decrease/increase raise and lowering speed
