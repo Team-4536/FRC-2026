@@ -15,9 +15,9 @@ class RobotState(NetworkTablesMixin):
     odometry: SwerveDrive4PoseEstimator
 
     def __post_init__(self) -> None:
+        super().__init__()
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.myField)
-        super().__init__()
 
     def publish(self) -> None:
         for field in fields(self):

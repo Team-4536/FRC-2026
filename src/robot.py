@@ -1,20 +1,24 @@
-from subsystemManager import SubsystemManager
+from subsystemManager import SubsystemManager, Subsystems
+from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.LEDSignals import LEDSignals
+from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from wpilib import TimedRobot
-from subsystems.cameras import CameraManager
 
 
 class Robot(TimedRobot):
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
+            subsystems=Subsystems(
+                ledSignals=LEDSignals(deviceID=0),
+                swerveDrive=SwerveDrive(),
+            ),
             inputs=Inputs(),
-            ledSignals=LEDSignals(deviceID=0),
-            swerveDrive=SwerveDrive(),
-            time=TimeData(),
             cameras=CameraManager(),
+            time=TimeData(),
+            robotState=RobotState.empty(),
         )
 
     def robotPeriodic(self) -> None:

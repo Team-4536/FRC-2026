@@ -131,9 +131,7 @@ class SwerveModules(NamedTuple):
         return tuple(m.position for m in self)  # type: ignore[return-value]
 
     @property
-    def modulePositions(
-        self,
-    ) -> Tuple[
+    def modulePositions(self) -> Tuple[
         SwerveModulePosition,
         SwerveModulePosition,
         SwerveModulePosition,
@@ -309,3 +307,20 @@ class SwerveDrive(Subsystem):
         modules.symmetricPosition(xPos, yPos)
 
         return modules
+
+    @property
+    def kinematics(self) -> SwerveDrive4Kinematics:
+        return self._kinematics
+
+    @property
+    def modulePoses(self) -> Tuple[
+        SwerveModulePosition,
+        SwerveModulePosition,
+        SwerveModulePosition,
+        SwerveModulePosition,
+    ]:
+        return self._modules.modulePositions
+
+    @property
+    def roboAngle(self) -> Rotation2d:
+        return self._gyro.getRotation2d()
