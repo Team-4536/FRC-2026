@@ -166,15 +166,15 @@ class OperateIntake(AutoStages):
 
         if self.pathTime < 0.5:  # TODO: make this not work like this
             self.robotState.intakePosYAxis = -1
-
-        self.robotState.initialIntake = True
-        self.robotState.intakeIndexer = True
+        else:
+            self.robotState.initialIntake = True
+            self.robotState.intakeIndexer = True
 
         return self.robotState
 
     def isDone(self) -> bool:
 
-        if self.pathTime < self.runTime:
+        if self.pathTime < self.runTime or self.pathTime < 0.5:
             return False
 
         self.pathDone = True
