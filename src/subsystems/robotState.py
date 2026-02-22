@@ -68,6 +68,7 @@ class RobotState(NetworkTablesMixin):
     turretSwitchEnabled: bool
     turretResetYawEncdoer: bool
     dontShoot: bool
+    forceDynamicTurret: bool
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
