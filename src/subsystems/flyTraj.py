@@ -43,7 +43,7 @@ class FlyTraj(Subsystem):
                 #self.manager.setStartPosition(start_position=Translation2d(robotState.pose.X(), robotState.pose.Y()))
                 self.manager.setStartPosition(start_position=Translation2d(7, 7))
                 self.manager.setGoalPosition(goal_position=Translation2d(0,0))
-                p: PathPlannerPath = self.manager.getCurrentPath(PathConstraints(5.0, 2.0, 0.3, 0.05, 12, True), GoalEndState(0, Rotation2d(0)))
+                p: PathPlannerPath = self.manager.getCurrentPath(PathConstraints(5.0, 2.5, 0.7, 0.35, 12, True), GoalEndState(0, Rotation2d(0)))
                 
                 if p is not None:
                     self.state = 2
@@ -93,14 +93,16 @@ class FlyTraj(Subsystem):
             print("stage = 3")
             self.startTime = wpilib.getTime()
             self.totalTIme = self.t.getTotalTimeSeconds()
-            print(self.totalTIme)
+            print("start point", self.t.getInitialPose())
+            print("end point", self.t.getEndState().pose)
+            print("total time", self.totalTIme)
             self.state = 4
 
         if self.state == 4:
             time = wpilib.getTime() - self.startTime
             goalState = self.t.sample(time)
             robotState.fieldSpeeds = goalState.fieldSpeeds
-            print(goalState.fieldSpeeds)
+            #print(goalState.fieldSpeeds)
 
             if time > self.totalTIme:
                 self.state = 5
