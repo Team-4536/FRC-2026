@@ -20,6 +20,7 @@ class FlyTraj(Subsystem):
         #self.manager = LocalADStar()
         self.manager = pathfinding.Pathfinding()
         self.finder = pathfinders.LocalADStar()
+        self.publishBoolean("A button works", False, "flyTraj")
         
         print("tick-")
 
@@ -37,6 +38,8 @@ class FlyTraj(Subsystem):
             self.state = 1
         
         if robotState.flyTest and self.state == 1:
+
+            self.publishBoolean("A button works", True, "flyTraj")
 
             if self.manager.isNewPathAvailable():
                 print("stage = 1")
