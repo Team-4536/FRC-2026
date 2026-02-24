@@ -50,7 +50,10 @@ class Inputs(Subsystem):
             self.MAX_ABTAINABLE_SPEED,
             self._driveCtrlr.getRightTriggerAxis(),
         )
-        self.robotState.fieldSpeeds = self._calculateDrive()
+
+        if not self.robotState.flyTest:
+            self.robotState.fieldSpeeds = self._calculateDrive()
+
         self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
         self.robotState.flyTest = self._driveCtrlr.getAButton()
         self.robotState.flyTestReset = self._driveCtrlr.getBButton()

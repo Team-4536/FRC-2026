@@ -17,13 +17,13 @@ class RobotState(NetworkTablesMixin):
     abtainableMaxSpeed: MPS
     resetGyro: bool
     pose: Pose2d
-    flyTest: bool
     odometry: SwerveDrive4PoseEstimator
     flyTestReset: bool
+    flyTest: bool = False
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field", self.myField)
+        SmartDashboard.putData("Field2", self.myField)
         super().__init__()
 
     def publish(self) -> None:

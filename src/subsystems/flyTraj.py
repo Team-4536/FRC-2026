@@ -5,6 +5,7 @@ from pathplannerlib.pathfinders import LocalADStar, GoalEndState
 from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import RobotState
+from subsystems.networkTablesMixin import NetworkTablesMixin
 from wpimath.geometry import Translation2d, Pose2d, Rotation2d
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
@@ -20,7 +21,8 @@ class FlyTraj(Subsystem):
         #self.manager = LocalADStar()
         self.manager = pathfinding.Pathfinding()
         self.finder = pathfinders.LocalADStar()
-        self.publishBoolean("A button works", False, "flyTraj")
+        #self.publishFloat("test",1.0)
+        
         
         print("tick-")
 
@@ -39,20 +41,20 @@ class FlyTraj(Subsystem):
         
         if robotState.flyTest and self.state == 1:
 
-            self.publishBoolean("A button works", True, "flyTraj")
+            # self.publishBoolean("A button works", True, "telemetry")
 
             if self.manager.isNewPathAvailable():
                 print("stage = 1")
-                #self.manager.setStartPosition(start_position=Translation2d(robotState.pose.X(), robotState.pose.Y()))
-                self.manager.setStartPosition(start_position=Translation2d(7, 7))
-                self.manager.setGoalPosition(goal_position=Translation2d(0,0))
+                self.manager.setStartPosition(start_position=Translation2d(robotState.odometry.getEstimatedPosition().X(), robotState.odometry.getEstimatedPosition().Y()))
+                # self.manager.setStartPosition(start_position=Translation2d(7, 7))
+                self.manager.setGoalPosition(goal_position=Translation2d(2.5,4))
                 p: PathPlannerPath = self.manager.getCurrentPath(PathConstraints(5.0, 2.5, 0.7, 0.35, 12, True), GoalEndState(0, Rotation2d(0)))
                 
                 if p is not None:
                     self.state = 2
                     print("path type not none")
                 
-        if self.state == 2:   
+        if robotState.flyTest and self.state == 2:   
                 print("**&&**", type(p))
                 nominalVoltage = 12.0
                 stallTorque = 2.6
@@ -92,7 +94,7 @@ class FlyTraj(Subsystem):
           
                
 
-        if self.state == 3:
+        if robotState.flyTest and self.state == 3:
             print("stage = 3")
             self.startTime = wpilib.getTime()
             self.totalTIme = self.t.getTotalTimeSeconds()
@@ -101,17 +103,15 @@ class FlyTraj(Subsystem):
             print("total time", self.totalTIme)
             self.state = 4
 
-        if self.state == 4:
+        if robotState.flyTest and self.state == 4:
             time = wpilib.getTime() - self.startTime
             goalState = self.t.sample(time)
             robotState.fieldSpeeds = goalState.fieldSpeeds
-            #print(goalState.fieldSpeeds)
+            # print(goalState.fieldSpeeds)
 
-            if time > self.totalTIme:
-                self.state = 5
 
-        if self.state == 5:
-            pass
+        else:
+            self.state = 0
 
         return robotState
 
@@ -121,6 +121,7 @@ class FlyTraj(Subsystem):
         pass
 
     def publish(self):
+        
         pass
 
         
