@@ -68,11 +68,13 @@ class RobotState(NetworkTablesMixin):
     turretSwitchEnabled: bool
     turretResetYawEncdoer: bool
     dontShoot: bool
+    impossibleDynamic: bool
+    forceDynamicTurret: bool
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
 
-    teamSide: TeamSide = TeamSide.SIDE_RED
+    teamSide: TeamSide = TeamSide.SIDE_BLUE
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll = 0.0
