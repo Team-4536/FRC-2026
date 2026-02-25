@@ -812,7 +812,7 @@ def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radian
 
 def _calculateVelocity(turretAngle: radians, distance: meters, height: meters) -> MPS:
 
-    numer = GRAVITY * (height**2)
+    numer = GRAVITY * (distance**2)
     denom = (
         2 * (math.cos(turretAngle) ** 2) * (distance * math.tan(turretAngle) - height)
     )
