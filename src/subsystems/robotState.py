@@ -82,7 +82,7 @@ class RobotState(NetworkTablesMixin):
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field", self.myField)
+        SmartDashboard.putData("Field2", self.myField)
         # SendableChooser().addOption("SIDE_RED")
         super().__init__()
         self.publish

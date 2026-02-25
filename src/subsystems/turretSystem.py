@@ -226,10 +226,8 @@ class Turret(Subsystem):
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
 
-        self.turretAutoDepedencies: tuple = (robotState.odometry,)
-
         self.turretManDependencies: tuple = (robotState.turretManualSetpoint,)
-        self.turretGenDepedencies: tuple = (robotState.odometry.getEstimatedPosition(),)
+        self.turretGenDepedencies: tuple = (robotState.odometry,)
 
         if not self.homeSet:
             self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
@@ -259,8 +257,9 @@ class Turret(Subsystem):
 
     def automaticUpdate(self, robotState: RobotState):
 
-        if not checkDependencies(self.turretAutoDepedencies):
-            return
+        self.impossibleDynamic = False
+        robotState.impossibleDynamic = False
+        robotState.dontShoot = False
 
         robotState.targetDistance = self.getTargetDist(self.targetPos, self.odom.pose)
         h = self.targetPos.z
@@ -721,6 +720,8 @@ class Shooter(Subsystem):
         # if not self.dontShoot:
         self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
+        self.badLimitedAngle: bool = False
+
         return robotState
 
     def manualUpdate(self, robotState: RobotState):
@@ -735,17 +736,25 @@ class Shooter(Subsystem):
             robotState.targetHeight,
         )
 
+        self.badLimitedAngle = False
+
         if not checkDependencies(depend):
             return
 
         if robotState.impossibleDynamic:
             return
 
-        mpsSetpoint: MPS = _calculateVelocity(
-            robotState.optimalTurretAngle,
-            robotState.targetDistance,
-            robotState.targetHeight,
-        )
+        mpsSetpoint: MPS = 0
+
+        try:
+            mpsSetpoint: MPS = _calculateVelocity(
+                robotState.optimalTurretAngle,
+                robotState.targetDistance,
+                robotState.targetHeight,
+            )
+        except:
+            self.badLimitedAngle = True
+            return
 
         mpsSetpoint *= VELOCITY_SCALAR
         # TODO add a constant scale value to the speed
@@ -801,15 +810,14 @@ def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radian
     return math.atan(numerator / denom)
 
 
-def _calculateVelocity(
-    turretAngle: radians, hubDistance: meters, height: meters
-) -> MPS:
+def _calculateVelocity(turretAngle: radians, distance: meters, height: meters) -> MPS:
 
-    velocityMps = math.sqrt(
-        (GRAVITY * turretAngle**2)
-        / (2 * math.cos(turretAngle) * (hubDistance * math.tan(turretAngle) - height))
+    numer = GRAVITY * (height**2)
+    denom = (
+        2 * (math.cos(turretAngle) ** 2) * (distance * math.tan(turretAngle) - height)
     )
-    return velocityMps / FLYWHEEL_CIRCUMFRENCE * 60
+    velocityMps = math.sqrt(numer / denom)
+    return velocityMps
 
 
 def calculateTime(velocity: MPS, distance: meters):

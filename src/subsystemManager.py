@@ -32,6 +32,7 @@ class SubsystemManager(NamedTuple):
 
     def robotPeriodic(self) -> None:
         self.robotState.publish()
+        self.cameras.periodic(self.robotState)
         for s in self:
             s.publish()
 

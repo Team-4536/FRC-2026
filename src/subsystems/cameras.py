@@ -61,7 +61,7 @@ class photonCameraClass:
             self.ambiguity = self.target[0].getPoseAmbiguity()
 
             if (
-                self.ambiguity < 0.04
+                self.ambiguity < 0.1
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
                 == EstimatedRobotPose
             ):
