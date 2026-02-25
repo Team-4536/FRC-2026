@@ -50,7 +50,7 @@ class RobotState(NetworkTablesMixin):
     intakePos: int
     intakeMode: bool
     resetGyro: bool
-    pose: Pose2d
+
     odometry: SwerveDrive4PoseEstimator
     motorDesiredState: float
 

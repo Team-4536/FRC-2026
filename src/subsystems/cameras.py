@@ -45,6 +45,7 @@ class photonCameraClass:
         self.trustworthy = False
         self.camEstPose: EstimatedRobotPose | None = None
         self.hasTargetsRan = False
+        self.running = False
 
     def update(self):
         self.hasTargetsRan = False
@@ -54,7 +55,7 @@ class photonCameraClass:
         self.hasTargets = self.result.hasTargets()
 
         if self.hasTargets:
-
+            self.running = True
             self.hasTargetsRan = True
             self.target = self.result.getTargets()
             self.fiducialId = self.target[0].getFiducialId()
@@ -65,6 +66,7 @@ class photonCameraClass:
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
                 == EstimatedRobotPose
             ):
+
                 self.trustworthy = True
                 self.camEstPose = self.camPoseEst.estimateLowestAmbiguityPose(
                     self.result
@@ -90,6 +92,7 @@ class photonCameraClass:
         else:
             self.ambiguity = 1
             self.fiducialId = -1
+            self.running = False
 
 
 class CameraManager(Subsystem):
@@ -127,6 +130,10 @@ class CameraManager(Subsystem):
 
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
+        self.publishBoolean("cam1 running", self.photonCameraRight.running)
+
+        self.publishBoolean("cam2 running", self.photonCameraLeft.running)
+
         # self.photonCameraMiddle.update()
 
         if self.photonCameraLeft.trustworthy:

@@ -109,10 +109,10 @@ BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 
-FLYWHEEL_RADIUS: inches = 3  # diameter of the wheels build decides to use
-FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_RADIUS) * TAU
+FLYWHEEL_DIAMETER: inches = 3  # diameter of the wheels build decides to use
+FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
-VELOCITY_SCALAR = 1  # to account for slight air drag
+VELOCITY_SCALAR = 2  # to account for slight air drag
 
 MANUAL_REV_SPEED: RPM = 3500  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
@@ -293,7 +293,7 @@ class Turret(Subsystem):
 
         self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
 
-        robotState.optimalTurretAngle = self.pitchAngle
+        robotState.optimalTurretAngle = self.pitchSetpoint
 
         self.yawMotor.setPosition(self.limitedYawSetpoint * YAW_GEARING)
         self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
@@ -757,8 +757,10 @@ class Shooter(Subsystem):
             return
 
         mpsSetpoint *= VELOCITY_SCALAR
+        mpsSetpoint *= robotState.revSpeed
+        self.revingSetpoint = mpsSetpoint
         # TODO add a constant scale value to the speed
-        self.revingSetpoint: RPM = MPSToRPM(mpsSetpoint, FLYWHEEL_CIRCUMFRENCE)
+        self.revingSetpoint: RPM = MPSToRPM(self.revingSetpoint, FLYWHEEL_CIRCUMFRENCE)
 
     def revShooters(self, speed: RPM):
         self.revingMotorBottom.setMaxMotionVelocity(speed)
