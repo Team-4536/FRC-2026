@@ -1,3 +1,4 @@
+from phoenix6.units import volt as voltage
 from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
@@ -10,13 +11,13 @@ from rev import (
     SparkMaxConfig,
     SparkRelativeEncoder,
 )
-from wpimath.units import radians
-from wpimath.units import revolutions_per_minute as RPM
+from wpimath.units import radians, revolutions_per_minute
 
 
 class RevMotor:
     def __init__(self, *, deviceID: int) -> None:
         self._ctrlr = SparkMax(deviceID, SparkMax.MotorType.kBrushless)
+        self._encoder = self._ctrlr.getEncoder()
 
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
@@ -28,13 +29,13 @@ class RevMotor:
     def stopMotor(self) -> None:
         self._ctrlr.set(0)
 
-    def setThrottle(self, throttle: float) -> None:
+    def setThrottle(self, throttle: voltage) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
-    def setVelocity(self, rpm: RPM) -> None:
+    def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,
-            ctrl=SparkMax.ControlType.kVelocity,
+            ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
 
     def setPosition(self, rot: radians) -> None:
@@ -44,7 +45,7 @@ class RevMotor:
         )
 
     def getEncoder(self) -> SparkRelativeEncoder:
-        return self._ctrlr.getEncoder()
+        return self._encoder
 
     DRIVE_GEARiNG: float = 6.12
 
