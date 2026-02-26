@@ -168,7 +168,7 @@ class OperateIntake(AutoStages):
             self.robotState.intakePosYAxis = -1
         else:
             self.robotState.initialIntake = True
-            # self.robotState.intakeIndexer = True
+            self.robotState.intakeIndexer = True
 
         return self.robotState
 
