@@ -12,7 +12,6 @@ from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import revolutions_per_minute as RPM
 from wpimath.units import (
-    metersToFeet,
     radians,
     meters,
     inchesToMeters,
@@ -82,7 +81,7 @@ class RobotState(NetworkTablesMixin):
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field2", self.myField)
+        SmartDashboard.putData("odomField", self.myField)
         # SendableChooser().addOption("SIDE_RED")
         super().__init__()
         self.publish
