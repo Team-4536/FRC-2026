@@ -1,24 +1,82 @@
 from dataclasses import dataclass, fields, MISSING
-from subsystems.networkTablesMixin import NetworkTablesMixin
-from typing import Any, Self
-from wpilib import Field2d, SmartDashboard
+from math import pi as PI, tau as TAU
+import numpy as np
+import math
+from enum import Enum
 from wpimath.estimator import SwerveDrive4PoseEstimator
 
 from wpilib import Field2d
 from wpilib import SmartDashboard
 
 from wpimath.geometry import Pose2d
+from wpilib import Field2d, SmartDashboard, SendableChooser
+from ntcore import NetworkTable
+from subsystems.networkTablesMixin import NetworkTablesMixin
+from wpimath.geometry import Pose2d, Translation2d, Pose3d
 from wpimath.kinematics import ChassisSpeeds
+from wpimath.units import meters_per_second as MPS
+from wpimath.units import revolutions_per_minute as RPM
+from wpimath.units import (
+    metersToFeet,
+    radians,
+    meters,
+    inchesToMeters,
+)
+from typing import Any, Self
+
+ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
+BATTERY_VOLTS: float = 12
+
+
+class TeamSide(Enum):
+    SIDE_RED = 1
+    SIDE_BLUE = 2
+
+
+class TurretTarget(Enum):
+    NONE = 0
+    HUB = 1
+    SHUTTLE_RIGHT = 2
+    SHUTTLE_LEFT = 3
+
+
+class TurretMode(Enum):
+    DISABLED = 0
+    MANUAL = 1
+    DYNAMIC = 2
 
 
 @dataclass
 class RobotState(NetworkTablesMixin):
+    motorDesiredState: float
+
+    revSpeed: float
+    kickShooter: bool
+    optimalTurretAngle: radians
+    targetDistance: meters
+    targetHeight: meters
+
+    turretSwitchMode: bool
+    turretManualSetpoint: float
+    fullyreved: bool
+    targetLocked: bool
+    turretSwitchTarget: bool
+    turretSwitchEnabled: bool
+    turretResetYawEncdoer: bool
+    dontShoot: bool
+    impossibleDynamic: bool
+    forceDynamicTurret: bool
+
+    robotOmegaSpeed: MPS
+    robotLinearVelocity: Translation2d
+
     fieldSpeeds: ChassisSpeeds
     resetGyro: bool
     pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
     autosInitPose: Pose2d
     initialIntake: bool = False  # TODO: change vals later, very temp
+    intakeIndexer: bool = False
     intakeSensorTest: bool = False
     intakeEject: bool = False
     intakePosYAxis: float = 0
@@ -26,11 +84,19 @@ class RobotState(NetworkTablesMixin):
     intakeMode: bool = True
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
-    
+
+    teamSide: TeamSide = TeamSide.SIDE_BLUE
+    turretTarget: TurretTarget = TurretTarget.NONE
+    turretMode: TurretMode = TurretMode.MANUAL
+    ejectAll = 0.0
+    intakePosYAxis = 0.0
+
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.myField)
+        # SendableChooser().addOption("SIDE_RED")
         super().__init__()
+        self.publish
 
     def publish(self) -> None:
         for field in fields(self):
@@ -38,7 +104,15 @@ class RobotState(NetworkTablesMixin):
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
+            self.publishGeneric(name, value)
+
+        self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
+        self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
+        self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
         self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        self.publishFloat(
+            "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
+        )
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:

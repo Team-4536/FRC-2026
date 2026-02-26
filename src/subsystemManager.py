@@ -1,5 +1,7 @@
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
+from subsystems.turretSystem import Turret, Shooter
+from subsystems.intake import Intake
 from subsystems.LEDSignals import LEDSignals
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
@@ -22,7 +24,10 @@ class SubsystemManager(NamedTuple):
     swerveDrive: SwerveDrive
     time: TimeData
     autos: AutoSubsystem
+    turret: Turret
+    shooter: Shooter
     intake: Intake
+    cameras: CameraManager
 
     def init(self) -> None:
         global robotState
@@ -61,6 +66,8 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
+            self.turret,
+            self.shooter,
             self.intake,
         ]
 
@@ -77,6 +84,6 @@ class SubsystemManager(NamedTuple):
                 self.swerveDrive._modules.modulePositions,
                 self.swerveDrive.initPos,
             )
-            print('made robotstate')
+            print("made robotstate")
 
         return robotState
