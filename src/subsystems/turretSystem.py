@@ -112,7 +112,9 @@ BLUE_SCORE_POS: Translation3d = Translation3d(
 FLYWHEEL_DIAMETER: inches = 3  # diameter of the wheels build decides to use
 FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
-VELOCITY_SCALAR = 2  # to account for slight air drag
+VELOCITY_SCALAR: Translation2d = Translation2d(
+    1.5, 1
+)  # to account for air drag and imperfect transfer of velocity
 
 MANUAL_REV_SPEED: RPM = 3500  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
@@ -180,6 +182,8 @@ class Turret(Subsystem):
         self.pitchVelocity: RPM = 0
 
         self.impossibleDynamic = False
+        self.compensateFail = False
+        self.dynamicFail = False
 
         self.lastTime: seconds = getTime()
 
@@ -206,12 +210,20 @@ class Turret(Subsystem):
         self.pitchVelocity: RPM = 0
 
         self.impossibleDynamic = False
+        self.compensateFail = False
+        self.dynamicFail = False
 
         self.lastTime: seconds = getTime()
 
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
+
+        self.compensateFail = False
+        self.dynamicFail = False
+        self.impossibleDynamic = False
+        robotState.impossibleDynamic = False
+        robotState.dontShoot = False
 
         if robotState.forceDynamicTurret:
             self.mode = TurretMode.DYNAMIC
@@ -257,10 +269,6 @@ class Turret(Subsystem):
 
     def automaticUpdate(self, robotState: RobotState):
 
-        self.impossibleDynamic = False
-        robotState.impossibleDynamic = False
-        robotState.dontShoot = False
-
         robotState.targetDistance = self.getTargetDist(self.targetPos, self.odom.pose)
         h = self.targetPos.z
         d = robotState.targetDistance
@@ -281,19 +289,27 @@ class Turret(Subsystem):
             self.publishFloat("time", time)
 
         except:
+            self.dynamicFail = True
             self.impossibleDynamic = True
             robotState.impossibleDynamic = True
             robotState.dontShoot = True
             return
 
-        # self.compensateSetpoint(
-        #     time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
-        # )
-        self.targetPoint(self.targetPos, self.odom.pose, robotState)  # need robot odom
+        self.compensateSetpoint(
+            time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
+        )
+        try:
+            self.targetPoint(
+                self.targetPos, self.odom.pose, robotState
+            )  # need robot odom
+        except:
+            self.compensateFail = True
+            self.impossibleDynamic = True
+            robotState.impossibleDynamic = True
+            robotState.dontShoot = True
+            return
 
         self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
-
-        robotState.optimalTurretAngle = self.pitchSetpoint
 
         self.yawMotor.setPosition(self.limitedYawSetpoint * YAW_GEARING)
         self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
@@ -450,14 +466,14 @@ class Turret(Subsystem):
         tanVel: Translation2d = getTangentalVelocity(offset, roboOmegaSpeed)
 
         # add the mps values
-        compensateVector.__add__(tanVel)
-        compensateVector.__add__(roboLinV)
+        compensateVector += tanVel
+        compensateVector += roboLinV
 
         # multiply by time to get the distance the ball would move
         compensateVector = scaleTranslation2D(compensateVector, time)
 
         # add in the opposite direction
-        self.targetPos.__add__(Translation3d(compensateVector.rotateBy(Rotation2d(PI))))
+        self.targetPos += Translation3d(compensateVector.rotateBy(Rotation2d(PI)))
 
     def dontOverdoItYaw(self, angle) -> radians:
 
@@ -507,6 +523,22 @@ class Turret(Subsystem):
         h = robotState.targetHeight
 
         self.pitchSetpoint = calculateAngle(d, h, self.getXPass(d), self.getYPass())
+
+        robotState.optimalTurretAngle = self.pitchSetpoint
+
+        # scale x and y independently
+
+        velocity: MPS = _calculateVelocity(self.pitchSetpoint, d, h)
+
+        temp: Translation2d = (
+            Translation2d(  # TODO change all velocities without direction to be spped and this to velocity
+                distance=velocity, angle=Rotation2d(self.pitchSetpoint)
+            )
+        )
+
+        temp = Translation2d(temp.x * VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
+
+        self.pitchAngle = temp.angle().radians()
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
@@ -594,6 +626,10 @@ class Turret(Subsystem):
         )
         self.publishStruct("Turret field pose", self.odom.pose)
         self.publishBoolean("Impossible dynamic", self.impossibleDynamic)
+        self.publishBoolean("Initial dynamic calculation failed", self.dynamicFail)
+        self.publishBoolean(
+            "Failed to dynamic after setpoint was compensated", self.compensateFail
+        )
 
 
 class TurretOdometry:
@@ -756,7 +792,7 @@ class Shooter(Subsystem):
             self.badLimitedAngle = True
             return
 
-        mpsSetpoint *= VELOCITY_SCALAR
+        mpsSetpoint *= VELOCITY_SCALAR.distance(Translation2d())
         mpsSetpoint *= robotState.revSpeed
         self.revingSetpoint = mpsSetpoint
         # TODO add a constant scale value to the speed
