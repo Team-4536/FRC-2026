@@ -240,7 +240,7 @@ class SwerveDrive(
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
 
-        print(fieldSpeeds)
+        #print(fieldSpeeds)
 
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)
