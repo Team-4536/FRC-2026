@@ -1,5 +1,7 @@
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
+from subsystems.turretSystem import Turret, Shooter
+from subsystems.intake import Intake
 from subsystems.LEDSignals import LEDSignals
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
@@ -17,12 +19,15 @@ robotState: RobotState = None  # type: ignore
 
 
 class SubsystemManager(NamedTuple):
-    inputs: Inputs
+    inputs: Inputs  # NOT A DEPENDANT SUBSYSTEM
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
     autos: AutoSubsystem
     flyTrajy: FlyTraj
+    turret: Turret
+    shooter: Shooter
+    intake: Intake
     cameras: CameraManager
 
     def init(self) -> None:
@@ -32,7 +37,10 @@ class SubsystemManager(NamedTuple):
         self.inputs.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
+        global robotState
         self.robotState.publish()
+        robotState = self.cameras.periodic(self.robotState)
+        robotState = self.swerveDrive.robotPeriodic(self.robotState)
         for s in self:
             s.publish()
 
@@ -59,10 +67,13 @@ class SubsystemManager(NamedTuple):
     def dependantSubsytems(self) -> Sequence[Subsystem]:  # dependant subsystems
         return [
             self.ledSignals,
-            self.swerveDrive,
             self.cameras,
+            self.swerveDrive,
             self.time,
             self.flyTrajy,
+            self.turret,
+            self.shooter,
+            self.intake,
         ]
 
     @property
