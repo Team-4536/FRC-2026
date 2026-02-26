@@ -5,6 +5,10 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
+from subsystems.autoSubsystem import AutoSubsystem
+from typing import List, NamedTuple
+from subsystems.flyTraj import FlyTraj
+from subsystems.cameras import CameraManager
 from typing import NamedTuple, Sequence
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.kinematics import ChassisSpeeds
@@ -17,6 +21,8 @@ class SubsystemManager(NamedTuple):
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData
+    autos: AutoSubsystem
+    flyTrajy: FlyTraj
     cameras: CameraManager
 
     def init(self) -> None:
@@ -32,7 +38,7 @@ class SubsystemManager(NamedTuple):
 
     def autonomousPeriodic(self) -> None:
         global robotState
-        robotState = self.inputs.periodic(self.robotState)
+        robotState = self.autos.periodic(self.robotState)
         self._periodic(self.robotState)
 
     def teleopPeriodic(self) -> None:
@@ -56,6 +62,7 @@ class SubsystemManager(NamedTuple):
             self.swerveDrive,
             self.cameras,
             self.time,
+            self.flyTrajy,
         ]
 
     @property

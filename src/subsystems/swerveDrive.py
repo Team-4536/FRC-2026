@@ -207,6 +207,8 @@ class SwerveDrive(Subsystem):
             attainableMaxSpeed=self.MAX_MODULE_SPEED,
         )
 
+        
+
         return robotState
 
     def disabled(self) -> None:
@@ -234,6 +236,8 @@ class SwerveDrive(Subsystem):
             state.optimize(module.modulePosition.angle)
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
+
+        #print(fieldSpeeds)
 
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)

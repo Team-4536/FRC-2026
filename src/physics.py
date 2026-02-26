@@ -12,7 +12,7 @@ class PhysicsEngine(PhysicsEngineBase):
         self.ctrlr = controller
         self.robot = robot
 
-        self.ctrlr.move_robot(Transform2d(x=1, y=3, rotation=Rotation2d(0)))
+        self.ctrlr.move_robot(Transform2d(x=0, y=0, rotation=Rotation2d(0)))
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         fieldSpeeds = self.robot.subsystems.robotState.fieldSpeeds
