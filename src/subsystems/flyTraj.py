@@ -109,6 +109,11 @@ class FlyTraj(Subsystem):
             robotState.fieldSpeeds = goalState.fieldSpeeds
             # print(goalState.fieldSpeeds)
 
+            if time > self.totalTIme:
+                self.state = 0
+
+
+
 
         else:
             self.state = 0
