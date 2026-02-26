@@ -1,15 +1,6 @@
 from functools import partial
-from ntcore import GenericPublisher, NetworkTableInstance, Value
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeAlias,
-    Union,
-)
+from ntcore import NetworkTableInstance, Value
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
 from wpimath.kinematics import SwerveModuleState
 
 Struct: TypeAlias = object
@@ -100,24 +91,26 @@ class NetworkTablesMixin:
             self.publishStruct(name, value)
             return
         elif isinstance(value, Sequence) and all(
-            v is not None and hasattr(v, "WPIStruct") for v in value  # type: ignore
+            v is not None and hasattr(v, "WPIStruct") for v in value  # pyright: ignore
         ):
-            self.publishStructArray(name, value)  # type: ignore
+            self.publishStructArray(name, value)  # pyright: ignore
         elif subtables:
             name = "/".join((*subtables, name))
 
         if value is None:
-            self.publishString(name, "Null")
+            self.publishString(name, "Null", *subtables)
 
-        typeStr = type(value).__name__  # type: ignore
+        typeStr = type(value).__name__  # pyright: ignore
         pub = self._ntPersist.get(name)
         if pub is None:
             topic = self.table.getTopic(name)
             pub = topic.genericPublish(typeStr)
             self._ntPersist[name] = pub
 
-        if type(pub) == GenericPublisher:
-            pub.set(Value.makeValue(value))
+        try:
+            pub.set(Value.makeValue(value))  # type: ignore
+        except TypeError:
+            self.publishGeneric("test", "Null", *subtables)
 
     def publishSwerve(
         self,

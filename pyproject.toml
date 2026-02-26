@@ -11,14 +11,12 @@ dependencies = [
     "photonlibpy",
     "ty",
     "pre-commit",
-    "setuptools<82.0.0",
 ]
 
 
 [tool.uv]
-python-preference = "managed"
+python-preference = "only-managed"
 
 
 [tool.ty.environment]
 python-version = "3.13"
-python = ".venv/bin/python3"

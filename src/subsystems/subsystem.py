@@ -11,8 +11,9 @@ class Subsystem(NetworkTablesMixin):
     def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
         super().__init__(table=table, instance=instance)
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotState: RobotState) -> RobotState:
         self._warn(self.phaseInit)
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self._warn(self.periodic)
@@ -25,7 +26,7 @@ class Subsystem(NetworkTablesMixin):
         pass
 
     def _warn(self, method: Callable[..., Optional[RobotState]]) -> None:
-        methodName = getattr(method, "__name__", "<unknown>")
+        methodName = getattr(method, "__name__")
         raise SubsystemMethodError(
             f"{methodName} method required in {self.__class__.__name__}"
         )

@@ -19,7 +19,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     freeSpeed: RPS = (5676 * 2 * math.pi) / 60
 
     wheelRadiusMeters = 0.0508
-    maxVelocity: MPS = 2
+    maxVelocity: MPS = 3
     wheelCOF = 1
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
@@ -49,9 +49,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
         path = path.flipPath()
 
     startingPose = path.getStartingHolonomicPose()
-    startingRotation = Rotation2d()
+    startingRotation = Rotation2d(20)
     if startingPose:
         startingRotation = startingPose.rotation()
+        print(startingRotation)
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
@@ -60,8 +61,8 @@ class AutoStages:
     def __init__(self):
         pass
 
-    def autoInit(self):
-        pass
+    def autoInit(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         return robotState
@@ -82,17 +83,27 @@ class FollowTrajectory(AutoStages):
     def __init__(self, pathName: str, isFlipped: bool):
         self.trajectory = loadTrajectory(pathName, isFlipped)
         self.robotState = RobotState.empty()
+
         self.pathDone = False
 
-    def autoInit(self):
+    def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
+        robotState.autosGyroResetToggle = True
+        robotState.autosGyroReset = (
+            self.trajectory.getInitialPose().rotation().degrees()
+        )
+        robotState.autosInitPose = self.trajectory.getInitialPose()
+        return robotState
 
     def run(self, robotState: RobotState):
+
         self.robotState = robotState
 
         self.pathTime = wpilib.getTime() - self.startTime
 
         targetState = self.trajectory.sample(self.pathTime)
+
+        # print(f" pose: {targetState.pose}")
 
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
@@ -102,7 +113,7 @@ class FollowTrajectory(AutoStages):
         if self.robotState.pose == None:
             self.robotState.pose = Pose2d()
 
-        print(self.robotState.pose, "robot pose")
+        # print(self.robotState.pose, "robot pose")
 
         currXPos = self.robotState.pose.x
         currYPos = self.robotState.pose.y
@@ -110,11 +121,11 @@ class FollowTrajectory(AutoStages):
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
-        posError = 0.1  # TODO: change later
+        posError = 0.02  # TODO: change later
         rotationError = 0.1  # TODO: change later
 
-        print(endXPos, endYPos, endRotation, "end pos")
-        print(self.trajectory.getTotalTimeSeconds())
+        # print(endXPos, endYPos, endRotation, "end pos")
+        # print(self.trajectory.getTotalTimeSeconds())
 
         if self.pathTime > self.trajectory.getTotalTimeSeconds():
             self.pathDone = True
@@ -140,24 +151,30 @@ class OperateIntake(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, runTime: float):
+    def __init__(self, runTime: float = 0):
         self.pathDone = False
         self.runTime = runTime
 
-    def autoInit(self):
+    def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = wpilib.getTime()
-        # self.robotState.intakeDown = True
+
+        return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         self.robotState = robotState
+        self.pathTime = wpilib.getTime() - self.startTime
 
-        # self.robotState.initialIntake = True
+        if self.pathTime < 0.5:  # TODO: make this not work like this
+            self.robotState.intakePosYAxis = -1
+        else:
+            self.robotState.initialIntake = True
+            # self.robotState.intakeIndexer = True
 
         return self.robotState
 
     def isDone(self) -> bool:
 
-        if self.pathTime < self.runTime:
+        if self.pathTime < self.runTime or self.pathTime < 0.5:
             return False
 
         self.pathDone = True
