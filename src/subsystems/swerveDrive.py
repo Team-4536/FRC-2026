@@ -205,6 +205,13 @@ class SwerveDrive(Subsystem):
 
         return robotState
 
+    def robotPeriodic(self, robotState: RobotState) -> RobotState:
+        robotState.odometry.update(
+            self._gyro.getRotation2d(),
+            self._modules.modulePositions,
+        )
+        return robotState
+
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:
             self._gyro.reset()
@@ -216,11 +223,6 @@ class SwerveDrive(Subsystem):
                     Rotation2d(),
                 ),
             )
-
-        robotState.odometry.update(
-            self._gyro.getRotation2d(),
-            self._modules.modulePositions,
-        )  # UNUSED
 
         self.drive(
             fieldSpeeds=robotState.fieldSpeeds,

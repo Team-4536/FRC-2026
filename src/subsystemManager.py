@@ -31,7 +31,10 @@ class SubsystemManager(NamedTuple):
         self.inputs.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
+        global robotState
         self.robotState.publish()
+        robotState = self.cameras.periodic(self.robotState)
+        robotState = self.swerveDrive.robotPeriodic(self.robotState)
         for s in self:
             s.publish()
 
@@ -58,8 +61,8 @@ class SubsystemManager(NamedTuple):
     def dependantSubsytems(self) -> Sequence[Subsystem]:  # dependant subsystems
         return [
             self.ledSignals,
-            self.swerveDrive,
             self.cameras,
+            self.swerveDrive,
             self.time,
             self.turret,
             self.shooter,
