@@ -10,6 +10,7 @@ import math
 import wpilib
 from typing import List
 
+
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
     nominalVoltage = 12.0
@@ -54,7 +55,6 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
         startingRotation = startingPose.rotation()
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
-
 
 
 class AutoStages:
@@ -106,8 +106,8 @@ class FollowTrajectory(AutoStages):
         posError = 0.3  # TODO: change later
         rotationError = 0.3  # TODO: change later
 
-        print(endXPos, endYPos, endRotation, "end pos")
-        print(self.trajectory.getTotalTimeSeconds())
+        # print(endXPos, endYPos, endRotation, "end pos")
+        # print(self.trajectory.getTotalTimeSeconds())
 
         if self.pathTime > self.trajectory.getTotalTimeSeconds():
             self.done = True

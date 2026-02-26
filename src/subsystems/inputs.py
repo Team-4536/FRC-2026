@@ -61,7 +61,9 @@ class Inputs(Subsystem):
             elif self._driveCtrlr.getXButton():
                 robotState.fieldSpeeds = ChassisSpeeds(omega=2)
 
-        robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
+        if not robotState.flyTest:
+            robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
+
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
         robotState.flyTest = self._driveCtrlr.getAButton()
         robotState.flyTestReset = self._driveCtrlr.getBButton()
