@@ -8,6 +8,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from typing import Generator, NamedTuple
 from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 
 
@@ -37,13 +38,15 @@ class SubsystemManager:
     robotState: RobotState
 
     def __post_init__(self) -> None:
+        drive = self.subsystems.swerveDrive
+        initPos = Pose2d()
+
         self.robotState.fieldSpeeds = ChassisSpeeds()
-        swerve = self.subsystems.swerveDrive
         self.robotState.odometry = SwerveDrive4PoseEstimator(
-            swerve.kinematics,
-            swerve.roboAngle,
-            swerve.modulePoses,
-            swerve.initPos,
+            drive.kinematics,
+            drive.roboAngle,
+            drive.modulePoses,
+            initPos,
         )
 
     def __iter__(self) -> Generator[Subsystem]:

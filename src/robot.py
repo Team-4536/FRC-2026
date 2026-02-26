@@ -9,8 +9,10 @@ from wpilib import TimedRobot
 
 
 class Robot(TimedRobot):
+    subsystems: SubsystemManager
+
     def robotInit(self) -> None:
-        self.subsystems: SubsystemManager = SubsystemManager(
+        self.subsystems = SubsystemManager(
             subsystems=Subsystems(
                 ledSignals=LEDSignals(deviceID=0),
                 swerveDrive=SwerveDrive(),

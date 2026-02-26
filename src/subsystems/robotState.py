@@ -16,8 +16,8 @@ class RobotState(NetworkTablesMixin):
 
     def __post_init__(self) -> None:
         super().__init__()
-        self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field", self.myField)
+        self.odomField: Field2d = Field2d()
+        SmartDashboard.putData("OdomField", self.odomField)
 
     def publish(self) -> None:
         for field in fields(self):
@@ -25,7 +25,7 @@ class RobotState(NetworkTablesMixin):
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
-        self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:

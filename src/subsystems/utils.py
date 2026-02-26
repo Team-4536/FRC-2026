@@ -11,16 +11,20 @@ def lerp(x: float, y: float, t: float) -> float:
 
 
 class TimeData(Subsystem):
+    dt: seconds = 0
+    timeSinceInit: seconds = 0
+    timeSincePhaseInit: seconds = 0
+    prevTime: seconds
+    initTime: seconds
+    phaseInitTime: seconds
+
     def __init__(self) -> None:
         super().__init__()
 
         time = getTime()
-        self.dt: seconds = 0
-        self.timeSinceInit: seconds = 0
-        self.timeSincePhaseInit: seconds = 0
-        self.prevTime: seconds = time
-        self.initTime: seconds = time
-        self.phaseInitTime: seconds = time
+        self.prevTime = time
+        self.initTime = time
+        self.phaseInitTime = time
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         time = getTime()
@@ -52,18 +56,23 @@ class TimeData(Subsystem):
 
 
 class Scalar:
+    _deadzone: float
+    _exponent: float
+    _magnitude: float
+    _scale: float
+
     def __init__(
         self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
     ) -> None:
-        self.deadzone = deadzone
+        self._deadzone = deadzone
         self._exponent = exponent
         self._magnitude = magnitude
 
     def scale(self, x: float) -> float:
-        if abs(x) <= self.deadzone:
+        if abs(x) <= self._deadzone:
             return 0
         else:
-            delta = abs(x) - self.deadzone
+            delta = abs(x) - self._deadzone
             sign = self._magnitude * copysign(1, x)
             return float(sign * (delta / self._scale) ** self.exponent)
 
@@ -80,7 +89,7 @@ class Scalar:
         self._scale = 1 - deadzone
 
     def setDeadzone(self, deadzone: float) -> None:
-        self.deadzone = deadzone
+        self._deadzone = deadzone
 
     @property
     def exponent(self) -> float:
@@ -106,19 +115,21 @@ class Scalar:
 
 
 class CircularScalar:
+    _linearScalar: Scalar
+
     def __init__(
         self, deadzone: float = 0.1, exponent: float = 1, magnitude: float = 1
     ) -> None:
-        self.linearScalar = Scalar(deadzone, exponent, magnitude)
+        self._linearScalar = Scalar(deadzone, exponent, magnitude)
 
     def scale(self, *, x: float, y: float) -> Tuple[float, float]:
         if y == 0 and not x == 0:
-            return self.linearScalar(x), y
+            return self._linearScalar(x), y
         elif x == 0 and not y == 0:
-            return x, self.linearScalar(y)
+            return x, self._linearScalar(y)
 
         mag = hypot(x, y)
-        mag = self.linearScalar(mag)
+        mag = self._linearScalar(mag)
 
         angle = atan2(y, x)
 
@@ -132,21 +143,21 @@ class CircularScalar:
 
     @property
     def deadzone(self) -> float:
-        return self.linearScalar.deadzone
+        return self._linearScalar.deadzone
 
     def setDeadzone(self, deadzone: float) -> None:
-        self.linearScalar.setDeadzone(deadzone)
+        self._linearScalar.setDeadzone(deadzone)
 
     @property
     def exponent(self) -> float:
-        return self.linearScalar.deadzone
+        return self._linearScalar.exponent
 
     def setExponent(self, exponent: float) -> None:
-        self.linearScalar.setExponent(exponent)
+        self._linearScalar.setExponent(exponent)
 
     @property
     def magnitude(self) -> float:
-        return self.linearScalar.magnitude
+        return self._linearScalar.magnitude
 
     def setMagnitude(self, magnitude: float) -> None:
-        self.linearScalar.setMagnitude(magnitude)
+        self._linearScalar.setMagnitude(magnitude)

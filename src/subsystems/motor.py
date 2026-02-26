@@ -15,6 +15,9 @@ from wpimath.units import radians, revolutions_per_minute
 
 
 class RevMotor:
+    _ctrlr: SparkMax
+    _encoder: SparkRelativeEncoder
+
     def __init__(self, *, deviceID: int) -> None:
         self._ctrlr = SparkMax(deviceID, SparkMax.MotorType.kBrushless)
         self._encoder = self._ctrlr.getEncoder()

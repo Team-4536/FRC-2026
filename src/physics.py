@@ -6,13 +6,16 @@ from wpimath.kinematics import ChassisSpeeds
 
 
 class PhysicsEngine(PhysicsEngineBase):
+    ctrlr: PhysicsInterface
+    robot: Robot
+
     def __init__(self, controller: PhysicsInterface, robot: Robot) -> None:
         super().__init__(controller)
 
         self.ctrlr = controller
         self.robot = robot
 
-        self.ctrlr.move_robot(Transform2d(x=1, y=3, rotation=Rotation2d(0)))
+        self.ctrlr.move_robot(Transform2d(x=1, y=3, rotation=Rotation2d()))
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         fieldSpeeds = self.robot.subsystems.robotState.fieldSpeeds

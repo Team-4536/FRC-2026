@@ -11,16 +11,24 @@ class Inputs(Subsystem):
     LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 2
     MAX_ABTAINABLE_SPEED: meters_per_second = 5
 
+    _driveCtrlr: XboxController
+    _mechCtrlr: XboxController
+
+    _linearDriveScalar: Scalar
+    _circularDriveScalar: CircularScalar
+    _linearScalar: Scalar
+
     def __init__(self, drivePort: int = 0, mechPort: int = 1) -> None:
         super().__init__()
 
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
-        self._linearScalar: Scalar = Scalar(magnitude=tau)
-        self._circularScalar: CircularScalar = CircularScalar(
+        self._linearDriveScalar = Scalar(magnitude=tau)
+        self._circularDriveScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
+        self._linearScalar = Scalar()
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         return robotState
@@ -41,11 +49,11 @@ class Inputs(Subsystem):
         pass
 
     def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
-        self._circularScalar.setMagnitude(maxSpeed)
-        vx, vy = self._circularScalar(
+        self._circularDriveScalar.setMagnitude(maxSpeed)
+        vx, vy = self._circularDriveScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
 
-        omega = self._linearScalar(-self._driveCtrlr.getRightX())
+        omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)
