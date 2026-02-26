@@ -179,3 +179,26 @@ class OperateIntake(AutoStages):
 
         self.pathDone = True
         return True
+
+
+class OperateTurret(AutoStages):
+    robotState: RobotState
+    startTime: float
+    pathTime: float
+    runTime: float
+    pathDone: bool
+
+    def __init__(self, runTime: float = 0):
+        pass
+
+    def autoInit(self, robotState: RobotState) -> RobotState:
+
+        return robotState
+
+    def run(self, robotState: RobotState) -> RobotState:
+
+        return self.robotState
+
+    def isDone(self) -> bool:
+
+        return True
