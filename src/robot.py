@@ -7,6 +7,7 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.intake import Intake
+from subsystems.cameras import CameraManager
 from wpilib import TimedRobot
 import wpilib
 
