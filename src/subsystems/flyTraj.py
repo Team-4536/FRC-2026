@@ -51,7 +51,7 @@ class FlyTraj(Subsystem):
                     )
                 )
                 # self.manager.setStartPosition(start_position=Translation2d(7, 7))
-                self.manager.setGoalPosition(goal_position=Translation2d(2.5, 4))
+                self.manager.setGoalPosition(goal_position=Translation2d(1, 0))
                 p: PathPlannerPath = self.manager.getCurrentPath(
                     PathConstraints(5.0, 2.5, 0.7, 0.35, 12, True),
                     GoalEndState(0, Rotation2d(0)),
