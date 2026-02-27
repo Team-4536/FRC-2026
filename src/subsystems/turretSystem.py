@@ -689,7 +689,9 @@ class Shooter(Subsystem):
         if not self.fullyReved:
             robotState.dontShoot = True
 
-        self.kickSpeed: RPM = self.kickMotorEncoder.getPosition()
+        self.kickSpeed = self.kickMotorEncoder.getVelocity()
+        self.revingSpeedTop = self.revTopEncoder.getVelocity()
+        self.revingSpeedBottom = self.revBottomEncoder.getVelocity()
 
         self.dependencies = (
             robotState.revSpeed,
@@ -718,8 +720,8 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        # if not self.dontShoot:
-        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+        if not self.dontShoot:
+            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 

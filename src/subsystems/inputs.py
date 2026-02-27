@@ -68,8 +68,11 @@ class Inputs(Subsystem):
         robotState.initialIntake = self._mechCtrlr.getAButton()
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
         robotState.intakeEject = self._mechCtrlr.getBButton()
+        robotState.indexerEject = self._mechCtrlr.getRightTriggerAxis()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
-        robotState.intakePos = self._mechCtrlr.getPOV()
+        robotState.intakePos = (
+            self._mechCtrlr.getPOV()
+        )  # using same input as turret manual setpoint
         robotState.intakeMode = self._mechCtrlr.getLeftBumper()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
 

@@ -47,6 +47,7 @@ class RobotState(NetworkTablesMixin):
     initialIntake: bool
     intakeIndexer: bool
     intakeEject: bool
+    indexerEject: bool
     intakePos: int
     intakeMode: bool
     resetGyro: bool
