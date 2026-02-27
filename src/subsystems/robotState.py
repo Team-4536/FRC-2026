@@ -69,11 +69,15 @@ class RobotState(NetworkTablesMixin):
     dontShoot: bool
     impossibleDynamic: bool
     forceDynamicTurret: bool
+    # commer moss
+    # elon musk
+    # I have a surprise for you
+    # get ready musk
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
 
-    teamSide: TeamSide = TeamSide.SIDE_BLUE
+    teamSide: TeamSide = TeamSide.SIDE_RED
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll = 0.0

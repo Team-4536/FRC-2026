@@ -65,7 +65,7 @@ BALL_RADIUS: inches = 5.91 / 2
 Y_PASS_DIFF_HUB: meters = inchesToMeters(15 + BALL_RADIUS)
 GOAL_HEIGHT: meters = 1  # not entirly correct, distance between goal and turret opening
 Y_PASS_HUB: meters = GOAL_HEIGHT + Y_PASS_DIFF_HUB
-HUB_RADIUS: inches = 24.5 / 2
+HUB_RADIUS: inches = 41.7 / 2
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
 SHUTTLE_Y_PASS_DIFF: meters = 0.3
@@ -94,7 +94,7 @@ RED_LEFT_SHUTTLE_POS: Translation3d = Translation3d(
 )
 RED_SCORE_POS: Translation3d = Translation3d(
     FIELD_LEN - HUB_DIST_X,
-    FIELD_WIDTH - HUB_DIST_Y,
+    HUB_DIST_Y,
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 BLUE_RIGHT_SHUTTLE_POS: Translation3d = Translation3d(
@@ -295,9 +295,9 @@ class Turret(Subsystem):
             robotState.dontShoot = True
             return
 
-        self.compensateSetpoint(
-            time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
-        )
+        # self.compensateSetpoint(
+        #     time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
+        # )
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -505,7 +505,22 @@ class Turret(Subsystem):
         yDiff = pointPos.Y() - turretPose.Y()
         robotState.targetHeight = pointPos.z
 
-        self.yawSetPoint = math.atan(yDiff / xDiff)  # gets the yaw angle
+        quadrant = 1
+        # inverse tan only returns in quadrant 1 and 4
+        if xDiff < 0 and yDiff > 0:
+            quadrant = 2
+
+        elif xDiff < 0 and yDiff < 0:
+            quadrant = 3
+
+        # we don't care if its 4
+
+        # gets the yaw angle
+        self.yawSetPoint = math.atan(yDiff / xDiff)
+
+        # In case inverse tan won't output correct angle
+        if quadrant == 2 or quadrant == 3:
+            self.yawSetPoint += PI
 
         self.yawSetPoint = wrapAngle(self.yawSetPoint)
 
@@ -514,6 +529,8 @@ class Turret(Subsystem):
             - wrapAngle(robotState.odometry.getEstimatedPosition().rotation().radians())
             + ZERO_OFFSET
         )
+
+        self.relativeYawSetpoint = wrapAngle(self.relativeYawSetpoint)
 
         self.limitedYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
 
