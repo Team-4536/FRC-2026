@@ -47,7 +47,7 @@ class FlyTraj(Subsystem):
                 print("stage = 1")
                 self.manager.setStartPosition(start_position=Translation2d(robotState.odometry.getEstimatedPosition().X(), robotState.odometry.getEstimatedPosition().Y()))
                 # self.manager.setStartPosition(start_position=Translation2d(7, 7))
-                self.manager.setGoalPosition(goal_position=Translation2d(2.5,4))
+                self.manager.setGoalPosition(goal_position=Translation2d(1,1))
                 p: PathPlannerPath = self.manager.getCurrentPath(PathConstraints(5.0, 2.5, 0.7, 0.35, 12, True), GoalEndState(0, Rotation2d(0)))
                 
                 if p is not None:
