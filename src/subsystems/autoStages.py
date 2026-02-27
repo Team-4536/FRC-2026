@@ -167,6 +167,7 @@ class OperateIntake(AutoStages):
         if self.pathTime < 0.5:  # TODO: make this not work like this
             self.robotState.intakePosYAxis = -1
         else:
+            self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
             self.robotState.intakeIndexer = True
 
@@ -176,6 +177,10 @@ class OperateIntake(AutoStages):
 
         if self.pathTime < self.runTime or self.pathTime < 0.5:
             return False
+
+        self.robotState.intakePosYAxis = 0
+        self.robotState.initialIntake = False
+        self.robotState.intakeIndexer = False
 
         self.pathDone = True
         return True
