@@ -184,7 +184,7 @@ class RevMotor:
             .pidf(0.08, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
@@ -210,14 +210,14 @@ class RevMotor:
     TURRET_PITCH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(20, 20)
-        .inverted(True)
+        .inverted(False)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
             .pidf(0.035, 0, 0, 0.05)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
+            .positionWrappingEnabled(False)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)

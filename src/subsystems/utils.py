@@ -20,6 +20,9 @@ from wpimath.units import (
 )
 import numpy as np
 
+FIELD_WIDTH: meters = inchesToMeters(317.7)
+FIELD_LEN: meters = inchesToMeters(651.2)
+
 
 def lerp(x: float, y: float, t: float) -> float:
     return x + t * (y - x)

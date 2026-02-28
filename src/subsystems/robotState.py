@@ -49,7 +49,6 @@ class RobotState(NetworkTablesMixin):
     intakePos: int
     intakeMode: bool
     resetGyro: bool
-    pose: Pose2d  # REMOVE
     odometry: SwerveDrive4PoseEstimator
     motorDesiredState: float  # REMOVE
 
@@ -66,11 +65,17 @@ class RobotState(NetworkTablesMixin):
     turretSwitchTarget: bool  # REMOVE
     turretSwitchEnabled: bool  # REMOVE
     turretResetYawEncdoer: bool
+    dontShoot: bool
+    impossibleDynamic: bool
+    forceDynamicTurret: bool
     dontShoot: bool  # REMOVE (local var)
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
 
+    teamSide: TeamSide = TeamSide.SIDE_BLUE
+    turretTarget: TurretTarget = TurretTarget.NONE
+    turretMode: TurretMode = TurretMode.MANUAL
     teamSide: TeamSide = TeamSide.SIDE_RED  # MAYBE REMOVE LATER
     turretTarget: TurretTarget = TurretTarget.NONE  # REMOVE
     turretMode: TurretMode = TurretMode.MANUAL  # REMOVE (local var)
