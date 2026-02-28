@@ -21,15 +21,15 @@ class RobotState(NetworkTablesMixin):
         super().__init__()
 
     def publish(self) -> None:
+        # self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        if self.limelightPose != None:
+            self.myField.setRobotPose(self.limelightPose)
+
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
-        # self.myField.setRobotPose(self.odometry.getEstimatedPosition())
-        if self.limelightPose != None:
-            self.limelightPose
-            self.myField.setRobotPose(self.limelightPose)
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:

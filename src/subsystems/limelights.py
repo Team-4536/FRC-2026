@@ -1,7 +1,6 @@
-import limelight
-import limelightresults
 from wpilib import Field2d
 from ntcore import NetworkTableInstance, NetworkTable
+from wpilib import DriverStation #Talk to cremmet about robotState implementation
 from wpimath.units import degreesToRadians
 from wpimath.geometry import Pose2d, Rotation2d
 from subsystems.subsystem import Subsystem
@@ -9,32 +8,57 @@ from subsystems.robotState import RobotState
 
 
 class llCams(Subsystem):
+    netTbl: NetworkTableInstance = None
+    llTbl: NetworkTable = None
+
+    # botposeWPIBLUE: any = [0,0,0,0,0,0,0,0,0,0,0]
+    # botposeWPIRED: any = [0,0,0,0,0,0,0,0,0,0,0]
+
+    botPoseWPI: any = [0,0,0,0,0,0,0,0,0,0,0]
+    Team: DriverStation.Alliance = DriverStation.Alliance.kBlue
+
+
+    limelight2dPose: Pose2d = None
 
     def __init__(self) -> None:
-        self.llTable = (
-            NetworkTableInstance.getDefault()
-            .getTable("limelight")
-            .getEntry("botpose_wpiblue")
-        )
-        self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.Team = DriverStation.getAlliance() or DriverStation.Alliance.kBlue
 
-    def init(self) -> None:
-        pass
+        self.netTbl = NetworkTableInstance.getDefault()
+        self.llTbl = self.netTbl.getTable("limelight")
+        if self.Team == DriverStation.Alliance.kRed :
+            self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray([0,0,0,0,0,0,0,0,0,0,0])
+        elif self.Team == DriverStation.Alliance.kBlue:
+            self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray([0,0,0,0,0,0,0,0,0,0,0])
+        
+
+    def phaseInit(self, robotState: RobotState) -> None:
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        # botpose_wpiblue 4 is x, 5 is y, 9 is yaw
-        self.llTable
-        robotState.limelightPose = Pose2d(
-            self.llTable.getDoubleArray(4),
-            self.llTable.getDoubleArray(5),
-            Rotation2d(degreesToRadians(self.llTable.getDoubleArray(9))),
-        )
+        # # botpose_wpiblue uses a 11 value array (index 0 = x, 2 = z, 5 = yaw)
+        # self.botposeWPIBLUE = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray([0,0,0,0,0,0,0,0,0,0,0])
+        # self.botposeWPIRED = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray([0,0,0,0,0,0,0,0,0,0,0])
+        if self.Team == DriverStation.Alliance.kRed :
+            self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray([0,0,0,0,0,0,0,0,0,0,0])
+        elif self.Team == DriverStation.Alliance.kBlue:
+            self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray([0,0,0,0,0,0,0,0,0,0,0])
+
+        llx = self.botposeWPI[0]
+        lly = self.botposeWPI[1]
+
+        yaw = degreesToRadians(self.botposeWPI[5])
+        self.limelight2dPose = Pose2d(llx, lly, yaw)
+        robotState.limelightPose = self.limelight2dPose
+        # robotState.limelightPose = self.limelight2dPoseRed
+
         return robotState
 
     def disabled(self) -> None:
         pass
 
-    def publish(self) -> None:
+    def publish(self) -> None:   
+        self.netTbl.getTable("limelightDebug").getEntry("llx").setFloat(self.botposeWPI[0])
+        self.netTbl.getTable("limelightDebug").getEntry("lly").setFloat(self.botposeWPI[1])  
         pass
 
 
