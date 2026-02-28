@@ -170,6 +170,10 @@ class OperateIntake(AutoStages):
             self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
             self.robotState.intakeIndexer = True
+        if self.pathTime < self.runTime or self.pathTime < 0.5:
+            self.robotState.intakePosYAxis = 0
+            self.robotState.initialIntake = False
+            self.robotState.intakeIndexer = False
 
         return self.robotState
 
@@ -177,10 +181,6 @@ class OperateIntake(AutoStages):
 
         if self.pathTime < self.runTime or self.pathTime < 0.5:
             return False
-
-        self.robotState.intakePosYAxis = 0
-        self.robotState.initialIntake = False
-        self.robotState.intakeIndexer = False
 
         self.pathDone = True
         return True
@@ -193,17 +193,34 @@ class OperateTurret(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, runTime: float = 0):
-        pass
+    def __init__(self, unload: bool = False, runTime: float = 0):
+        self.pathDone = False
+        self.runTime = runTime
+        self.unload = unload
 
     def autoInit(self, robotState: RobotState) -> RobotState:
+        self.startTime = wpilib.getTime()
 
         return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
+        self.robotState = robotState
+        self.pathTime = wpilib.getTime() - self.startTime
+
+        self.robotState.forceDynamicTurret = True
+        self.robotState.revSpeed = 1
+        self.robotState.kickShooter = self.unload
+
+        if self.pathTime < self.runTime:
+            self.robotState.revSpeed = 0
+            self.robotState.kickShooter = False
 
         return self.robotState
 
     def isDone(self) -> bool:
 
+        if self.pathTime < self.runTime:
+            return False
+
+        self.pathDone = True
         return True
