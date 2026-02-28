@@ -4,8 +4,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, lerp, Scalar
 from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import radians_per_second as RPS, meters_per_second
-from math import pi as PI
+from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
@@ -54,9 +53,6 @@ class Inputs(Subsystem):
 
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
-
-        robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())
-        robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())
 
         robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
