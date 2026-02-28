@@ -12,7 +12,7 @@ from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import radians_per_second as RPS
 from wpimath.units import feetToMeters, lbsToKilograms
-from wpimath.geometry import Translation2d
+from wpimath.geometry import Translation2d, Pose2d
 import math
 from math import pi as PI
 
@@ -40,6 +40,7 @@ class Inputs(Subsystem):
         self._isTestMode: bool = False
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
+        # robotState.flyTestGoal = Pose2d()
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -66,7 +67,7 @@ class Inputs(Subsystem):
 
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
         robotState.flyTest = self._driveCtrlr.getAButton()
-        robotState.flyTestReset = self._driveCtrlr.getBButton()
+    
 
         robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())
         robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())

@@ -50,8 +50,9 @@ class RobotState(NetworkTablesMixin):
     intakeMode: bool
     resetGyro: bool
     pose: Pose2d
+    flyTestGoal: Pose2d
     odometry: SwerveDrive4PoseEstimator
-    flyTestReset: bool
+   
     motorDesiredState: float
 
     revSpeed: float
@@ -84,6 +85,9 @@ class RobotState(NetworkTablesMixin):
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.myField)
         # SendableChooser().addOption("SIDE_RED")
+        self.trajField: Field2d = Field2d()
+        self.flyTestGoal = Pose2d()
+        SmartDashboard.putData("trajGoal", self.trajField)
         super().__init__()
         self.publish
 
@@ -99,6 +103,7 @@ class RobotState(NetworkTablesMixin):
         self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
         self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
         self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        self.trajField.setRobotPose(self.flyTestGoal)
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )
