@@ -1,21 +1,13 @@
-import math
-from math import cos, pi as PI, sin, tau
+from math import pi, tau
 from navx import AHRS
 from phoenix6.hardware import CANcoder
 from phoenix6.units import rotation
 from rev import SparkBaseConfig
 from subsystems.motor import RevMotor
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from subsystems.robotState import (
-    RobotState,
-    ROBOT_RADIUS,
-)
-from subsystems.utils import (
-    getTangentAngle,
-    getContributedRotation,
-    RPMToMPS,
-)
+from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
+from subsystems.utils import getTangentAngle, getContributedRotation
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
@@ -23,18 +15,7 @@ from wpimath.kinematics import (
     SwerveDrive4Kinematics,
     SwerveModulePosition,
 )
-from wpimath.units import (
-    meters_per_second as MPS,
-    rotationsPerMinuteToRadiansPerSecond,
-    revolutions_per_minute as RPM,
-    meters,
-    radiansToRotations,
-    feetToMeters,
-    radians,
-    rotationsToRadians,
-    inchesToMeters,
-)
-from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.units import inchesToMeters, meters_per_second, meters, rotationsToRadians
 
 
 class SwerveModule(NetworkTablesMixin):
@@ -59,7 +40,7 @@ class SwerveModule(NetworkTablesMixin):
         self._position = Translation2d(0, 0)
 
         wheelDiam: meters = 0.1016
-        self._wheelCircumferance: meters = wheelDiam * PI
+        self._wheelCircumferance: meters = wheelDiam * pi
 
         self._driveEncoder.setPosition(0)
         self.resetAzimuthEncoder()
@@ -73,7 +54,7 @@ class SwerveModule(NetworkTablesMixin):
         )
 
     @property
-    def driveVelocity(self) -> MPS:
+    def driveVelocity(self) -> meters_per_second:
         motorRPS = self._driveEncoder.getVelocity() / 60
         wheelRPS = motorRPS / self._driveGearing
         wheelMPS = wheelRPS * self._wheelCircumferance
@@ -110,7 +91,7 @@ class SwerveModule(NetworkTablesMixin):
     def setPosition(self, x: float, y: float) -> None:
         self._position = Translation2d(x, y)
 
-    def setDrive(self, velocity: MPS) -> None:
+    def setDrive(self, velocity: meters_per_second) -> None:
         wheelRPS = velocity / self._wheelCircumferance
         motorRPS = wheelRPS * self._driveGearing
         motorRPM = motorRPS * 60
@@ -163,7 +144,7 @@ class SwerveModules(NamedTuple):
 
 
 class SwerveDrive(Subsystem):
-    MAX_MODULE_SPEED: MPS = 5.15
+    MAX_MODULE_SPEED: meters_per_second = 5.15
 
     def __init__(self) -> None:
         super().__init__()
@@ -246,35 +227,33 @@ class SwerveDrive(Subsystem):
             vector += self.getDriveVelocity(module)
 
         vector = Translation2d(
-            distance=(vector.distance(Translation2d())) / 4,
-            angle=Rotation2d(),  # TODO TODO TODO EMMET HELP
+            distance=vector.distance(Translation2d()) / 4,
+            angle=Rotation2d(),  # TODO EMMETT HELP
         )
 
         return vector
 
-    def getOmegaVelocity(self) -> MPS:
-
+    def getOmegaVelocity(self) -> meters_per_second:
         sum = 0
         for module in self._modules:
-
-            tanVel = getTangentAngle(module._position)
-
+            tanVel = getTangentAngle(module.position)
             sum += getContributedRotation(
                 tanVel,
-                rotationsToRadians(module._azimuthMotor.getEncoder().getPosition()),
+                rotationsToRadians(module.azimuthRotation),
                 self.getDriveVelocity(module).distance(Translation2d()),
             )
 
         return sum / 4
 
     def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
-        ## (MPS)
-        speed: MPS = module.driveVelocity
-        angle: radians = rotationsToRadians(module.azimuthRotation)
+        speed = module.driveVelocity
+        angle = rotationsToRadians(module.azimuthRotation)
         vector = Translation2d(distance=speed, angle=Rotation2d(angle))
         return vector
 
-    def drive(self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: MPS) -> None:
+    def drive(
+        self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: meters_per_second
+    ) -> None:
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             fieldSpeeds.vx,
             fieldSpeeds.vy,

@@ -13,8 +13,7 @@ from rev import (
     SoftLimitConfig,
     FeedForwardConfig,
 )
-from wpimath.units import radians
-from wpimath.units import revolutions_per_minute as RPM, radiansToRotations
+from wpimath.units import radians, revolutions_per_minute, radiansToRotations
 
 
 class RevMotor:
@@ -34,13 +33,13 @@ class RevMotor:
     def setThrottle(self, throttle: float) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
-    def setVelocity(self, rpm: RPM) -> None:
+    def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,
             ctrl=SparkMax.ControlType.kVelocity,
         )
 
-    def setMaxMotionVelocity(self, rpm) -> None:
+    def setMaxMotionVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm, ctrl=SparkMax.ControlType.kMAXMotionVelocityControl
         )
@@ -184,7 +183,7 @@ class RevMotor:
             .pidf(0.08, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
+            .positionWrappingEnabled(False)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
@@ -210,14 +209,14 @@ class RevMotor:
     TURRET_PITCH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(20, 20)
-        .inverted(False)
+        .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
             .pidf(0.035, 0, 0, 0.05)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)

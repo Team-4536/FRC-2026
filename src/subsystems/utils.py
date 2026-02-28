@@ -1,24 +1,19 @@
-from math import atan2, copysign, cos, hypot, sin
-from subsystems.robotState import RobotState
+from math import atan2, copysign, cos, hypot, pi, sin, tau
+from numpy import sign
+from phoenix6.units import volt as voltage
+from subsystems.robotState import BATTERY_VOLTS, RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple
 from wpilib import getTime
-from dataclasses import dataclass, fields, MISSING
-from math import pi as PI, tau as TAU
-from subsystems.robotState import BATTERY_VOLTS
-import numpy as np
-import math
-from wpimath.geometry import Translation2d, Rotation2d
+from wpimath.geometry import Translation2d
 from wpimath.units import (
-    seconds,
-    metersToFeet,
-    radians,
-    meters,
     inchesToMeters,
-    revolutions_per_minute as RPM,
     meters_per_second as MPS,
+    meters,
+    radians,
+    revolutions_per_minute as RPM,
+    seconds,
 )
-import numpy as np
 
 FIELD_WIDTH: meters = inchesToMeters(317.7)
 FIELD_LEN: meters = inchesToMeters(651.2)
@@ -172,14 +167,13 @@ class CircularScalar:
 
 def getTangentAngle(posFromCenter: Translation2d) -> radians:
     # TODO idk if this works
-    tangentAngle: radians = atan2(posFromCenter.y, posFromCenter.x) + PI / 2
+    tangentAngle: radians = atan2(posFromCenter.y, posFromCenter.x) + pi / 2
 
     return tangentAngle
 
 
 def getContributedRotation(tangentAngle: radians, angle: radians, speed: MPS) -> MPS:
-
-    contributedVector: float = math.cos(tangentAngle - angle)
+    contributedVector: float = cos(tangentAngle - angle)
 
     return speed * contributedVector
 
@@ -192,26 +186,21 @@ def MPSToRPM(speed: MPS, circ: meters) -> RPM:
     return speed / circ * 60
 
 
-def scaleTranslation2D(translation: Translation2d, scalar) -> Translation2d:
-
+def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
     angle = translation.angle().radians()
     hyp = translation.distance(Translation2d())
-    xScale = hyp * math.cos(angle)
-    yScale = hyp * math.sin(angle)
+    xScale = hyp * cos(angle)
+    yScale = hyp * sin(angle)
 
     return Translation2d(xScale, yScale)
 
 
 def wrapAngle(angle: radians) -> radians:
-
-    # mod only returns positive like a bum
     if angle == 0:
         return 0
 
-    wrappedAngle: radians = angle % (TAU * np.sign(angle))
-    return wrappedAngle
+    return angle % (tau * sign(angle))
 
 
-def RPMToVolts(rpm: RPM, maxRPM) -> float:
-
+def RPMToVolts(rpm: RPM, maxRPM: RPM) -> voltage:
     return rpm / (maxRPM / BATTERY_VOLTS)

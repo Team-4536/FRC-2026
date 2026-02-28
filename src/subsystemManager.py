@@ -1,11 +1,11 @@
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
-from subsystems.turretSystem import Turret, Shooter
 from subsystems.intake import Intake
 from subsystems.LEDSignals import LEDSignals
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
+from subsystems.turretSystem import Turret, Shooter
 from subsystems.utils import TimeData
 from typing import NamedTuple, Sequence
 from wpimath.estimator import SwerveDrive4PoseEstimator
@@ -15,7 +15,7 @@ robotState: RobotState = None  # type: ignore
 
 
 class SubsystemManager(NamedTuple):
-    inputs: Inputs  # NOT A DEPENDANT SUBSYSTEM
+    inputs: Inputs
     ledSignals: LEDSignals
     swerveDrive: SwerveDrive
     time: TimeData

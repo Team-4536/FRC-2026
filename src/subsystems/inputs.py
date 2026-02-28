@@ -17,8 +17,6 @@ class Inputs(Subsystem):
         mechPort: int = 1,
     ) -> None:
         super().__init__()
-        # self.turretSpeed: float = 0.0
-
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
@@ -34,33 +32,25 @@ class Inputs(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # Drive Controls
-
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
             min(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
         )
-
-        if self._driveCtrlr.getBackButtonPressed():
-            self._isTestMode = not self._isTestMode
-
-        if self._isTestMode:
-            robotState.fieldSpeeds = ChassisSpeeds()
-            if self._driveCtrlr.getBButton():
-                robotState.fieldSpeeds = ChassisSpeeds(vx=5)
-            elif self._driveCtrlr.getXButton():
-                robotState.fieldSpeeds = ChassisSpeeds(omega=2)
-
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
+        # Misc Controls
         robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
 
+        # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
         robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
+
+        # Intake Controls
         robotState.initialIntake = self._mechCtrlr.getAButton()
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
         robotState.intakeEject = self._mechCtrlr.getBButton()
