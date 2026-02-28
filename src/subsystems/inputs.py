@@ -72,6 +72,8 @@ class Inputs(Subsystem):
         robotState.intakePos = self._mechCtrlr.getPOV()
         robotState.intakeMode = self._mechCtrlr.getLeftBumper()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
+        robotState.turretShuttle = self._mechCtrlr.getLeftY()
+        robotState.turretShuttleOff = self._mechCtrlr.getLeftX()
 
         return robotState
 

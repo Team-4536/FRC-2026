@@ -1,7 +1,7 @@
 from dataclasses import dataclass, fields, MISSING
 from math import pi as PI, tau as TAU
 import numpy as np
-import math
+
 from enum import Enum
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpilib import Field2d, SmartDashboard, SendableChooser
@@ -17,6 +17,7 @@ from wpimath.units import (
     inchesToMeters,
 )
 from typing import Any, Self
+from wpilib import DriverStation
 
 ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 BATTERY_VOLTS: float = 12
@@ -60,6 +61,8 @@ class RobotState(NetworkTablesMixin):
     targetHeight: meters
 
     turretSwitchMode: bool
+    turretShuttle: float
+    turretShuttleOff: float
     turretManualSetpoint: float
     fullyreved: bool
     targetLocked: bool
@@ -73,14 +76,18 @@ class RobotState(NetworkTablesMixin):
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
+    alliance = DriverStation.getAlliance()
 
     teamSide: TeamSide = TeamSide.SIDE_RED
+    if alliance == DriverStation.Alliance.kBlue:
+        teamSide = TeamSide.SIDE_BLUE
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll = 0.0
     intakePosYAxis = 0.0
 
     def __post_init__(self) -> None:
+
         self.myField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.myField)
         # SendableChooser().addOption("SIDE_RED")

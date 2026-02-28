@@ -81,15 +81,15 @@ HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15)
 
 SHUTTLE_DIST_X: meters = 3
-RIGHT_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
-LEFT_SHUTTLE_DIST_Y: meters = 3
+RIGHT_SHUTTLE_DIST_Y: meters = 3
+LEFT_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
 
 # TODO find feild positions for each
 # x and y should be the same as what the robot thinks those are, z is height (in meters)
-RED_RIGHT_SHUTTLE_POS: Translation3d = Translation3d(
+RED_TOP_SHUTTLE_POS: Translation3d = Translation3d(
     FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - RIGHT_SHUTTLE_DIST_Y, 0
 )
-RED_LEFT_SHUTTLE_POS: Translation3d = Translation3d(
+RED_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
     FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - LEFT_SHUTTLE_DIST_Y, 0
 )
 RED_SCORE_POS: Translation3d = Translation3d(
@@ -97,10 +97,10 @@ RED_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_Y,
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
-BLUE_RIGHT_SHUTTLE_POS: Translation3d = Translation3d(
+BLUE_TOP_SHUTTLE_POS: Translation3d = Translation3d(
     SHUTTLE_DIST_X, RIGHT_SHUTTLE_DIST_Y, 0
 )
-BLUE_LEFT_SHUTTLE_POS: Translation3d = Translation3d(
+BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
     SHUTTLE_DIST_X, LEFT_SHUTTLE_DIST_Y, 0
 )
 BLUE_SCORE_POS: Translation3d = Translation3d(
