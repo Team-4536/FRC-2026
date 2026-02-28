@@ -31,8 +31,8 @@ class TeamSide(Enum):
 class TurretTarget(Enum):
     NONE = 0
     HUB = 1
-    SHUTTLE_RIGHT = 2
-    SHUTTLE_LEFT = 3
+    SHUTTLE_TOP = 2
+    SHUTTLE_BOTTOM = 3
 
 
 class TurretMode(Enum):

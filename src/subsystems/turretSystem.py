@@ -407,16 +407,23 @@ class Turret(Subsystem):
 
         target: TurretTarget = self.target
 
-        if rs.turretSwitchTarget:
-            if not (
-                self.target == TurretTarget.HUB
-            ):  # TODO it is a button rn but change to determine side of feild
-                target = TurretTarget.HUB
+        # if rs.turretSwitchTarget:
+        #     if not (
+        #         self.target == TurretTarget.HUB
+        #     ):  # TODO it is a button rn but change to determine side of feild
+        #         target = TurretTarget.HUB
 
-        if not (target == TurretTarget.HUB):
-            pass  # TODO determine side of field
+        # if not (target == TurretTarget.HUB):
+        #     pass  # TODO determine side of field
 
-        # TODO check if path will interfere with thing then
+        # # TODO check if path will interfere with thing then
+        if rs.turretShuttle > 0.8:
+
+            target = TurretTarget.SHUTTLE_TOP
+        if rs.turretShuttle < -0.8:
+            target = TurretTarget.SHUTTLE_BOTTOM
+        if abs(rs.turretShuttleOff) < 0.5:
+            target = TurretTarget.HUB
 
         return target
 
@@ -429,11 +436,11 @@ class Turret(Subsystem):
                 case TurretTarget.HUB:
                     return BLUE_SCORE_POS
 
-                case TurretTarget.SHUTTLE_RIGHT:
-                    return BLUE_RIGHT_SHUTTLE_POS
+                case TurretTarget.SHUTTLE_TOP:
+                    return BLUE_TOP_SHUTTLE_POS
 
-                case TurretTarget.SHUTTLE_LEFT:
-                    return BLUE_LEFT_SHUTTLE_POS
+                case TurretTarget.SHUTTLE_BOTTOM:
+                    return BLUE_BOTTOM_SHUTTLE_POS
 
                 case _:
                     return pos
@@ -442,11 +449,11 @@ class Turret(Subsystem):
                 case TurretTarget.HUB:
                     return RED_SCORE_POS
 
-                case TurretTarget.SHUTTLE_RIGHT:
-                    return RED_RIGHT_SHUTTLE_POS
+                case TurretTarget.SHUTTLE_TOP:
+                    return RED_TOP_SHUTTLE_POS
 
-                case TurretTarget.SHUTTLE_LEFT:
-                    return RED_LEFT_SHUTTLE_POS
+                case TurretTarget.SHUTTLE_BOTTOM:
+                    return RED_BOTTOM_SHUTTLE_POS
 
                 case _:
                     return pos
