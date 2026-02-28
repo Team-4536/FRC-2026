@@ -90,13 +90,6 @@ class photonCameraClass(NetworkTablesMixin):
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
                     self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
-
-                    # self.publishFloat("robotXodom", self.robotX.real)
-                    # self.publishFloat("robotYodom", self.robotY.real)
-                    # self.publishFloat("robotZodom", self.robotAngle.real)
-                    self.table.putNumber("camOdomX", self.robotX)
-                    self.table.putNumber("camOdomY", self.robotY)
-                    self.table.putNumber("camOdomR", self.robotAngle)
                 elif (
                     len(self.target) > 1
                     and type(self.camPoseEst.estimateCoprocMultiTagPose(self.result))
@@ -122,14 +115,6 @@ class photonCameraClass(NetworkTablesMixin):
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
                     self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
-
-                    # self.publishFloat("robotXodom", self.robotX.real)
-                    # self.publishFloat("robotYodom", self.robotY.real)
-                    # self.publishFloat("robotZodom", self.robotAngle.real)
-                    self.table.putNumber("camOdomX", self.robotX)
-                    self.table.putNumber("camOdomY", self.robotY)
-                    self.table.putNumber("camOdomR", self.robotAngle)
-
             else:
                 pass
         else:
@@ -193,7 +178,6 @@ class CameraManager(Subsystem):
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraRight.camEstPose2d, getTime()
             )
-        self.publish()
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 

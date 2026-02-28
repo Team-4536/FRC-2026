@@ -183,8 +183,8 @@ class Turret(Subsystem):
         self.compensateFail = False
         self.dynamicFail = False
 
-        self.publishFloat("X scale", 1)
-        self.publishFloat("Y scale", 1)
+        self.publishFloat("x_scale", VELOCITY_SCALAR.x)
+        self.publishFloat("y_scale", VELOCITY_SCALAR.y)
 
         self.lastTime: seconds = getTime()
 
@@ -558,9 +558,9 @@ class Turret(Subsystem):
                 distance=velocity, angle=Rotation2d(self.pitchSetpoint)
             )
         )
-        xScaleIn = self.getFloat("X scale", default=1)
-        yScaleIn = self.getFloat("Y scale", default=1)
-        temp = Translation2d(temp.x * VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
+        xScaleIn = self.getFloat("x_scale", default=1.0)
+        yScaleIn = self.getFloat("y_scale", default=1.0)
+        temp = Translation2d(temp.x * xScaleIn, temp.y * yScaleIn)
 
         self.pitchAngle = temp.angle().radians()
 
