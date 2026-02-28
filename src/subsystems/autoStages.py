@@ -67,6 +67,9 @@ class AutoStages:
     def run(self, robotState: RobotState) -> RobotState:
         return robotState
 
+    def end(self, robotState: RobotState) -> RobotState:
+        return robotState
+
     def isDone(self) -> bool:
         return False
 
@@ -108,6 +111,9 @@ class FollowTrajectory(AutoStages):
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
         return self.robotState
+
+    def end(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def isDone(self) -> bool:
         if self.robotState.pose == None:
@@ -170,10 +176,13 @@ class OperateIntake(AutoStages):
             self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
             self.robotState.intakeIndexer = True
-        if self.pathTime < self.runTime or self.pathTime < 0.5:
-            self.robotState.intakePosYAxis = 0
-            self.robotState.initialIntake = False
-            self.robotState.intakeIndexer = False
+
+        return self.robotState
+
+    def end(self, robotState: RobotState) -> RobotState:
+        robotState.intakePosYAxis = 0
+        robotState.initialIntake = False
+        robotState.intakeIndexer = False
 
         return self.robotState
 
@@ -211,9 +220,11 @@ class OperateTurret(AutoStages):
         self.robotState.revSpeed = 1
         self.robotState.kickShooter = self.unload
 
-        if self.pathTime < self.runTime:
-            self.robotState.revSpeed = 0
-            self.robotState.kickShooter = False
+        return self.robotState
+
+    def end(self, robotState: RobotState) -> RobotState:
+        self.robotState.revSpeed = 0
+        self.robotState.kickShooter = False
 
         return self.robotState
 

@@ -66,7 +66,7 @@ class SubsystemManager(NamedTuple):
             self.ledSignals,
             self.swerveDrive,
             self.time,
-            self.turret,
+            # self.turret, TODO: Turn me back on
             self.shooter,
             self.intake,
         ]

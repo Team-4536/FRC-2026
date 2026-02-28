@@ -27,6 +27,9 @@ class AutoSubsystem(Subsystem):
     # Declare Variables
     autoRoutineChooser: wpilib.SendableChooser = wpilib.SendableChooser()
     autoSideChooser: wpilib.SendableChooser = wpilib.SendableChooser()
+    routineFinished: bool = False
+    routineKeys: list = list()
+    currentPath: int = 0
 
     def __init__(self):
         super().__init__()
@@ -75,8 +78,10 @@ class AutoSubsystem(Subsystem):
 
         if not self.routineFinished:
             for path in self.routine[self.routineKeys[self.currentPath]]:
-                path.run(robotState)
+                robotState = path.run(robotState)
             if self.routine[self.routineKeys[self.currentPath]][0].isDone():
+                for path in self.routine[self.routineKeys[self.currentPath]]:
+                    robotState = path.end(robotState)
                 self.currentPath += 1
                 self.routineFinished = self.currentPath >= len(self.routineKeys)
                 if not self.routineFinished:
@@ -93,7 +98,16 @@ class AutoSubsystem(Subsystem):
         pass
 
     def publish(self) -> None:
-        pass
+        wpilib.SmartDashboard.putString(
+            "auto routine", self.autoRoutineChooser.getSelected().value
+        )
+        if self.routineKeys and not self.routineFinished:
+            wpilib.SmartDashboard.putString(
+                "current path", self.routineKeys[self.currentPath]
+            )
+        else:
+            wpilib.SmartDashboard.putString("current path", "empty/done")
+        wpilib.SmartDashboard.putString("auto side", self.autoSideChooser.getSelected())
 
 
 def routineChooser(
