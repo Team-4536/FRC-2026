@@ -12,10 +12,11 @@ import wpilib
 
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
-    DRIVE_FORWARD_TEST = "Drive Forward Test"
     TEST_INTAKE = "Test Intake"
     DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
     WONKY = "Wonky"
+    FORWARD = "Forward"
+    FORWARD_AND_INTAKE = "Forward And Intake"
 
 
 class AutoSubsystem(Subsystem):
@@ -98,8 +99,8 @@ def routineChooser(selectedRoutine: AutoRoutines, isFlipped: bool):
     match selectedRoutine:
         case AutoRoutines.DO_NOTHING:
             pass
-        case AutoRoutines.DRIVE_FORWARD_TEST:
-            routine["Drive Forward Test"] = FollowTrajectory(
+        case AutoRoutines.FORWARD:
+            routine["Forward"] = FollowTrajectory(
                 "Drive Forward Test",
                 isFlipped,
             )
@@ -123,5 +124,11 @@ def routineChooser(selectedRoutine: AutoRoutines, isFlipped: bool):
                 "Wonky 2",
                 isFlipped,
             )
+        case AutoRoutines.FORWARD_AND_INTAKE:
+            routine["Forward"] = FollowTrajectory(
+                "Drive Forward Test",
+                isFlipped,
+            )
+            OperateIntake(5)
 
     return routine
