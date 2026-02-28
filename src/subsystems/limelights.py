@@ -57,7 +57,7 @@ class llCams(Subsystem):
         yaw = degreesToRadians(self.botposeWPI[5])  # sets yaw (from degrees to radians)
         self.limelight2dPose = Pose2d(llx, lly, yaw)
         # robotState.limelightPose = self.limelight2dPoseRed
-        if llx > 0 & lly > 0:
+        if llx > 0 and lly > 0:
             robotState.limelightPose = self.limelight2dPose
             robotState.odometry.addVisionMeasurement(
                 robotState.limelightPose, wpilib.getTime()
