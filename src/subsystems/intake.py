@@ -16,7 +16,7 @@ class IntakeState(Enum):
 class Intake(Subsystem):
 
     # defines all motors that are used in the subsystem
-    def __init__(self, FrontMotorID: int, BackMotorID: int, RaiseMotorID:int):
+    def __init__(self, FrontMotorID: int, BackMotorID: int, RaiseMotorID: int):
         super().__init__()
         self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
@@ -105,6 +105,8 @@ class Intake(Subsystem):
             self.manualThrottle = self.motorForwardSetpoint
         else:
             self.manualThrottle = 0
+
+        self.publishFloat("mannual_throttle", self.manualThrottle)
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:

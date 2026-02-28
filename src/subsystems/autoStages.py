@@ -165,7 +165,7 @@ class OperateIntake(AutoStages):
         self.pathTime = wpilib.getTime() - self.startTime
 
         if self.pathTime < 0.5:  # TODO: make this not work like this
-            self.robotState.intakePosYAxis = -1
+            self.robotState.intakePosYAxis = 0.5
         else:
             self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
