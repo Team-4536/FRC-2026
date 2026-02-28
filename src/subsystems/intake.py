@@ -75,11 +75,7 @@ class Intake(Subsystem):
             else:
                 self.raiseThrottle = 0  # dead
 
-            self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-            if robotState.intakeMode:
-                self.AUTOMATIC_MODE = False
-
-        if self.AUTOMATIC_MODE:  # AUTOMATIC MODE
+        elif self.AUTOMATIC_MODE:  # AUTOMATIC MODE
 
             if self.state == IntakeState.UP:
                 self.raiseThrottle = self.raiseStayUpSetpoint
@@ -103,11 +99,10 @@ class Intake(Subsystem):
                 if self.upLimitSwitch:
                     self.state = IntakeState.UP
 
-            self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-            if robotState.intakeMode:
-                self.AUTOMATIC_MODE = False
+        self.intakeMotorRaise.setThrottle(self.raiseThrottle)
+        self.AUTOMATIC_MODE = not robotState.intakeMode
 
-        # initial motor that intakes, should be the only one you press a button for
+        # initial motor that intakes
         if robotState.initialIntake:
             self.manualThrottle = self.motorForwardSetpoint
         else:
