@@ -1,6 +1,6 @@
 import pathplannerlib
 from pathplannerlib import pathfinders, pathfinding, trajectory
-from pathplannerlib.path import PathPlannerTrajectory, PathConstraints, PathPlannerPath
+from pathplannerlib.path import PathPlannerTrajectory, PathConstraints, PathPlannerPath, PathPoint
 from pathplannerlib.pathfinders import LocalADStar, GoalEndState
 from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
 from subsystems.subsystem import Subsystem
@@ -21,6 +21,8 @@ class FlyTraj(Subsystem):
         #self.manager = LocalADStar()
         self.manager = pathfinding.Pathfinding()
         self.finder = pathfinders.LocalADStar()
+
+        self.wayPointsList = []
         #self.publishFloat("test",1.0)
         
         
@@ -45,7 +47,7 @@ class FlyTraj(Subsystem):
 
             # self.publishBoolean("A button works", True, "telemetry")
 
-            # if self.manager.isNewPathAvailable():
+            if self.manager.isNewPathAvailable():
                 print("stage = 1")
                 self.manager.setStartPosition(start_position=Translation2d(robotState.odometry.getEstimatedPosition().X(), robotState.odometry.getEstimatedPosition().Y()))
                 # self.manager.setStartPosition(start_position=Translation2d(7, 7))
@@ -54,7 +56,14 @@ class FlyTraj(Subsystem):
                 
                 if self.p is not None:
                     self.state = 2
-                    print("path type not none")
+                    self.wayPointsList = self.p.getAllPathPoints()
+                    listy = []
+                    for point in self.wayPointsList:
+                        listy.append(point.position)
+    
+                    with open("C:\Repos\FRC-2026\src\subsystems\wayPoints.txt","a", encoding="utf-8") as f:
+                        f.write(str(listy)+"\n")
+                    print("path type not none" )
                 
         elif robotState.flyTest and self.state == 2:   
                 # print("**&&**", type(p))
