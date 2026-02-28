@@ -12,7 +12,6 @@ from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import revolutions_per_minute as RPM
 from wpimath.units import (
-    metersToFeet,
     radians,
     meters,
     inchesToMeters,
@@ -50,26 +49,26 @@ class RobotState(NetworkTablesMixin):
     intakePos: int
     intakeMode: bool
     resetGyro: bool
-
     odometry: SwerveDrive4PoseEstimator
-    motorDesiredState: float
+    motorDesiredState: float  # REMOVE
 
     revSpeed: float
     kickShooter: bool
     optimalTurretAngle: radians
-    targetDistance: meters
-    targetHeight: meters
+    targetDistance: meters  # REMOVE (local var)
+    targetHeight: meters  # REMOVE (local var)
 
-    turretSwitchMode: bool
+    turretSwitchMode: bool  # REMOVE
     turretManualSetpoint: float
-    fullyreved: bool
-    targetLocked: bool
-    turretSwitchTarget: bool
-    turretSwitchEnabled: bool
+    fullyreved: bool  # REMOVE
+    targetLocked: bool  # REMOVE
+    turretSwitchTarget: bool  # REMOVE
+    turretSwitchEnabled: bool  # REMOVE
     turretResetYawEncdoer: bool
     dontShoot: bool
     impossibleDynamic: bool
     forceDynamicTurret: bool
+    dontShoot: bool  # REMOVE (local var)
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
@@ -77,12 +76,15 @@ class RobotState(NetworkTablesMixin):
     teamSide: TeamSide = TeamSide.SIDE_BLUE
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
+    teamSide: TeamSide = TeamSide.SIDE_RED  # MAYBE REMOVE LATER
+    turretTarget: TurretTarget = TurretTarget.NONE  # REMOVE
+    turretMode: TurretMode = TurretMode.MANUAL  # REMOVE (local var)
     ejectAll = 0.0
     intakePosYAxis = 0.0
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field2", self.myField)
+        SmartDashboard.putData("odomField", self.myField)
         # SendableChooser().addOption("SIDE_RED")
         super().__init__()
         self.publish
