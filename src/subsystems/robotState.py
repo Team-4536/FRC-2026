@@ -12,7 +12,7 @@ class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     resetGyro: bool
     pose: Pose2d
-    limelightPose: Pose2d
+    limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
 
     def __post_init__(self) -> None:
@@ -21,15 +21,15 @@ class RobotState(NetworkTablesMixin):
         super().__init__()
 
     def publish(self) -> None:
-        # self.myField.setRobotPose(self.odometry.getEstimatedPosition())
         if self.limelightPose != None:
-            self.myField.setRobotPose(self.limelightPose)
+            self.myField.setRobotPose(
+                self.limelightPose
+            )  # Switched field location form fields
 
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
             self.publishGeneric(name, value)
-
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
