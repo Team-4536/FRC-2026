@@ -1,5 +1,4 @@
 from subsystems.motor import RevMotor
-from typing import Any, Tuple
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import (
     RobotState,
@@ -17,12 +16,19 @@ from subsystems.utils import (
     FIELD_LEN,
     FIELD_WIDTH,
 )
-from rev import SparkRelativeEncoder
+from rev import (
+    SparkRelativeEncoder,
+    SoftLimitConfig,
+)
+from subsystems.inputs import Inputs
 from subsystems.robotState import RobotState
+from phoenix6.hardware import CANcoder
 from wpimath.units import (
     rotationsToRadians,
     degreesToRadians,
+    rotationsToDegrees,
     inchesToMeters,
+    radiansToRotations,
     revolutions_per_minute as RPM,
     radians,
     meters,
@@ -31,9 +37,14 @@ from wpimath.units import (
     seconds,
 )
 import math
-from math import tau as TAU, pi as PI
+from math import tau as TAU, pi as PI, atan2
+import numpy as np
 from wpimath.geometry import Pose2d, Translation3d, Translation2d, Rotation2d
-from wpilib import DigitalInput, getTime
+from wpilib import getTime
+from ntcore import NetworkTableInstance
+from wpilib import DigitalInput
+from enum import Enum
+from typing import Optional
 
 MAX_PITCH: radians = degreesToRadians(90)  # in relation to feild
 MIN_PITCH: radians = degreesToRadians(40)
@@ -161,8 +172,8 @@ class Turret(Subsystem):
         self.target: TurretTarget = TurretTarget.NONE
         self.mode: TurretMode = TurretMode.MANUAL
 
-        self.turretManDependencies: Tuple[Any, ...] = (None,)
-        self.turretGenDepedencies: Tuple[Any, ...] = (None,)
+        self.turretManDependencies: tuple = (None,)
+        self.turretGenDepedencies: tuple = (None,)
 
         # these velocity values are only used when in manual mode
         self.yawVelocity: RPM = 0
@@ -191,9 +202,9 @@ class Turret(Subsystem):
         self.target: TurretTarget = TurretTarget.HUB
         self.mode: TurretMode = TurretMode.DYNAMIC
 
-        self.turretAutoDepedencies: Tuple[Any, ...] = (None,)
-        self.turretManDependencies = (None,)
-        self.turretGenDepedencies = (None,)
+        self.turretAutoDepedencies: tuple = (None,)
+        self.turretManDependencies: tuple = (None,)
+        self.turretGenDepedencies: tuple = (None,)
 
         # these velocity values are only used when in manual mode
         self.yawVelocity: RPM = 0
@@ -224,8 +235,8 @@ class Turret(Subsystem):
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
 
-        self.turretManDependencies = (robotState.turretManualSetpoint,)
-        self.turretGenDepedencies = (robotState.odometry,)
+        self.turretManDependencies: tuple = (robotState.turretManualSetpoint,)
+        self.turretGenDepedencies: tuple = (robotState.odometry,)
 
         if not self.homeSet:
             self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
@@ -470,7 +481,8 @@ class Turret(Subsystem):
         # add in the opposite direction
         self.targetPos += Translation3d(compensateVector.rotateBy(Rotation2d(PI)))
 
-    def dontOverdoItYaw(self, angle: radians) -> radians:
+    def dontOverdoItYaw(self, angle) -> radians:
+
         if angle > MAX_ROTATION + (TURRET_GAP / 2) or (
             angle < 0 and angle > 0 - TURRET_GAP / 2
         ):
@@ -482,6 +494,7 @@ class Turret(Subsystem):
         return angle
 
     def dontOverDoItPitch(self, angle: radians) -> radians:
+
         if angle > MAX_PITCH:
             return MAX_PITCH
 
@@ -493,6 +506,7 @@ class Turret(Subsystem):
     def targetPoint(
         self, pointPos: Translation3d, turretPose: Pose2d, robotState: RobotState
     ) -> None:  # make velocity later
+
         xDiff = pointPos.X() - turretPose.X()
         yDiff = pointPos.Y() - turretPose.Y()
         robotState.targetHeight = pointPos.z
@@ -544,8 +558,8 @@ class Turret(Subsystem):
                 distance=velocity, angle=Rotation2d(self.pitchSetpoint)
             )
         )
-        xScaleIn = self.getFloat("X scale", default=1)  # pyright: ignore
-        yScaleIn = self.getFloat("Y scale", default=1)  # pyright: ignore
+        xScaleIn = self.getFloat("X scale", default=1)
+        yScaleIn = self.getFloat("Y scale", default=1)
         temp = Translation2d(temp.x * VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
 
         self.pitchAngle = temp.angle().radians()
@@ -619,11 +633,11 @@ class Turret(Subsystem):
         self.publishBoolean("Target Locked", self.targetLocked)
         self.publishBoolean(
             "Yaw forward soft limit",
-            self.yawMotor._ctrlr.getForwardSoftLimit().isReached(),  # pyright: ignore
+            self.yawMotor._ctrlr.getForwardSoftLimit().isReached(),
         )
         self.publishBoolean(
             "Yaw reverse soft limit",
-            self.yawMotor._ctrlr.getReverseSoftLimit().isReached(),  # pyright: ignore
+            self.yawMotor._ctrlr.getReverseSoftLimit().isReached(),
         )
         self.publishFloat(
             "(Radians) Yaw Motor Actual Setpoint",
@@ -682,12 +696,12 @@ class TurretOdometry:
 
 class Shooter(Subsystem):
 
-    def __init__(self, kickerID: int, revTopID: int, revBottomID: int):
+    def __init__(self, kickerId, revTopId, revBottomId):
         super().__init__()
 
-        self.kickMotor = RevMotor(deviceID=kickerID)
-        self.revingMotorTop: RevMotor = RevMotor(deviceID=revTopID)
-        self.revingMotorBottom: RevMotor = RevMotor(deviceID=revBottomID)
+        self.kickMotor = RevMotor(deviceID=kickerId)
+        self.revingMotorTop: RevMotor = RevMotor(deviceID=revTopId)
+        self.revingMotorBottom: RevMotor = RevMotor(deviceID=revBottomId)
 
         self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
         self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
@@ -707,7 +721,7 @@ class Shooter(Subsystem):
         self.fullyReved: bool = False
         self.badLimitedAngle: bool = False
 
-        self.dependencies: Tuple[Any, ...] = (None,)
+        self.dependencies: tuple = (None,)
 
         self.kickSetPoint = 0
         self.kickShooter: bool = False
@@ -721,7 +735,8 @@ class Shooter(Subsystem):
         self.publishFloat("shooter manual", self.mode.value)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-        self.dependencies: Tuple[Any, ...] = (None,)
+
+        self.dependencies: tuple = (None,)
 
         self.kickSetPoint = 0
         self.kickShooter: bool = False
@@ -731,6 +746,7 @@ class Shooter(Subsystem):
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
+
         self.mode = robotState.turretMode
         self.badLimitedAngle = False
 
@@ -752,7 +768,7 @@ class Shooter(Subsystem):
             return robotState
 
         if self.mode == TurretMode.MANUAL:
-            self.manualUpdate()
+            self.manualUpdate(robotState)
 
         elif self.mode == TurretMode.DYNAMIC:
             self.dynamicUpdate(robotState)
@@ -774,11 +790,13 @@ class Shooter(Subsystem):
 
         return robotState
 
-    def manualUpdate(self):
+    def manualUpdate(self, robotState: RobotState):
+
         self.revingSetpoint = MANUAL_REV_SPEED
 
     def dynamicUpdate(self, robotState: RobotState) -> None:
-        dependencies: Tuple[Any, ...] = (
+
+        depend: tuple = (
             robotState.optimalTurretAngle,
             robotState.targetDistance,
             robotState.targetHeight,
@@ -786,7 +804,7 @@ class Shooter(Subsystem):
 
         self.badLimitedAngle = False
 
-        if not checkDependencies(dependencies):
+        if not checkDependencies(depend):
             return
 
         if robotState.impossibleDynamic:
@@ -851,6 +869,7 @@ class Shooter(Subsystem):
 
 
 def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radians:
+
     numerator = yPass * d**2 - xPass**2 * h
     denom = d * (xPass * d - xPass**2)
 
@@ -858,6 +877,7 @@ def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radian
 
 
 def _calculateVelocity(turretAngle: radians, distance: meters, height: meters) -> MPS:
+
     numer = GRAVITY * (distance**2)
     denom = (
         2 * (math.cos(turretAngle) ** 2) * (distance * math.tan(turretAngle) - height)
@@ -870,7 +890,8 @@ def calculateTime(velocity: MPS, distance: meters):
     return distance / velocity
 
 
-def checkDependencies(depends: Tuple[Any, ...]) -> bool:
+def checkDependencies(depends: tuple) -> bool:
+
     for var in depends:
         if var is None:
             return False

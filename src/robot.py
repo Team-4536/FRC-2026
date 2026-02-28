@@ -18,7 +18,7 @@ class Robot(TimedRobot):
             swerveDrive=SwerveDrive(),
             time=TimeData(),
             turret=Turret(yawMotorID=14, pitchMotorID=13),
-            shooter=Shooter(kickerID=18, revTopID=12, revBottomID=11),
+            shooter=Shooter(kickerId=18, revTopId=12, revBottomId=11),
             intake=Intake(10, 30, 9),
         )
 
