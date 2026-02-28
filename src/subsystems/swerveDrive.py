@@ -243,7 +243,12 @@ class SwerveDrive(Subsystem):
         vector = Translation2d()
 
         for module in self._modules:
-            vector = vector.__add__(self.getDriveVelocity(module))
+            vector += self.getDriveVelocity(module)
+
+        vector = Translation2d(
+            distance=(vector.distance(Translation2d())) / 4,
+            angle=Rotation2d(),  # TODO TODO TODO EMMET HELP
+        )
 
         return vector
 
