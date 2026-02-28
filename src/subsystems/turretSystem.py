@@ -113,7 +113,7 @@ FLYWHEEL_DIAMETER: inches = 3  # diameter of the wheels build decides to use
 FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 # to account for air drag and imperfect transfer of velocity, x is a power scalar, y is linear
-VELOCITY_SCALAR: Translation2d = Translation2d(1.95, 2)
+VELOCITY_SCALAR: Translation2d = Translation2d(2.05, 2)
 MANUAL_REV_SPEED: RPM = 3500  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 2000
@@ -560,7 +560,7 @@ class Turret(Subsystem):
         )
         xScaleIn = self.getFloat("X scale", default=1)
         yScaleIn = self.getFloat("Y scale", default=1)
-        temp = Translation2d(temp.x * xScaleIn, temp.y * yScaleIn)
+        temp = Translation2d(temp.x * VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
 
         self.pitchAngle = temp.angle().radians()
 
