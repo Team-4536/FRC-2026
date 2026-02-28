@@ -46,7 +46,7 @@ from wpilib import DigitalInput
 from enum import Enum
 from typing import Optional
 
-MAX_PITCH: radians = degreesToRadians(90)  # in relation to up
+MAX_PITCH: radians = degreesToRadians(90)  # in relation to feild
 MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
@@ -113,7 +113,7 @@ FLYWHEEL_DIAMETER: inches = 3  # diameter of the wheels build decides to use
 FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 # to account for air drag and imperfect transfer of velocity, x is a power scalar, y is linear
-VELOCITY_SCALAR: Translation2d = Translation2d(1.04, 0.8)
+VELOCITY_SCALAR: Translation2d = Translation2d(1.95, 2)
 MANUAL_REV_SPEED: RPM = 3500  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 2000
@@ -183,6 +183,9 @@ class Turret(Subsystem):
         self.compensateFail = False
         self.dynamicFail = False
 
+        self.publishFloat("X scale", 1)
+        self.publishFloat("Y scale", 1)
+
         self.lastTime: seconds = getTime()
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
@@ -229,10 +232,6 @@ class Turret(Subsystem):
         else:
             self.mode = self.getMode(robotState)
 
-        if robotState.turretResetYawEncdoer:
-            self.yawEncoder.setPosition(0)
-            self.yawSetPoint = 0
-
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
 
@@ -260,7 +259,8 @@ class Turret(Subsystem):
             self.automaticUpdate(robotState)
 
         elif self.mode == TurretMode.DISABLED:
-            self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
+            pass
+            # self.reset(self.yawLimitSwitch.get() and self.pitchLimitSwitch.get())
 
         robotState.turretMode = self.mode
         return robotState
@@ -300,9 +300,9 @@ class Turret(Subsystem):
             ),
         )
 
-        self.compensateSetpoint(
-            time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
-        )
+        # self.compensateSetpoint(
+        #     time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
+        # )
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -407,15 +407,6 @@ class Turret(Subsystem):
 
         target: TurretTarget = self.target
 
-        if rs.turretSwitchTarget:
-            if not (
-                self.target == TurretTarget.HUB
-            ):  # TODO it is a button rn but change to determine side of feild
-                target = TurretTarget.HUB
-
-        if not (target == TurretTarget.HUB):
-            pass  # TODO determine side of field
-
         # TODO check if path will interfere with thing then
 
         return target
@@ -423,6 +414,7 @@ class Turret(Subsystem):
     def getTargetPos(self, target: TurretTarget, side: TeamSide) -> Translation3d:
 
         pos: Translation3d = self.targetPos
+        self.publishString("TEAM side", side.name)
 
         if side == TeamSide.SIDE_BLUE:
             match target:
@@ -562,12 +554,13 @@ class Turret(Subsystem):
         velocity: MPS = _calculateVelocity(self.pitchSetpoint, d, h)
 
         temp: Translation2d = (
-            Translation2d(  # TODO change all velocities without direction to be spped and this to velocity
+            Translation2d(  # TODO change all velocities without direction to be speed and this to velocity
                 distance=velocity, angle=Rotation2d(self.pitchSetpoint)
             )
         )
-
-        temp = Translation2d(temp.x**VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
+        xScaleIn = self.getFloat("X scale", default=1)
+        yScaleIn = self.getFloat("Y scale", default=1)
+        temp = Translation2d(temp.x * xScaleIn, temp.y * yScaleIn)
 
         self.pitchAngle = temp.angle().radians()
 
@@ -726,6 +719,7 @@ class Shooter(Subsystem):
         self.mode: TurretMode = TurretMode.MANUAL
 
         self.fullyReved: bool = False
+        self.badLimitedAngle: bool = False
 
         self.dependencies: tuple = (None,)
 
@@ -754,6 +748,7 @@ class Shooter(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
 
         self.mode = robotState.turretMode
+        self.badLimitedAngle = False
 
         self.fullyReved = self.getFullyReved()
 
@@ -781,6 +776,7 @@ class Shooter(Subsystem):
         else:
             return robotState
 
+        self.publishFloat("RRRRRAAAAAHAHHH", self.revingSetpoint)
         self.revingSetpoint *= robotState.revSpeed  # multiplied by the trigger value
 
         self.revShooters(self.revingSetpoint)
@@ -791,8 +787,6 @@ class Shooter(Subsystem):
 
         # if not self.dontShoot:
         self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
-
-        self.badLimitedAngle: bool = False
 
         return robotState
 
@@ -818,21 +812,18 @@ class Shooter(Subsystem):
 
         mpsSetpoint: MPS = 0
 
-        try:
-            mpsSetpoint: MPS = _calculateVelocity(
-                robotState.optimalTurretAngle,
-                robotState.targetDistance,
-                robotState.targetHeight,
-            )
-        except:
-            self.badLimitedAngle = True
-            return
+        # try:
+        #     mpsSetpoint: MPS = _calculateVelocity(
+        #         robotState.optimalTurretAngle,
+        #         robotState.targetDistance,
+        #         robotState.targetHeight,
+        #     )
+        # except:
+        #     self.badLimitedAngle = True
+        #     return
 
-        mpsSetpoint *= robotState.turretVelocitySetpoint.distance(Translation2d())
-        mpsSetpoint *= robotState.revSpeed
-        self.revingSetpoint = mpsSetpoint
-        # TODO add a constant scale value to the speed
-        self.revingSetpoint: RPM = MPSToRPM(self.revingSetpoint, FLYWHEEL_CIRCUMFRENCE)
+        mpsSetpoint = robotState.turretVelocitySetpoint.distance(Translation2d())
+        self.revingSetpoint = MPSToRPM(mpsSetpoint, FLYWHEEL_CIRCUMFRENCE)
 
     def revShooters(self, speed: RPM):
         self.revingMotorBottom.setMaxMotionVelocity(speed)
@@ -874,6 +865,7 @@ class Shooter(Subsystem):
         self.publishBoolean("Fully Reved", self.fullyReved)
         self.publishBoolean("kick shooter spinning", self.kickShooter)
         self.publishFloat("kick setpoint", self.kickSetPoint)
+        self.publishBoolean("bad limited angle", self.badLimitedAngle)
 
 
 def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radians:
