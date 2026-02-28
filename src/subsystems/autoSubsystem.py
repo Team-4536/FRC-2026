@@ -129,6 +129,6 @@ def routineChooser(selectedRoutine: AutoRoutines, isFlipped: bool):
                 "Drive Forward Test",
                 isFlipped,
             )
-            OperateIntake(5)
+            routine["intake"] = OperateIntake(5)
 
     return routine
