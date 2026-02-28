@@ -37,9 +37,10 @@ class SubsystemManager(NamedTuple):
         self.inputs.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
-        self.robotState.publish()
-        for s in self:
-            s.publish()
+        # self.robotState.publish()  # TODO: uncomment
+        # for s in self:
+        #     s.publish()
+        pass
 
     def autonomousPeriodic(self) -> None:
         global robotState

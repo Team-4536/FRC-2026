@@ -49,10 +49,9 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
         path = path.flipPath()
 
     startingPose = path.getStartingHolonomicPose()
-    startingRotation = Rotation2d(20)
+    startingRotation = Rotation2d(20)  # TODO: understand
     if startingPose:
         startingRotation = startingPose.rotation()
-        print(startingRotation)
 
     return path.generateTrajectory(ChassisSpeeds(), startingRotation, robotConfig)
 
@@ -106,8 +105,6 @@ class FollowTrajectory(AutoStages):
 
         targetState = self.trajectory.sample(self.pathTime)
 
-        # print(f" pose: {targetState.pose}")
-
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
         return self.robotState
@@ -116,22 +113,16 @@ class FollowTrajectory(AutoStages):
         return robotState
 
     def isDone(self) -> bool:
-        if self.robotState.pose == None:
-            self.robotState.pose = Pose2d()
-
-        # print(self.robotState.pose, "robot pose")
-
-        currXPos = self.robotState.pose.x
-        currYPos = self.robotState.pose.y
-        currRotation = self.robotState.pose.rotation().radians()
+        currXPos = self.robotState.odometry.getEstimatedPosition().x
+        currYPos = self.robotState.odometry.getEstimatedPosition().y
+        currRotation = (
+            self.robotState.odometry.getEstimatedPosition().rotation().radians()
+        )
         endXPos = self.trajectory.getEndState().pose.x
         endYPos = self.trajectory.getEndState().pose.y
         endRotation = self.trajectory.getEndState().pose.rotation().radians()
         posError = 0.02  # TODO: change later
         rotationError = 0.1  # TODO: change later
-
-        # print(endXPos, endYPos, endRotation, "end pos")
-        # print(self.trajectory.getTotalTimeSeconds())
 
         if self.pathTime > self.trajectory.getTotalTimeSeconds():
             self.pathDone = True

@@ -248,7 +248,7 @@ class SwerveDrive(Subsystem):
         self.odomZ = float(
             robotState.odometry.getEstimatedPosition().rotation().degrees()
         )
-        robotState.robotOmegaSpeed = self.getOmegaVelocity()
+        # robotState.robotOmegaSpeed = self.getOmegaVelocity()
         robotState.robotLinearVelocity = self.getLinearVelocity()
 
         return robotState
