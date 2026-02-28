@@ -59,13 +59,14 @@ class RobotState(NetworkTablesMixin):
     dontShoot: bool  # REMOVE (local var)
     impossibleDynamic: bool  # REMOVE (local var)
     forceDynamicTurret: bool  # REMOVE (local var)
-    dontShoot: bool  # REMOVE (local var)
+    turretVelocitySetpoint: Translation2d
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
 
-    teamSide: TeamSide = TeamSide.SIDE_RED  # MAYBE REMOVE LATER
-    turretMode: TurretMode = TurretMode.MANUAL  # REMOVE (local var)
+    teamSide: TeamSide = TeamSide.SIDE_RED
+    turretTarget: TurretTarget = TurretTarget.NONE
+    turretMode: TurretMode = TurretMode.MANUAL
     ejectAll = 0.0
     intakePosYAxis = 0.0
 

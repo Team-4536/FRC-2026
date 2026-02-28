@@ -8,7 +8,7 @@ from math import pi as PI, tau as TAU
 from subsystems.robotState import BATTERY_VOLTS
 import numpy as np
 import math
-from wpimath.geometry import Translation2d
+from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.units import (
     seconds,
     metersToFeet,
@@ -170,21 +170,16 @@ class CircularScalar:
         self.linearScalar.setMagnitude(magnitude)
 
 
-def getTangentalVelocity(posFromCenter: Translation2d, speed: MPS) -> Translation2d:
+def getTangentAngle(posFromCenter: Translation2d) -> radians:
     # TODO idk if this works
-    tangentAngle: radians = math.atan(posFromCenter.y / posFromCenter.x) + PI / 2
+    tangentAngle: radians = atan2(posFromCenter.y, posFromCenter.x) + PI / 2
 
-    tangentVelocity: Translation2d = Translation2d(
-        speed * math.cos(tangentAngle), speed * math.sin(tangentAngle)
-    )
-
-    return tangentVelocity
+    return tangentAngle
 
 
-def getContributedRotation(tangentVel: Translation2d, angle: radians) -> MPS:
-    tangentAngle = tangentVel.angle().radians()
-    speed = tangentVel.distance(Translation2d())
-    contributedVector: radians = math.cos(tangentAngle - angle)
+def getContributedRotation(tangentAngle: radians, angle: radians, speed: MPS) -> MPS:
+
+    contributedVector: float = math.cos(tangentAngle - angle)
 
     return speed * contributedVector
 
