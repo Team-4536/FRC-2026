@@ -34,6 +34,12 @@ class RevMotor:
     def setThrottle(self, throttle: float) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
+    def getLimitSwitch(self, switch: int) -> None:
+        if switch == 0:
+            return self._ctrlr.getReverseLimitSwitch()
+        elif switch == 1:
+            return self._ctrlr.getForwardLimitSwitch()
+
     def setVelocity(self, rpm: RPM) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,

@@ -714,6 +714,12 @@ class Shooter(Subsystem):
 
         self.revingSetpoint *= robotState.revSpeed  # multiplied by the trigger value
 
+        if robotState.ejectAll > 0.3 or robotState.indexerEject:
+            robotState.kickShooter = -1
+
+        if robotState.intakeIndexer:
+            robotState.kickShooter = 1
+
         self.revShooters(self.revingSetpoint)
 
         self.kickSetPoint = KICK_SPEED * int(robotState.kickShooter)

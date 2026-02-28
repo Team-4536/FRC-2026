@@ -21,10 +21,9 @@ class Intake(Subsystem):
         self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
+        self.downLimitSwitch = self.intakeMotorRaise.getLimitSwitch(0)
+        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(1)
 
-        self.state = (
-            IntakeState.UP
-        )  # DO NOT put this in phaseInit. bad things will happen
         self.AUTOMATIC_MODE = False
 
         self.publishFloat("intake_speed (0 to 1)", 0.2)
@@ -46,6 +45,13 @@ class Intake(Subsystem):
         self.raiseThrottle = 0
         self.manualThrottle = 0
         self.automaticThrottle = 0
+
+        if self.downLimitSwitch:
+            self.state = IntakeState.DOWN
+        elif self.upLimitSwitch:
+            self.state = IntakeState.UP
+        else:
+            self.state = IntakeState.OH_NO
 
         return robotState
 
@@ -73,27 +79,30 @@ class Intake(Subsystem):
             if robotState.intakeMode:
                 self.AUTOMATIC_MODE = False
 
-        if (
-            self.AUTOMATIC_MODE
-        ):  # AUTOMATIC MODE. !!!! MAKE SURE INTAKE IS UP !!!! BEFORE ENTERING AUTOMATIC MODE.
+        if self.AUTOMATIC_MODE:  # AUTOMATIC MODE
+
             if self.state == IntakeState.UP:
                 self.raiseThrottle = self.raiseStayUpSetpoint
-                if robotState.intakePos == 0:
+                if robotState.intakePos:
                     self.startTime = wpilib.getTime()
                     self.state = IntakeState.GOING_DOWN
+
             if self.state == IntakeState.GOING_DOWN:
                 if wpilib.getTime() - self.startTime < 0.3:
                     self.raiseThrottle = self.raiseDownSetpoint
                 else:
                     self.raiseThrottle = 0
                     self.state = IntakeState.DOWN
+
             if self.state == IntakeState.DOWN:
-                if robotState.intakePos == 180:
+                if robotState.intakePos:
                     self.state = IntakeState.GOING_UP
+
             if self.state == IntakeState.GOING_UP:
                 self.raiseThrottle = self.raiseUpSetpoint
-                if wpilib.getTime() - self.startTime < 1:
+                if self.upLimitSwitch:
                     self.state = IntakeState.UP
+
             self.intakeMotorRaise.setThrottle(self.raiseThrottle)
             if robotState.intakeMode:
                 self.AUTOMATIC_MODE = False
