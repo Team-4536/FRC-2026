@@ -9,7 +9,7 @@ from subsystems.robotState import (
 )
 from subsystems.utils import (
     RPMToVolts,
-    getTangentalVelocity,
+    getTangentAngle,
     scaleTranslation2D,
     wrapAngle,
     MPSToRPM,
@@ -37,7 +37,7 @@ from wpimath.units import (
     seconds,
 )
 import math
-from math import tau as TAU, pi as PI
+from math import tau as TAU, pi as PI, atan2
 import numpy as np
 from wpimath.geometry import Pose2d, Translation3d, Translation2d, Rotation2d
 from wpilib import getTime
@@ -112,10 +112,8 @@ BLUE_SCORE_POS: Translation3d = Translation3d(
 FLYWHEEL_DIAMETER: inches = 3  # diameter of the wheels build decides to use
 FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
-VELOCITY_SCALAR: Translation2d = Translation2d(
-    1.5, 1
-)  # to account for air drag and imperfect transfer of velocity
-
+# to account for air drag and imperfect transfer of velocity, x is a power scalar, y is linear
+VELOCITY_SCALAR: Translation2d = Translation2d(1.04, 0.8)
 MANUAL_REV_SPEED: RPM = 3500  # TODO change to what emmet wants
 MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
 KICK_SPEED: RPM = 2000
@@ -294,10 +292,17 @@ class Turret(Subsystem):
             robotState.impossibleDynamic = True
             robotState.dontShoot = True
             return
+        self.publishFloatArray(
+            "Robot Linera veloity",
+            (
+                robotState.robotLinearVelocity.distance(Translation2d()),
+                robotState.robotLinearVelocity.angle().radians(),
+            ),
+        )
 
-        # self.compensateSetpoint(
-        #     time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
-        # )
+        self.compensateSetpoint(
+            time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
+        )
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -457,16 +462,25 @@ class Turret(Subsystem):
         return True
 
     def compensateSetpoint(
-        self, time: float, roboLinV: Translation2d, roboOmegaSpeed: MPS
+        self,
+        time: float,
+        roboLinV: Translation2d,
+        roboOmegaSpeed: MPS,
     ):
 
         compensateVector: Translation2d = Translation2d()
 
-        offset: Translation2d = self.odom.robotRelativePos
-        tanVel: Translation2d = getTangentalVelocity(offset, roboOmegaSpeed)
+        offset: Translation2d = self.odom.posFromRobot
+        turretRotSpeed: MPS = roboOmegaSpeed * (TURRET_DIST_FROM_CENTER / ROBOT_RADIUS)
+        tanVel: Translation2d = Translation2d(turretRotSpeed, getTangentAngle(offset))
+
+        self.publishFloatArray(
+            "Tangent velocity",
+            (tanVel.distance(Translation2d()), tanVel.angle().radians()),
+        )
 
         # add the mps values
-        compensateVector += tanVel
+        # compensateVector += tanVel
         compensateVector += roboLinV
 
         # multiply by time to get the distance the ball would move
@@ -553,11 +567,16 @@ class Turret(Subsystem):
             )
         )
 
-        temp = Translation2d(temp.x * VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
+        temp = Translation2d(temp.x**VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
 
         self.pitchAngle = temp.angle().radians()
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
+
+        robotState.turretVelocitySetpoint = Translation2d(
+            distance=temp.distance(Translation2d()),
+            angle=Rotation2d(self.pitchSetpoint),
+        )
 
     def getXPass(self, d: meters) -> meters:
 
@@ -653,7 +672,7 @@ class TurretOdometry:
     def __init__(self):
 
         self.pitch: radians = 0
-        self.robotRelativePos: Translation2d = Translation2d()
+        self.posFromRobot: Translation2d = Translation2d()
         self.pose: Pose2d = Pose2d()
 
     def updateWithEncoder(
@@ -672,11 +691,11 @@ class TurretOdometry:
         wrappedRoboYaw = wrapAngle(roboPose.rotation().radians())
         wrappedYaw = wrapAngle(yawAngle)
 
-        robotRelativeX = math.cos(wrappedRoboYaw + PI / 2) * TURRET_DIST_FROM_CENTER
-        robotRelativeY = math.sin(wrappedRoboYaw + PI / 2) * TURRET_DIST_FROM_CENTER
+        self.posFromRobot = Translation2d(
+            distance=TURRET_DIST_FROM_CENTER, angle=Rotation2d(wrappedRoboYaw)
+        )
 
-        self.robotRelativePos = Translation2d(robotRelativeX, robotRelativeY)
-        feildPos: Translation2d = roboPose.translation().__add__(self.robotRelativePos)
+        feildPos: Translation2d = roboPose.translation().__add__(self.posFromRobot)
 
         self.pose = Pose2d(feildPos, Rotation2d(wrappedRoboYaw - wrappedYaw))
         self.pitch = pitchAngle
@@ -809,7 +828,7 @@ class Shooter(Subsystem):
             self.badLimitedAngle = True
             return
 
-        mpsSetpoint *= VELOCITY_SCALAR.distance(Translation2d())
+        mpsSetpoint *= robotState.turretVelocitySetpoint.distance(Translation2d())
         mpsSetpoint *= robotState.revSpeed
         self.revingSetpoint = mpsSetpoint
         # TODO add a constant scale value to the speed

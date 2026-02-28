@@ -69,10 +69,7 @@ class RobotState(NetworkTablesMixin):
     dontShoot: bool
     impossibleDynamic: bool
     forceDynamicTurret: bool
-    # commer moss
-    # elon musk
-    # I have a surprise for you
-    # get ready musk
+    turretVelocitySetpoint: Translation2d
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d

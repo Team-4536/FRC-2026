@@ -11,7 +11,7 @@ from subsystems.robotState import (
     ROBOT_RADIUS,
 )
 from subsystems.utils import (
-    getTangentalVelocity,
+    getTangentAngle,
     getContributedRotation,
     RPMToMPS,
 )
@@ -252,25 +252,21 @@ class SwerveDrive(Subsystem):
         sum = 0
         for module in self._modules:
 
-            tanVel = getTangentalVelocity(
-                module._position,
-                self.getDriveVelocity(module).distance(Translation2d()),
-            )
+            tanVel = getTangentAngle(module._position)
 
             sum += getContributedRotation(
                 tanVel,
                 rotationsToRadians(module._azimuthMotor.getEncoder().getPosition()),
+                self.getDriveVelocity(module).distance(Translation2d()),
             )
 
-        return sum / 4 / ROBOT_RADIUS
+        return sum / 4
 
     def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
-        rpm: RPM = module._driveMotor.getEncoder().getVelocity()
-        speed = RPMToMPS(rpm, self._modules[0]._wheelCircumferance)
-        angle: radians = rotationsToRadians(
-            module._azimuthMotor.getEncoder().getVelocity()
-        )
-        vector = Translation2d(speed * math.cos(angle), speed * math.sin(angle))
+        ## (MPS)
+        speed: MPS = module.driveVelocity
+        angle: radians = rotationsToRadians(module.azimuthRotation)
+        vector = Translation2d(distance=speed, angle=Rotation2d(angle))
         return vector
 
     def drive(self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: MPS) -> None:
