@@ -3,16 +3,24 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.autoStages import AutoStages, FollowTrajectory, OperateIntake
 from typing import List
+from subsystems.autoStages import (
+    AutoStages,
+    FollowTrajectory,
+    OperateIntake,
+    OperateTurret,
+)
 import wpilib
 
 
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
-    DRIVE_FORWARD_TEST = "Drive Forward Test"
+    TEST_INTAKE = "Test Intake"
     DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
     WONKY = "Wonky"
     GET_BALLS_AND_BRING_BACK_RIGHT = "Get Balls And Bring Back Right"
     GET_BALLS_AND_BRING_BACK_LEFT = "Get Balls And Bring Back Left"
+    FORWARD = "Forward"
+    FORWARD_AND_INTAKE = "Forward And Intake"
 
 
 class AutoSubsystem(Subsystem):
@@ -40,7 +48,7 @@ class AutoSubsystem(Subsystem):
 
         wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
-    def phaseInit(self) -> None:
+    def phaseInit(self, robotState: RobotState) -> RobotState:
         print(self.autoRoutineChooser.getSelected(), "value to test")
         self.routine: dict[str, List[AutoStages]] = routineChooser(
             self.autoRoutineChooser.getSelected(),
@@ -57,7 +65,9 @@ class AutoSubsystem(Subsystem):
 
         if self.routine:
             for path in self.routine[self.routineKeys[self.currentPath]]:
-                path.autoInit()
+                robotState = path.autoInit(robotState)
+
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
 
@@ -71,7 +81,7 @@ class AutoSubsystem(Subsystem):
                 self.routineFinished = self.currentPath >= len(self.routineKeys)
                 if not self.routineFinished:
                     for path in self.routine[self.routineKeys[self.currentPath]]:
-                        path.autoInit()
+                        robotState = path.autoInit(robotState)
 
         robotState.intakeMode = False
 
@@ -93,14 +103,6 @@ def routineChooser(
     match selectedRoutine:
         case AutoRoutines.DO_NOTHING:
             pass
-        case AutoRoutines.DRIVE_FORWARD_TEST:
-            routine["Drive Forward Test"] = [
-                FollowTrajectory(
-                    "Drive Forward Test",
-                    isFlipped,
-                )
-            ]
-
         case AutoRoutines.GET_BALLS_AND_BRING_BACK_RIGHT:
             routine["Under Right Trench"] = [
                 FollowTrajectory(
@@ -143,6 +145,15 @@ def routineChooser(
                 )
             ]
 
+        case AutoRoutines.FORWARD:
+            routine["Forward"] = [
+                FollowTrajectory(
+                    "Drive Forward Test",
+                    isFlipped,
+                )
+            ]
+        case AutoRoutines.TEST_INTAKE:
+            routine["Drop & Run Intake"] = [OperateIntake(10.5)]
         case AutoRoutines.DRIVE_FORWARD_BACK_TEST:
             routine["Forward"] = [
                 FollowTrajectory(
@@ -168,6 +179,14 @@ def routineChooser(
                     "Wonky 2",
                     isFlipped,
                 )
+            ]
+        case AutoRoutines.FORWARD_AND_INTAKE:
+            routine["Forward"] = [
+                FollowTrajectory(
+                    "Drive Forward Test",
+                    isFlipped,
+                ),
+                OperateIntake(5),
             ]
 
     return routine

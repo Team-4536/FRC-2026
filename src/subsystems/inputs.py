@@ -2,15 +2,15 @@ from math import tau
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, lerp, Scalar
-from typing import Optional
-from wpilib import XboxController as Ctrlr
+from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import radians_per_second as RPS
+from wpimath.units import radians_per_second as RPS, meters_per_second
+from math import pi as PI
 
 
 class Inputs(Subsystem):
-    MAX_ABTAINABLE_SPEED: float = 2.5
-    LOW_MAX_ABTAINABLE_SPEED: float = 1.5
+    MAX_ABTAINABLE_SPEED: float = 5
+    LOW_MAX_ABTAINABLE_SPEED: float = 2
 
     def __init__(
         self,
@@ -18,11 +18,10 @@ class Inputs(Subsystem):
         mechPort: int = 1,
     ) -> None:
         super().__init__()
+        # self.turretSpeed: float = 0.0
 
-        self.robotState = RobotState.empty(abtainableMaxSpeed=self.MAX_ABTAINABLE_SPEED)
-
-        self._driveCtrlr = Ctrlr(drivePort)
-        self._mechCtrlr = Ctrlr(mechPort)
+        self._driveCtrlr = XboxController(drivePort)
+        self._mechCtrlr = XboxController(mechPort)
 
         self.robotState = RobotState.empty(abtainableMaxSpeed=1)
 
@@ -31,41 +30,62 @@ class Inputs(Subsystem):
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
 
-    def phaseInit(
-        self, drivePort: Optional[int] = None, mechPort: Optional[int] = None
-    ) -> None:
-        self._driveCtrlr = Ctrlr(drivePort) if drivePort else self._driveCtrlr
-        self._mechCtrlr = Ctrlr(mechPort) if mechPort else self._mechCtrlr
+        self._isTestMode: bool = False
+
+    def phaseInit(self, robotState: RobotState) -> RobotState:
+        return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        self.robotState.abtainableMaxSpeed = lerp(
+        # Drive Controls
+
+        maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            self._driveCtrlr.getRightTriggerAxis(),
+            min(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
         )
-        self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
-        # def periodic(self, rs: RobotState) -> None:
-        self.robotState.fieldSpeeds = self._calculateDrive()
-        self.robotState.initialIntake = self._mechCtrlr.getAButton()
-        self.robotState.intakeSensorTest = self._mechCtrlr.getBButton()
-        self.robotState.intakeEject = self._mechCtrlr.getLeftBumper()
-        self.robotState.intakePosYAxis = self._mechCtrlr.getLeftY()
-        self.robotState.intakePos = self._mechCtrlr.getYButtonPressed()
-        self.robotState.intakeMode = self._mechCtrlr.getRightBumper()
+        if self._driveCtrlr.getBackButtonPressed():
+            self._isTestMode = not self._isTestMode
+
+        if self._isTestMode:
+            robotState.fieldSpeeds = ChassisSpeeds()
+            if self._driveCtrlr.getBButton():
+                robotState.fieldSpeeds = ChassisSpeeds(vx=5)
+            elif self._driveCtrlr.getXButton():
+                robotState.fieldSpeeds = ChassisSpeeds(omega=2)
+
+        robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
+        robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+
+        robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())
+        robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())
+
+        robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
+        robotState.kickShooter = self._mechCtrlr.getRightBumper()
+
+        robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
+        robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
+        robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
+        robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
+        robotState.initialIntake = self._mechCtrlr.getAButton()
+        robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
+        robotState.intakeEject = self._mechCtrlr.getBButton()
+        robotState.intakePosYAxis = self._mechCtrlr.getRightY()
+        robotState.intakePos = self._mechCtrlr.getPOV()
+        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
 
         return robotState
 
     def disabled(self) -> None:
-        self.robotState.fieldSpeeds = ChassisSpeeds()
+        pass
 
-    def _calculateDrive(self) -> ChassisSpeeds:
-        self._circularScalar.setMagnitude(self.robotState.abtainableMaxSpeed)
+    def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
+        self._circularScalar.setMagnitude(maxSpeed)
         vx, vy = self._circularScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
 
-        omega: RPS = self._linearScalar(-self._driveCtrlr.getRightX())
+        omega = self._linearScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)

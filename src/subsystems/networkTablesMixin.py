@@ -1,15 +1,6 @@
 from functools import partial
-from ntcore import GenericPublisher, NetworkTableInstance, Value
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeAlias,
-    Union,
-)
+from ntcore import NetworkTableInstance, Value
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
 from wpimath.kinematics import SwerveModuleState
 
 Struct: TypeAlias = object
@@ -107,7 +98,7 @@ class NetworkTablesMixin:
             name = "/".join((*subtables, name))
 
         if value is None:
-            self.publishString(name, "Null")
+            self.publishString(name, "Null", *subtables)
 
         typeStr = type(value).__name__  # pyright: ignore
         pub = self._ntPersist.get(name)
@@ -116,8 +107,10 @@ class NetworkTablesMixin:
             pub = topic.genericPublish(typeStr)
             self._ntPersist[name] = pub
 
-        if type(pub) == GenericPublisher:
+        try:
             pub.set(Value.makeValue(value))  # type: ignore
+        except TypeError:
+            self.publishGeneric("test", "Null", *subtables)
 
     def publishSwerve(
         self,

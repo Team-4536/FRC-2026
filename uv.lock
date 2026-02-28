@@ -56,6 +56,15 @@ wheels = [
 ]
 
 [[package]]
+name = "certifi"
+version = "2026.1.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e0/2d/a891ca51311197f6ad14a7ef42e2399f36cf2f9bd44752b3dc4eab60fdc5/certifi-2026.1.4.tar.gz", hash = "sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120", size = 154268, upload-time = "2026-01-04T02:42:41.825Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/ad/3cc14f097111b4de0040c83a525973216457bbeeb63739ef1ed275c1c021/certifi-2026.1.4-py3-none-any.whl", hash = "sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c", size = 152900, upload-time = "2026-01-04T02:42:40.15Z" },
+]
+
+[[package]]
 name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -182,6 +191,7 @@ name = "frc-2026"
 version = "1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "certifi" },
     { name = "phoenix6" },
     { name = "photonlibpy" },
     { name = "pre-commit" },
@@ -189,11 +199,13 @@ dependencies = [
     { name = "robotpy-navx" },
     { name = "robotpy-pathplannerlib" },
     { name = "robotpy-rev" },
+    { name = "setuptools" },
     { name = "ty" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "certifi", specifier = ">=2026.1.4" },
     { name = "phoenix6" },
     { name = "photonlibpy" },
     { name = "pre-commit" },
@@ -201,6 +213,7 @@ requires-dist = [
     { name = "robotpy-navx" },
     { name = "robotpy-pathplannerlib" },
     { name = "robotpy-rev" },
+    { name = "setuptools", specifier = "<82.0.0" },
     { name = "ty" },
 ]
 
@@ -889,6 +902,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9b/69/3bfc68ca338e24cbee293eabb7c8ffbd9fbb30af2921c44be775550b8eef/robotpy_wpiutil-2026.2.1-cp313-cp313-manylinux_2_35_aarch64.whl", hash = "sha256:becf56c54b39ffded8526c7add5e3abb7b0dbb7ce9c491b9d6fc59df3a25615f", size = 600396, upload-time = "2026-01-16T18:33:24.076Z" },
     { url = "https://files.pythonhosted.org/packages/27/a5/585e8ae3c21d87415d76a623b27593c1306e59cea503bf0da042c01a2865/robotpy_wpiutil-2026.2.1-cp313-cp313-manylinux_2_35_x86_64.whl", hash = "sha256:38510e49cb7e3efa50f49ef93e8b909b7fbe939ba93ab84a7a192360dc506d86", size = 659257, upload-time = "2026-01-16T18:33:25.469Z" },
     { url = "https://files.pythonhosted.org/packages/78/10/f8e2897fd35d6f7eef3519c977f1184ef1327cb6e7350b7763986df1af83/robotpy_wpiutil-2026.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:7196abefd11c87e700aca2ac5c1800b2b7f1b3d84e6264be415b4614d5f72d82", size = 341362, upload-time = "2026-01-16T18:33:27.197Z" },
+]
+
+[[package]]
+name = "setuptools"
+version = "81.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0d/1c/73e719955c59b8e424d015ab450f51c0af856ae46ea2da83eba51cc88de1/setuptools-81.0.0.tar.gz", hash = "sha256:487b53915f52501f0a79ccfd0c02c165ffe06631443a886740b91af4b7a5845a", size = 1198299, upload-time = "2026-02-06T21:10:39.601Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/e3/c164c88b2e5ce7b24d667b9bd83589cf4f3520d97cad01534cd3c4f55fdb/setuptools-81.0.0-py3-none-any.whl", hash = "sha256:fdd925d5c5d9f62e4b74b30d6dd7828ce236fd6ed998a08d81de62ce5a6310d6", size = 1062021, upload-time = "2026-02-06T21:10:37.175Z" },
 ]
 
 [[package]]
