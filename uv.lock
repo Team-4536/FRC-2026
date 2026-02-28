@@ -1185,18 +1185,6 @@ wheels = [
 ]
 
 [[package]]
-name = "rsa"
-version = "4.9.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pyasn1" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/da/8a/22b7beea3ee0d44b1916c0c1cb0ee3af23b700b6da9f04991899d0c555d4/rsa-4.9.1.tar.gz", hash = "sha256:e7bdbfdb5497da4c07dfd35530e1a902659db6ff241e39d9953cad06ebd0ae75", size = 29034, upload-time = "2025-04-16T09:51:18.218Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/8d/0133e4eb4beed9e425d9a98ed6e081a55d195481b7632472be1af08d2f6b/rsa-4.9.1-py3-none-any.whl", hash = "sha256:68635866661c6836b8d39430f97a996acbd61bfa49406748ea243539fe239762", size = 34696, upload-time = "2025-04-16T09:51:17.142Z" },
-]
-
-[[package]]
 name = "setuptools"
 version = "81.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1342,13 +1330,4 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/3b/b2/8ccad15a350ed860337e51069c6b688b8fdd303ccb08cf6f1900949d7fc3/wpilib-2026.2.1.1-cp313-cp313-manylinux_2_35_aarch64.whl", hash = "sha256:05056c64ed5e7847a9500e90ea0b7e20131e956a131eaf3474d5f69e8cfd7654", size = 4501632, upload-time = "2026-02-22T03:01:39.593Z" },
     { url = "https://files.pythonhosted.org/packages/d5/c3/3d4dc1a5e6e4ea2339154272ca30f49aff2e8eebe99c85dfcdb0f2a51b0a/wpilib-2026.2.1.1-cp313-cp313-manylinux_2_35_x86_64.whl", hash = "sha256:10442b101665c4992deeb90af38a0d05e976cc61e56f8c4329519dcb523b1568", size = 5108543, upload-time = "2026-02-22T03:01:41.412Z" },
     { url = "https://files.pythonhosted.org/packages/3b/0d/c744a3277d08f4110215f69376403fdd5118233956ba19762bbae491e64c/wpilib-2026.2.1.1-cp313-cp313-win_amd64.whl", hash = "sha256:3c147710e490dc6a1aed52d971bf3396d341299db21d8c3bba0386135cdab8d5", size = 2264971, upload-time = "2026-02-22T03:01:43.143Z" },
-]
-
-[[package]]
-name = "zipp"
-version = "3.23.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e3/02/0f2892c661036d50ede074e376733dca2ae7c6eb617489437771209d4180/zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166", size = 25547, upload-time = "2025-06-08T17:06:39.4Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2e/54/647ade08bf0db230bfea292f893923872fd20be6ac6f53b2b936ba839d75/zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e", size = 10276, upload-time = "2025-06-08T17:06:38.034Z" },
 ]
