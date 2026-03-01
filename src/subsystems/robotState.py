@@ -79,17 +79,16 @@ class RobotState(NetworkTablesMixin):
     intakeIndexer: bool = False
     intakeSensorTest: bool = False
     intakeEject: bool = False
-    intakePosYAxis: float = 0
-    intakePos: bool = False
-    intakeMode: bool = True
+    intakePosYAxis: float = 0.0
+    intakePos: int = False
+    intakeMode: bool = False
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
 
     teamSide: TeamSide = TeamSide.SIDE_BLUE
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
-    ejectAll = 0.0
-    intakePosYAxis = 0.0
+    ejectAll: float = 0.0
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()

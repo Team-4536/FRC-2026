@@ -1,13 +1,19 @@
-from pathplannerlib.path import PathPlannerPath, PathPlannerTrajectory
-from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor
-from wpimath.units import meters_per_second as MPS
-from wpimath.units import radians_per_second as RPS
-from wpimath.units import feetToMeters, lbsToKilograms
-from wpimath.geometry import Translation2d, Rotation2d, Pose2d
-from wpimath.kinematics import ChassisSpeeds
+from math import tau
+from pathplannerlib.config import ModuleConfig, RobotConfig, DCMotor  # pyright: ignore
+from pathplannerlib.path import (  # pyright: ignore
+    PathPlannerPath,
+    PathPlannerTrajectory,
+)
 from subsystems.robotState import RobotState
-import math
-import wpilib
+from wpilib import getTime
+from wpimath.geometry import Translation2d, Rotation2d
+from wpimath.kinematics import ChassisSpeeds
+from wpimath.units import (
+    feetToMeters,
+    lbsToKilograms,  # pyright: ignore
+    meters_per_second,
+    radians_per_second,
+)
 
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
@@ -16,10 +22,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     stallTorque = 2.6
     stallCurrent = 105.0
     freeCurrent = 1.8
-    freeSpeed: RPS = (5676 * 2 * math.pi) / 60
+    freeSpeed: radians_per_second = (5676 * tau) / 60
 
     wheelRadiusMeters = 0.0508
-    maxVelocity: MPS = 3
+    maxVelocity: meters_per_second = 3
     wheelCOF = 1
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
@@ -89,7 +95,7 @@ class FollowTrajectory(AutoStages):
         self.pathDone = False
 
     def autoInit(self, robotState: RobotState) -> RobotState:
-        self.startTime = wpilib.getTime()
+        self.startTime = getTime()
         robotState.autosGyroResetToggle = True
         robotState.autosGyroReset = (
             self.trajectory.getInitialPose().rotation().degrees()
@@ -101,7 +107,7 @@ class FollowTrajectory(AutoStages):
 
         self.robotState = robotState
 
-        self.pathTime = wpilib.getTime() - self.startTime
+        self.pathTime = getTime() - self.startTime
 
         targetState = self.trajectory.sample(self.pathTime)
 
@@ -153,13 +159,13 @@ class OperateIntake(AutoStages):
         self.runTime = runTime
 
     def autoInit(self, robotState: RobotState) -> RobotState:
-        self.startTime = wpilib.getTime()
+        self.startTime = getTime()
 
         return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         self.robotState = robotState
-        self.pathTime = wpilib.getTime() - self.startTime
+        self.pathTime = getTime() - self.startTime
 
         if self.pathTime < 0.5:  # TODO: make this not work like this
             self.robotState.intakePosYAxis = 0.5
@@ -199,13 +205,13 @@ class OperateTurret(AutoStages):
         self.unload = unload
 
     def autoInit(self, robotState: RobotState) -> RobotState:
-        self.startTime = wpilib.getTime()
+        self.startTime = getTime()
 
         return robotState
 
     def run(self, robotState: RobotState) -> RobotState:
         self.robotState = robotState
-        self.pathTime = wpilib.getTime() - self.startTime
+        self.pathTime = getTime() - self.startTime
 
         self.robotState.forceDynamicTurret = True
         self.robotState.revSpeed = 1

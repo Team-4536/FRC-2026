@@ -1,15 +1,14 @@
 from enum import Enum
-from subsystems.robotState import RobotState
-from subsystems.subsystem import Subsystem
-from subsystems.autoStages import AutoStages, FollowTrajectory, OperateIntake
-from typing import List
 from subsystems.autoStages import (
     AutoStages,
     FollowTrajectory,
     OperateIntake,
     OperateTurret,
 )
-import wpilib
+from subsystems.robotState import RobotState
+from subsystems.subsystem import Subsystem
+from typing import List
+from wpilib import SendableChooser, SmartDashboard
 
 
 class AutoRoutines(Enum):
@@ -25,10 +24,10 @@ class AutoRoutines(Enum):
 
 class AutoSubsystem(Subsystem):
     # Declare Variables
-    autoRoutineChooser: wpilib.SendableChooser = wpilib.SendableChooser()
-    autoSideChooser: wpilib.SendableChooser = wpilib.SendableChooser()
+    autoRoutineChooser: SendableChooser = SendableChooser()
+    autoSideChooser: SendableChooser = SendableChooser()
     routineFinished: bool = False
-    routineKeys: list = list()
+    routineKeys: List[str] = list()
     currentPath: int = 0
 
     def __init__(self):
@@ -47,9 +46,9 @@ class AutoSubsystem(Subsystem):
         self.autoSideChooser.setDefaultOption(AUTO_SIDE_BLUE, AUTO_SIDE_BLUE)
         self.autoSideChooser.addOption(AUTO_SIDE_RED, AUTO_SIDE_RED)
 
-        wpilib.SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
+        SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
 
-        wpilib.SmartDashboard.putData("auto side chooser", self.autoSideChooser)
+        SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.routine: dict[str, List[AutoStages]] = routineChooser(
@@ -61,7 +60,7 @@ class AutoSubsystem(Subsystem):
         self.routineFinished = False
         self.routineKeys = list(self.routine.keys())
 
-        wpilib.SmartDashboard.putStringArray("routineKeys", self.routineKeys)
+        SmartDashboard.putStringArray("routineKeys", self.routineKeys)
 
         if self.routine:
             for path in self.routine[self.routineKeys[self.currentPath]]:
@@ -70,7 +69,6 @@ class AutoSubsystem(Subsystem):
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
@@ -85,26 +83,20 @@ class AutoSubsystem(Subsystem):
                     for path in self.routine[self.routineKeys[self.currentPath]]:
                         robotState = path.autoInit(robotState)
 
-        robotState.intakeMode = False
-
-        robotState.intakePosYAxis = 0.0
-
         return robotState
 
     def disabled(self) -> None:
         pass
 
     def publish(self) -> None:
-        wpilib.SmartDashboard.putString(
+        SmartDashboard.putString(
             "auto routine", self.autoRoutineChooser.getSelected().value
         )
         if self.routineKeys and not self.routineFinished:
-            wpilib.SmartDashboard.putString(
-                "current path", self.routineKeys[self.currentPath]
-            )
+            SmartDashboard.putString("current path", self.routineKeys[self.currentPath])
         else:
-            wpilib.SmartDashboard.putString("current path", "empty/done")
-        wpilib.SmartDashboard.putString("auto side", self.autoSideChooser.getSelected())
+            SmartDashboard.putString("current path", "empty/done")
+        SmartDashboard.putString("auto side", self.autoSideChooser.getSelected())
 
 
 def routineChooser(
