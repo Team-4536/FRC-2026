@@ -27,14 +27,18 @@ class llCams(Subsystem):
         self.netTbl = NetworkTableInstance.getDefault()
         self.llTbl = self.netTbl.getTable("limelight")
 
-        if self.Team == DriverStation.Alliance.kRed:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
-        elif self.Team == DriverStation.Alliance.kBlue:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
+        self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray(
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        )
+
+        # if self.Team == DriverStation.Alliance.kBlue:
+        #     self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray(  # blue alliance code
+        #         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # )
+        # elif self.Team == DriverStation.Alliance.kRed:
+        #     self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray( # red alliance code
+        #         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        #     )
         # picks pose based on side
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
@@ -42,14 +46,14 @@ class llCams(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # # botpose_wpiblue uses a 11 value array (index 0 = x, 2 = z, 5 = yaw)
-        if self.Team == DriverStation.Alliance.kRed:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
-        elif self.Team == DriverStation.Alliance.kBlue:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
+        # if self.Team == DriverStation.Alliance.kBlue:
+        #     self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray( # blue alliance code
+        #         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        #     )
+        # elif self.Team == DriverStation.Alliance.kRed:
+        #     self.botposeWPI = self.llTbl.getEntry("botpose_wpibred").getDoubleArray(  # red alliance code
+        #         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        #     )
 
         llx = self.botposeWPI[0]  # sets x pose
         lly = self.botposeWPI[1]  # sets y pose
@@ -82,7 +86,6 @@ class llCams(Subsystem):
             self.botposeWPI[5]
         )
         # robotState.myField.setRobotPose(self.limelightPose)
-        pass
 
 
 # # X and Y are converted coordinates from inches to meters
