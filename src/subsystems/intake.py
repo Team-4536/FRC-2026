@@ -26,8 +26,8 @@ class Intake(Subsystem):
         )  # DO NOT put this in phaseInit. bad things will happen
         self.AUTOMATIC_MODE = False
 
-        self.publishFloat("intake_speed (0 to 1)", 0.2)
-        self.publishFloat("reverse_speed (0 to 1)", 0.2)
+        self.publishFloat("intake_speed (0 to 1)", 0.7)
+        self.publishFloat("reverse_speed (0 to 1)", 0.7)
         self.publishFloat("indexer_speed (0 to 1)", 0.4)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:

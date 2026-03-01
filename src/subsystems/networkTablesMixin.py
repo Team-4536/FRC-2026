@@ -1,5 +1,5 @@
 from functools import partial
-from ntcore import NetworkTableInstance, Value
+from ntcore import NetworkTable, NetworkTableInstance, Value
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
 from wpimath.kinematics import SwerveModuleState
 
@@ -7,9 +7,12 @@ Struct: TypeAlias = object
 
 
 class NetworkTablesMixin:
+    _table: NetworkTable
+    _ntPersist: Dict[str, object]
+
     def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
-        self.table = self._getTable(table, instance)
-        self._ntPersist: Dict[str, object] = {}
+        self._table = self._getTable(table, instance)
+        self._ntPersist = {}
 
     def __publish(
         self, name: str, value: Any, topicFn: Callable[[str], Any], *subtables: str
@@ -26,45 +29,45 @@ class NetworkTablesMixin:
         pub.set(value)  # type: ignore[attr-defined]
 
     def publishString(self, name: str, value: str, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getStringTopic, *subtables)
+        self.__publish(name, value, self._table.getStringTopic, *subtables)
 
     def publishStringArray(
         self, name: str, value: Sequence[str], *subtables: str
     ) -> None:
-        self.__publish(name, value, self.table.getStringArrayTopic, *subtables)
+        self.__publish(name, value, self._table.getStringArrayTopic, *subtables)
 
     def publishInteger(self, name: str, value: int, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getIntegerTopic, *subtables)
+        self.__publish(name, value, self._table.getIntegerTopic, *subtables)
 
     def publishIntegerArray(
         self, name: str, value: Sequence[int], *subtables: str
     ) -> None:
-        self.__publish(name, value, self.table.getIntegerArrayTopic, *subtables)
+        self.__publish(name, value, self._table.getIntegerArrayTopic, *subtables)
 
     def publishFloat(self, name: str, value: float, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getFloatTopic, *subtables)
+        self.__publish(name, value, self._table.getFloatTopic, *subtables)
 
     def publishFloatArray(
         self, name: str, value: Sequence[float], *subtables: str
     ) -> None:
-        self.__publish(name, value, self.table.getFloatArrayTopic, *subtables)
+        self.__publish(name, value, self._table.getFloatArrayTopic, *subtables)
 
     def publishBoolean(self, name: str, value: bool, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getBooleanTopic, *subtables)
+        self.__publish(name, value, self._table.getBooleanTopic, *subtables)
 
     def publishBooleanArray(
         self, name: str, value: Sequence[bool], *subtables: str
     ) -> None:
-        self.__publish(name, value, self.table.getBooleanArrayTopic, *subtables)
+        self.__publish(name, value, self._table.getBooleanArrayTopic, *subtables)
 
     def publishStruct(self, name: str, value: Struct, *subtables: str) -> None:
-        topicFn = partial(self.table.getStructTopic, type=value.__class__)
+        topicFn = partial(self._table.getStructTopic, type=value.__class__)
         self.__publish(name, value, topicFn, *subtables)
 
     def publishStructArray(
         self, name: str, value: Sequence[Struct], *subtables: str
     ) -> None:
-        topicFn = partial(self.table.getStructArrayTopic, type=value[0].__class__)
+        topicFn = partial(self._table.getStructArrayTopic, type=value[0].__class__)
         self.__publish(name, value, topicFn, *subtables)
 
     def publishGeneric(
@@ -103,7 +106,7 @@ class NetworkTablesMixin:
         typeStr = type(value).__name__  # pyright: ignore
         pub = self._ntPersist.get(name)
         if pub is None:
-            topic = self.table.getTopic(name)
+            topic = self._table.getTopic(name)
             pub = topic.genericPublish(typeStr)
             self._ntPersist[name] = pub
 
@@ -115,9 +118,7 @@ class NetworkTablesMixin:
     def publishSwerve(
         self,
         name: str,
-        value: Tuple[
-            SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState
-        ],
+        value: Tuple[SwerveModuleState, ...],
         *subtables: str,
     ) -> None:
         self.publishStructArray(name, value, *subtables)

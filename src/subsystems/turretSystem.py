@@ -2,10 +2,8 @@ from subsystems.motor import RevMotor
 from subsystems.subsystem import Subsystem
 from subsystems.robotState import (
     RobotState,
-    TeamSide,
     TurretTarget,
     TurretMode,
-    ROBOT_RADIUS,
 )
 from subsystems.utils import (
     RPMToVolts,
@@ -45,6 +43,9 @@ from ntcore import NetworkTableInstance
 from wpilib import DigitalInput
 from enum import Enum
 from typing import Optional
+from wpilib import DriverStation
+
+ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 
 MAX_PITCH: radians = degreesToRadians(90)  # in relation to feild
 MIN_PITCH: radians = degreesToRadians(40)
@@ -188,6 +189,10 @@ class Turret(Subsystem):
 
         self.lastTime: seconds = getTime()
 
+        self.side: DriverStation.Alliance = (
+            DriverStation.getAlliance() or DriverStation.Alliance.kRed
+        )
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
 
         self.homeSet: bool = True
@@ -255,7 +260,9 @@ class Turret(Subsystem):
 
         elif self.mode == TurretMode.DYNAMIC:
             self.target = self.getTarget(robotState)
-            self.targetPos = self.getTargetPos(self.target, robotState.teamSide)
+            self.targetPos = self.getTargetPos(
+                self.target, DriverStation.getAlliance() or DriverStation.Alliance.kRed
+            )
             self.automaticUpdate(robotState)
 
         elif self.mode == TurretMode.DISABLED:
@@ -293,10 +300,14 @@ class Turret(Subsystem):
             robotState.dontShoot = True
             return
         self.publishFloatArray(
-            "Robot Linera veloity",
+            "Robot Linear veloity",
             (
                 robotState.robotLinearVelocity.distance(Translation2d()),
-                robotState.robotLinearVelocity.angle().radians(),
+                (
+                    0
+                    if robotState.robotLinearVelocity.norm() == 0
+                    else robotState.robotLinearVelocity.angle().radians()
+                ),
             ),
         )
 
@@ -411,12 +422,14 @@ class Turret(Subsystem):
 
         return target
 
-    def getTargetPos(self, target: TurretTarget, side: TeamSide) -> Translation3d:
+    def getTargetPos(
+        self, target: TurretTarget, side: DriverStation.Alliance
+    ) -> Translation3d:
 
         pos: Translation3d = self.targetPos
         self.publishString("TEAM side", side.name)
 
-        if side == TeamSide.SIDE_BLUE:
+        if side == DriverStation.Alliance.kBlue:
             match target:
                 case TurretTarget.HUB:
                     return BLUE_SCORE_POS
@@ -429,7 +442,7 @@ class Turret(Subsystem):
 
                 case _:
                     return pos
-        elif side == TeamSide.SIDE_RED:
+        elif side == DriverStation.Alliance.kRed:
             match target:
                 case TurretTarget.HUB:
                     return RED_SCORE_POS
@@ -442,6 +455,8 @@ class Turret(Subsystem):
 
                 case _:
                     return pos
+
+        return Translation3d()
 
     def getTargetLocked(self) -> bool:
 

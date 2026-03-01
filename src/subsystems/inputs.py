@@ -8,22 +8,27 @@ from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
-    MAX_ABTAINABLE_SPEED: float = 5
-    LOW_MAX_ABTAINABLE_SPEED: float = 2
+    LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 2
+    MAX_ABTAINABLE_SPEED: meters_per_second = 5
 
-    def __init__(
-        self,
-        drivePort: int = 0,
-        mechPort: int = 1,
-    ) -> None:
+    _driveCtrlr: XboxController
+    _mechCtrlr: XboxController
+
+    _linearDriveScalar: Scalar
+    _circularDriveScalar: CircularScalar
+    _linearScalar: Scalar
+
+    def __init__(self, drivePort: int = 0, mechPort: int = 1) -> None:
         super().__init__()
+
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
-        self._linearScalar: Scalar = Scalar(magnitude=tau)
-        self._circularScalar: CircularScalar = CircularScalar(
+        self._linearDriveScalar = Scalar(magnitude=tau)
+        self._circularDriveScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
+        self._linearScalar = Scalar()
 
         self._isTestMode: bool = False
 
@@ -35,20 +40,18 @@ class Inputs(Subsystem):
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            min(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1),
+            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1.0),
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
-
-        # Misc Controls
-        robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
-        robotState.kickShooter = self._mechCtrlr.getRightBumper()
 
         # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
         robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
+        robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
+        robotState.kickShooter = self._mechCtrlr.getRightBumper()
 
         # Intake Controls
         robotState.initialIntake = self._mechCtrlr.getAButton()
@@ -65,11 +68,11 @@ class Inputs(Subsystem):
         pass
 
     def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
-        self._circularScalar.setMagnitude(maxSpeed)
-        vx, vy = self._circularScalar(
+        self._circularDriveScalar.setMagnitude(maxSpeed)
+        vx, vy = self._circularDriveScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
 
-        omega = self._linearScalar(-self._driveCtrlr.getRightX())
+        omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)

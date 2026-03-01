@@ -1,3 +1,4 @@
+from dataclasses import dataclass, fields
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
@@ -6,81 +7,91 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.turretSystem import Turret, Shooter
-from subsystems.utils import TimeData
-from typing import NamedTuple, Sequence
+from subsystems.utils import matchData, TimeData
+from typing import Generator, NamedTuple, Union
 from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 
-robotState: RobotState = None  # type: ignore
 
-
-class SubsystemManager(NamedTuple):
-    inputs: Inputs
-    ledSignals: LEDSignals
-    swerveDrive: SwerveDrive
-    time: TimeData
-    turret: Turret
-    shooter: Shooter
+class Subsystems(NamedTuple):
     intake: Intake
-    cameras: CameraManager
+    ledSignals: LEDSignals
+    shooter: Shooter
+    swerveDrive: SwerveDrive
+    turret: Turret
 
-    def init(self) -> None:
-        global robotState
-        for s in self.dependantSubsytems:
-            robotState = s.phaseInit(self.robotState)
-        self.inputs.phaseInit(self.robotState)
-
-    def robotPeriodic(self) -> None:
-        global robotState
-        self.robotState.publish()
-        robotState = self.cameras.periodic(self.robotState)
-        robotState = self.swerveDrive.robotPeriodic(self.robotState)
+    def phaseInit(self, rs: RobotState) -> None:
         for s in self:
-            s.publish()
+            s.phaseInit(rs)
 
-    def autonomousPeriodic(self) -> None:
-        global robotState
-        robotState = self.inputs.periodic(self.robotState)
-        self._periodic(self.robotState)
-
-    def teleopPeriodic(self) -> None:
-        global robotState
-        robotState = self.inputs.periodic(self.robotState)
-        self._periodic(self.robotState)
-
-    def _periodic(self, state: RobotState) -> None:
-        global robotState
-        for s in self.dependantSubsytems:
-            robotState = s.periodic(state)
+    def periodic(self, rs: RobotState) -> None:
+        for s in self:
+            rs = s.periodic(rs)
 
     def disabled(self) -> None:
         for s in self:
             s.disabled()
 
-    @property
-    def dependantSubsytems(self) -> Sequence[Subsystem]:  # dependant subsystems
-        return [
-            self.ledSignals,
-            self.cameras,
-            self.swerveDrive,
-            self.time,
-            self.turret,
-            self.shooter,
-            self.intake,
-        ]
+    def publish(self) -> None:
+        for s in self:
+            s.publish()
 
-    @property
-    def robotState(self) -> RobotState:
-        global robotState
 
-        if not robotState:
-            robotState = RobotState.empty()
-            robotState.fieldSpeeds = ChassisSpeeds()
-            robotState.odometry = SwerveDrive4PoseEstimator(
-                self.swerveDrive._kinematics,
-                self.swerveDrive._gyro.getRotation2d(),
-                self.swerveDrive._modules.modulePositions,
-                self.swerveDrive.initPos,
-            )
+@dataclass
+class SubsystemManager:
+    subsystems: Subsystems
+    inputs: Inputs
+    cameras: CameraManager
+    time: TimeData
+    robotState: RobotState
 
-        return robotState
+    def __post_init__(self) -> None:
+        drive = self.subsystems.swerveDrive
+        initPos = (
+            Pose2d(x=2, y=4, rotation=Rotation2d())
+            if matchData.isBlue()
+            else Pose2d(x=14.5, y=4, rotation=Rotation2d.fromDegrees(180))
+        )
+
+        self.robotState.fieldSpeeds = ChassisSpeeds()
+        self.robotState.odometry = SwerveDrive4PoseEstimator(
+            drive.kinematics,
+            drive.roboAngle,
+            drive.modulePoses,
+            initPos,
+        )
+
+    def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
+        for f in fields(self):
+            v = getattr(self, f.name)
+            if isinstance(v, (Subsystem, Subsystems)):
+                yield v
+
+    def init(self) -> None:
+        for s in self:
+            s.phaseInit(self.robotState)
+
+    def robotPeriodic(self) -> None:
+        for s in self:
+            s.publish()
+        self.robotState.publish()
+
+        self.cameras.periodic(self.robotState)
+        self.time.periodic(self.robotState)
+
+    def autonomousPeriodic(self) -> None:
+        self.inputs.periodic(self.robotState)
+        self._periodic()
+
+    def teleopPeriodic(self) -> None:
+        self.inputs.periodic(self.robotState)
+        self._periodic()
+
+    def _periodic(self) -> None:
+        for s in self.subsystems:
+            s.periodic(self.robotState)
+
+    def disabled(self) -> None:
+        for s in self:
+            s.disabled()

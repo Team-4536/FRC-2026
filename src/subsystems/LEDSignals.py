@@ -8,11 +8,14 @@ NONE: int = 255
 
 
 class LEDSignals(Subsystem):
+    API_ID: int = 0
+
+    _can: CAN
+
     def __init__(self, deviceID: int) -> None:
         super().__init__()
 
-        self.apiID = 0
-        self.can = CAN(deviceID)
+        self._can = CAN(deviceID)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         return robotState
@@ -40,7 +43,7 @@ class LEDSignals(Subsystem):
 
         try:
             byteArray = bytearray(bytes)
-            self.can.writePacket(byteArray, self.apiID)
+            self._can.writePacket(byteArray, self.API_ID)
 
             self.publishString("CAN_WRITE_PACKET_STATUS", "None")
 

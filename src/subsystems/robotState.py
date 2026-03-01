@@ -6,20 +6,7 @@ from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import (
-    radians,
-    meters_per_second,
-    meters,
-    inchesToMeters,
-)
-
-ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
-BATTERY_VOLTS: float = 12
-
-
-class TeamSide(Enum):
-    SIDE_RED = 1
-    SIDE_BLUE = 2
+from wpimath.units import meters_per_second, meters, radians
 
 
 class TurretTarget(Enum):
@@ -64,16 +51,15 @@ class RobotState(NetworkTablesMixin):
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
 
-    teamSide: TeamSide = TeamSide.SIDE_RED
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll = 0.0
     intakePosYAxis = 0.0
 
     def __post_init__(self) -> None:
-        self.myField: Field2d = Field2d()
-        SmartDashboard.putData("odomField", self.myField)
         super().__init__()
+        self.odomField: Field2d = Field2d()
+        SmartDashboard.putData("OdomField", self.odomField)
 
     def publish(self) -> None:
         for field in fields(self):
@@ -81,7 +67,7 @@ class RobotState(NetworkTablesMixin):
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
-        self.myField.setRobotPose(self.odometry.getEstimatedPosition())
+        self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
 
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
