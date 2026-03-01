@@ -7,10 +7,10 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.turretSystem import Turret, Shooter
-from subsystems.utils import TimeData
+from subsystems.utils import matchData, TimeData
 from typing import Generator, NamedTuple, Union
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 
 
@@ -48,7 +48,11 @@ class SubsystemManager:
 
     def __post_init__(self) -> None:
         drive = self.subsystems.swerveDrive
-        initPos = Pose2d()
+        initPos = (
+            Pose2d(x=2, y=4, rotation=Rotation2d())
+            if matchData.isBlue()
+            else Pose2d(x=14.5, y=4, rotation=Rotation2d.fromDegrees(180))
+        )
 
         self.robotState.fieldSpeeds = ChassisSpeeds()
         self.robotState.odometry = SwerveDrive4PoseEstimator(
@@ -58,7 +62,7 @@ class SubsystemManager:
             initPos,
         )
 
-    def __iter__(self) -> Generator[Union[Subsystem, Subsystems, TimeData]]:
+    def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
         for f in fields(self):
             v = getattr(self, f.name)
             if isinstance(v, (Subsystem, Subsystems)):
