@@ -17,7 +17,6 @@ from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second as MPS
 from wpimath.units import revolutions_per_minute as RPM
 from wpimath.units import (
-    metersToFeet,
     radians,
     meters,
     inchesToMeters,
@@ -66,6 +65,7 @@ class RobotState(NetworkTablesMixin):
     dontShoot: bool
     impossibleDynamic: bool
     forceDynamicTurret: bool
+    turretVelocitySetpoint: Translation2d
 
     robotOmegaSpeed: MPS
     robotLinearVelocity: Translation2d
@@ -85,14 +85,14 @@ class RobotState(NetworkTablesMixin):
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
 
-    teamSide: TeamSide = TeamSide.SIDE_BLUE
+    teamSide: TeamSide = TeamSide.SIDE_RED
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll: float = 0.0
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field", self.myField)
+        SmartDashboard.putData("odomField", self.myField)
         # SendableChooser().addOption("SIDE_RED")
         super().__init__()
         self.publish
