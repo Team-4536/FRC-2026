@@ -3,8 +3,8 @@ from numpy import sign
 from phoenix6.units import volt as voltage
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from typing import Tuple
-from wpilib import Timer
+from typing import Optional, Tuple
+from wpilib import DriverStation, RobotBase, Timer
 from wpimath.geometry import Translation2d
 from wpimath.units import (
     inchesToMeters,
@@ -71,7 +71,10 @@ class TimeData(Subsystem):
 timeData: TimeData = TimeData()
 
 
-class _MatchTime:
+class _MatchData:
+    red: DriverStation.Alliance = DriverStation.Alliance.kRed
+    blue: DriverStation.Alliance = DriverStation.Alliance.kBlue
+
     @property
     def dt(self) -> seconds:
         return timeData.dt
@@ -84,8 +87,33 @@ class _MatchTime:
     def timeSincePhaseInit(self) -> seconds:
         return timeData.timeSincePhaseInit
 
+    def isSimulation(self) -> bool:
+        return RobotBase.isSimulation()
 
-matchTime: _MatchTime = _MatchTime()
+    def isReal(self) -> bool:
+        return RobotBase.isReal()
+
+    def isAutonomous(self) -> bool:
+        return DriverStation.isAutonomousEnabled()
+
+    def isTeleop(self) -> bool:
+        return DriverStation.isTeleopEnabled()
+
+    def isDisabled(self) -> bool:
+        return DriverStation.isDisabled()
+
+    @property
+    def allianceSide(self) -> Optional[DriverStation.Alliance]:
+        return DriverStation.getAlliance()
+
+    def isRed(self) -> bool:
+        return self.allianceSide == self.red
+
+    def isBlue(self) -> bool:
+        return self.allianceSide == self.blue
+
+
+matchData: _MatchData = _MatchData()
 
 
 class Scalar:
