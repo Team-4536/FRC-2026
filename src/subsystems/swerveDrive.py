@@ -230,7 +230,9 @@ class SwerveDrive(Subsystem):
         )
 
         robotState.robotOmegaSpeed = self.getOmegaVelocity()
-        robotState.robotLinearVelocity = self.getLinearVelocity()
+        robotState.robotLinearVelocity = self.getLinearVelocity(
+            robotState.odometry.getEstimatedPosition().rotation()
+        )
 
         return robotState
 
@@ -239,7 +241,7 @@ class SwerveDrive(Subsystem):
         self._configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
         self._configureAzimuthMotors(config=RevMotor.DISABLED_AZIMUTH_CONFIG)
 
-    def getLinearVelocity(self) -> Translation2d:
+    def getLinearVelocity(self, roboRotation: Rotation2d) -> Translation2d:
         vector = Translation2d()
 
         for module in self._modules:
@@ -247,10 +249,10 @@ class SwerveDrive(Subsystem):
 
         vector = Translation2d(
             distance=(vector.distance(Translation2d())) / 4,
-            angle=Rotation2d(),  # TODO TODO TODO EMMET HELP
+            angle=vector.angle(),  # TODO TODO TODO EMMET HELP
         )
 
-        return vector
+        return vector.rotateBy(roboRotation)
 
     def getOmegaVelocity(self) -> MPS:
 

@@ -300,9 +300,9 @@ class Turret(Subsystem):
             ),
         )
 
-        # self.compensateSetpoint(
-        #     time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
-        # )
+        self.compensateSetpoint(
+            time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
+        )
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -558,8 +558,7 @@ class Turret(Subsystem):
                 distance=velocity, angle=Rotation2d(self.pitchSetpoint)
             )
         )
-        xScaleIn = self.getFloat("X scale", default=1)
-        yScaleIn = self.getFloat("Y scale", default=1)
+
         temp = Translation2d(temp.x * VELOCITY_SCALAR.x, temp.y * VELOCITY_SCALAR.y)
 
         self.pitchAngle = temp.angle().radians()
