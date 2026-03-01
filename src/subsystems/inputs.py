@@ -40,7 +40,7 @@ class Inputs(Subsystem):
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
-            max(self._driveCtrlr.getRightTriggerAxis() / 0.9, 1.0),
+            min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
