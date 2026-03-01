@@ -4,7 +4,7 @@ from phoenix6.units import volt as voltage
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Tuple
-from wpilib import getTime
+from wpilib import Timer
 from wpimath.geometry import Translation2d
 from wpimath.units import (
     inchesToMeters,
@@ -20,53 +20,72 @@ FIELD_LEN: meters = inchesToMeters(651.2)
 BATTERY_VOLTS: float = 12
 
 
-def lerp(x: float, y: float, t: float) -> float:
-    return x + t * (y - x)
-
-
 class TimeData(Subsystem):
-    dt: seconds = 0
-    timeSinceInit: seconds = 0
-    timeSincePhaseInit: seconds = 0
-    prevTime: seconds
-    initTime: seconds
-    phaseInitTime: seconds
+    _matchTime: Timer
+    _phaseTime: Timer
+
+    _prevTime: seconds = 0
+    _deltaTime: seconds = 0
 
     def __init__(self) -> None:
         super().__init__()
 
-        time = getTime()
-        self.prevTime = time
-        self.initTime = time
-        self.phaseInitTime = time
+        self._matchTime = Timer()
+        self._phaseTime = Timer()
+
+        self._matchTime.start()
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-        time = getTime()
-        self.timeSincePhaseInit = 0
-        self.phaseInitTime = time
-
+        self._phaseTime.reset()
+        self._phaseTime.start()
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
-        time = getTime()
-        self.dt = time - self.prevTime
-        self.timeSinceInit = time - self.initTime
-        self.timeSincePhaseInit = time - self.phaseInitTime
-        self.prevTime = time
-
+        time = self._matchTime.get()
+        self._deltaTime = time - self._prevTime
+        self._prevTime = time
         return robotState
 
     def disabled(self) -> None:
-        time = getTime()
-        self.dt = time - self.prevTime
-        self.timeSinceInit = time - self.initTime
-        self.timeSincePhaseInit = 0
-        self.prevTime = time
+        self._phaseTime.stop()
+        self._phaseTime.reset()
 
     def publish(self) -> None:
         self.publishFloat("delta_time", self.dt)
         self.publishFloat("time_since_init", self.timeSinceInit)
         self.publishFloat("time_since_phase_init", self.timeSincePhaseInit)
+
+    @property
+    def dt(self) -> seconds:
+        return self._deltaTime
+
+    @property
+    def timeSinceInit(self) -> seconds:
+        return self._matchTime.get()
+
+    @property
+    def timeSincePhaseInit(self) -> seconds:
+        return self._phaseTime.get()
+
+
+timeData: TimeData = TimeData()
+
+
+class _MatchTime:
+    @property
+    def dt(self) -> seconds:
+        return timeData.dt
+
+    @property
+    def timeSinceInit(self) -> seconds:
+        return timeData.timeSinceInit
+
+    @property
+    def timeSincePhaseInit(self) -> seconds:
+        return timeData.timeSincePhaseInit
+
+
+matchTime: _MatchTime = _MatchTime()
 
 
 class Scalar:
@@ -175,6 +194,10 @@ class CircularScalar:
 
     def setMagnitude(self, magnitude: float) -> None:
         self._linearScalar.setMagnitude(magnitude)
+
+
+def lerp(x: float, y: float, t: float) -> float:
+    return x + t * (y - x)
 
 
 def getTangentAngle(posFromCenter: Translation2d) -> radians:

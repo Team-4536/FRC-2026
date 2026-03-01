@@ -58,7 +58,7 @@ class SubsystemManager:
             initPos,
         )
 
-    def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
+    def __iter__(self) -> Generator[Union[Subsystem, Subsystems, TimeData]]:
         for f in fields(self):
             v = getattr(self, f.name)
             if isinstance(v, (Subsystem, Subsystems)):

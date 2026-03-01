@@ -6,7 +6,7 @@ from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.turretSystem import Shooter, Turret
-from subsystems.utils import TimeData
+from subsystems.utils import timeData
 from wpilib import TimedRobot
 
 
@@ -22,10 +22,10 @@ class Robot(TimedRobot):
                 swerveDrive=SwerveDrive(),
                 turret=Turret(yawMotorID=14, pitchMotorID=13),
             ),
-            cameras=CameraManager(),
             inputs=Inputs(),
+            cameras=CameraManager(),
+            time=timeData,
             robotState=RobotState.empty(),
-            time=TimeData(),
         )
 
     def robotPeriodic(self) -> None:
