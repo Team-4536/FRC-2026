@@ -27,7 +27,7 @@ class Subsystems(NamedTuple):
 
     def periodic(self, rs: RobotState) -> None:
         for s in self:
-            rs = s.periodic(rs)
+            s.periodic(rs)
 
     def disabled(self) -> None:
         for s in self:
