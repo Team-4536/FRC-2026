@@ -6,6 +6,7 @@ from subsystems.motor import RevMotor
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
+from subsystems.utils import getTangentAngle, getContributedRotation
 from typing import NamedTuple, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
@@ -196,6 +197,13 @@ class SwerveDrive(Subsystem):
 
         return robotState
 
+    def robotPeriodic(self, robotState: RobotState) -> RobotState:
+        robotState.odometry.update(
+            self._gyro.getRotation2d(),
+            self._modules.modulePositions,
+        )
+        return robotState
+
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:
             self._gyro.reset()
@@ -215,12 +223,46 @@ class SwerveDrive(Subsystem):
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
+        robotState.robotOmegaSpeed = self.getOmegaVelocity()
+        robotState.robotLinearVelocity = self.getLinearVelocity()
+
         return robotState
 
     def disabled(self) -> None:
         self._modules.stopModules()
         self._configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
         self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
+
+    def getLinearVelocity(self) -> Translation2d:
+        vector = Translation2d()
+
+        for module in self._modules:
+            vector += self.getDriveVelocity(module)
+
+        vector = Translation2d(
+            distance=vector.distance(Translation2d()) / 4,
+            angle=Rotation2d(),  # TODO EMMETT HELP
+        )
+
+        return vector
+
+    def getOmegaVelocity(self) -> meters_per_second:
+        sum = 0
+        for module in self._modules:
+            tanVel = getTangentAngle(module.position)
+            sum += getContributedRotation(
+                tanVel,
+                module.azimuthRotation.radians(),
+                self.getDriveVelocity(module).distance(Translation2d()),
+            )
+
+        return sum / 4
+
+    def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
+        speed = module.driveVelocity
+        angle = module.azimuthRotation
+        vector = Translation2d(distance=speed, angle=angle)
+        return vector
 
     def drive(self, fieldSpeeds: ChassisSpeeds) -> None:
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(

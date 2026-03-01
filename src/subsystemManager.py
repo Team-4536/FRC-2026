@@ -1,35 +1,44 @@
 from dataclasses import dataclass, fields
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
+from subsystems.intake import Intake
 from subsystems.LEDSignals import LEDSignals
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
+from subsystems.turretSystem import Turret, Shooter
 from subsystems.utils import TimeData
-from typing import Generator, NamedTuple
+from typing import Generator, NamedTuple, Union
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d
 from wpimath.kinematics import ChassisSpeeds
 
 
 class Subsystems(NamedTuple):
+    intake: Intake
     ledSignals: LEDSignals
+    shooter: Shooter
     swerveDrive: SwerveDrive
+    turret: Turret
 
     def phaseInit(self, rs: RobotState) -> None:
-        (s.phaseInit(rs) for s in self)
+        for s in self:
+            s.phaseInit(rs)
 
     def periodic(self, rs: RobotState) -> None:
-        (s.periodic(rs) for s in self)
+        for s in self:
+            rs = s.periodic(rs)
 
     def disabled(self) -> None:
-        (s.disabled() for s in self)
+        for s in self:
+            s.disabled()
 
     def publish(self) -> None:
-        (s.publish() for s in self)
+        for s in self:
+            s.publish()
 
 
-@dataclass(frozen=True)
+@dataclass
 class SubsystemManager:
     subsystems: Subsystems
     inputs: Inputs
@@ -49,22 +58,21 @@ class SubsystemManager:
             initPos,
         )
 
-    def __iter__(self) -> Generator[Subsystem]:
+    def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
         for f in fields(self):
             v = getattr(self, f.name)
-            if isinstance(v, Subsystem):
+            if isinstance(v, (Subsystem, Subsystems)):
                 yield v
 
     def init(self) -> None:
-        for s in self.subsystems:
+        for s in self:
             s.phaseInit(self.robotState)
-        self.inputs.phaseInit(self.robotState)
-        self.cameras.phaseInit(self.robotState)
-        self.time.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
         for s in self:
             s.publish()
+        self.robotState.publish()
+
         self.cameras.periodic(self.robotState)
         self.time.periodic(self.robotState)
 
@@ -81,5 +89,5 @@ class SubsystemManager:
             s.periodic(self.robotState)
 
     def disabled(self) -> None:
-        for s in (*self.subsystems, self.inputs, self.cameras, self.time):
+        for s in self:
             s.disabled()

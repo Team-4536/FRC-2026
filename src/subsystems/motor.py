@@ -3,15 +3,18 @@ from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
+    FeedForwardConfig,
+    LimitSwitchConfig,
     MAXMotionConfig,
     PersistMode,
     ResetMode,
+    SoftLimitConfig,
     SparkBaseConfig,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
 )
-from wpimath.units import radians, revolutions_per_minute
+from wpimath.units import radians, radiansToRotations, revolutions_per_minute
 
 
 class RevMotor:
@@ -41,9 +44,17 @@ class RevMotor:
             ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
 
+    def setMaxMotionVelocity(self, rpm: revolutions_per_minute) -> None:
+        self._ctrlr.getClosedLoopController().setReference(
+            setpoint=rpm, ctrl=SparkMax.ControlType.kMAXMotionVelocityControl
+        )
+
+    def setVoltage(self, volts: float) -> None:
+        self._ctrlr.setVoltage(volts)
+
     def setPosition(self, rot: radians) -> None:
         self._ctrlr.getClosedLoopController().setReference(
-            setpoint=rot,
+            setpoint=radiansToRotations(rot),
             ctrl=SparkMax.ControlType.kPosition,
         )
 
@@ -57,6 +68,64 @@ class RevMotor:
     DRIVE_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00019, 0, 0, 0.00205)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(2000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
+
+    INTAKE_MOTOR_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(15)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00019, 0, 0, 0.00205)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(2000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(25000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
+
+    INDEXER_MOTOR_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(20)
+        .disableFollowerMode()
+        .inverted(False)
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00019, 0, 0, 0.00205)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(2000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(25000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
+
+    INTAKE_RAISE_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(15)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
@@ -107,4 +176,109 @@ class RevMotor:
         .smartCurrentLimit(40)
         .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
+    )
+
+    TURRET_YAW_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(20, 20)
+        .inverted(True)
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.08, 0, 0, 0.02)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .positionWrappingEnabled(False)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(500, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.2)
+            )
+            .apply(FeedForwardConfig().kA(0))
+        )
+        .apply(
+            LimitSwitchConfig().limitSwitchPositionSensor(
+                FeedbackSensor.kPrimaryEncoder
+            )
+        )
+        .apply(
+            SoftLimitConfig()
+            .forwardSoftLimit(16.67)
+            .reverseSoftLimit(0)
+            .forwardSoftLimitEnabled(True)
+            .reverseSoftLimitEnabled(True)
+        )
+    )
+
+    TURRET_PITCH_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(20, 20)
+        .inverted(True)
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.035, 0, 0, 0.05)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .positionWrappingEnabled(True)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(500, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.2)
+            )
+        )
+        .apply(
+            LimitSwitchConfig().limitSwitchPositionSensor(
+                FeedbackSensor.kPrimaryEncoder
+            )
+        )
+        .apply(
+            SoftLimitConfig()
+            .forwardSoftLimit(29)
+            .reverseSoftLimit(0)
+            .forwardSoftLimitEnabled(True)
+            .reverseSoftLimitEnabled(True)
+        )
+    )
+
+    FLYWHEEL_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
+        .inverted(True)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.000025, 0, 0, 0.0018072289)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(4000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(4000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
+    )
+
+    KICK_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .inverted(False)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.00019, 0, 0, 0.00205)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(4000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(1000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(1)
+            )
+        )
     )

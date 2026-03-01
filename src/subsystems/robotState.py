@@ -1,18 +1,60 @@
 from dataclasses import dataclass, fields, MISSING
+from enum import Enum
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Translation2d
 from wpimath.kinematics import ChassisSpeeds
+from wpimath.units import meters_per_second, meters, radians
+
+
+class TurretTarget(Enum):
+    NONE = 0
+    HUB = 1
+    SHUTTLE_RIGHT = 2
+    SHUTTLE_LEFT = 3
+
+
+class TurretMode(Enum):
+    DISABLED = 0
+    MANUAL = 1
+    DYNAMIC = 2
 
 
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
+    initialIntake: bool
+    intakeIndexer: bool
+    intakeEject: bool
+    intakePos: int
+    intakeMode: bool
     resetGyro: bool
-    pose: Pose2d
     odometry: SwerveDrive4PoseEstimator
+
+    revSpeed: float
+    kickShooter: bool
+    optimalTurretAngle: radians  # REMOVE (local var)
+    targetDistance: meters  # REMOVE (local var)
+    targetHeight: meters  # REMOVE (local var)
+    turretSwitchMode: bool
+    turretManualSetpoint: float
+    turretSwitchTarget: bool
+    turretSwitchEnabled: bool
+    turretResetYawEncdoer: bool  # REMOVE (local var)
+    dontShoot: bool  # REMOVE (local var)
+    impossibleDynamic: bool  # REMOVE (local var)
+    forceDynamicTurret: bool  # REMOVE (local var)
+    turretVelocitySetpoint: Translation2d
+
+    robotOmegaSpeed: meters_per_second
+    robotLinearVelocity: Translation2d
+
+    turretTarget: TurretTarget = TurretTarget.NONE
+    turretMode: TurretMode = TurretMode.MANUAL
+    ejectAll = 0.0
+    intakePosYAxis = 0.0
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -26,6 +68,10 @@ class RobotState(NetworkTablesMixin):
             self.publishGeneric(name, value)
 
         self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
+
+        self.publishFloat(
+            "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
+        )
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
@@ -41,4 +87,4 @@ class RobotState(NetworkTablesMixin):
             else:
                 data[f.name] = None
 
-        return cls(**data)  # type: ignore
+        return cls(**data)  # pyright: ignore

@@ -3,7 +3,7 @@ name = "FRC-2026"
 version = "1.0"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-    "robotpy==2026.2.1",
+    "robotpy==2026.2.1.1",
     "robotpy-navx",
     "robotpy-pathplannerlib",
     "robotpy-rev",
@@ -11,6 +11,7 @@ dependencies = [
     "photonlibpy",
     "ty",
     "pre-commit",
+    "certifi>=2026.1.4",
     "setuptools<82.0.0",
 ]
 

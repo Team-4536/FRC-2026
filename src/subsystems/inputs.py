@@ -30,6 +30,8 @@ class Inputs(Subsystem):
         )
         self._linearScalar = Scalar()
 
+        self._isTestMode: bool = False
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
         return robotState
 
@@ -42,6 +44,23 @@ class Inputs(Subsystem):
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+
+        # Turret Controls
+        robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
+        robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
+        robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
+        robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
+        robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
+        robotState.kickShooter = self._mechCtrlr.getRightBumper()
+
+        # Intake Controls
+        robotState.initialIntake = self._mechCtrlr.getAButton()
+        robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
+        robotState.intakeEject = self._mechCtrlr.getBButton()
+        robotState.intakePosYAxis = self._mechCtrlr.getRightY()
+        robotState.intakePos = self._mechCtrlr.getPOV()
+        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
 
         return robotState
 
