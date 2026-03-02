@@ -102,6 +102,7 @@ class SubsystemManager(NetworkTablesMixin):
         self.robotState.publish()
 
         self.cameras.periodic(self.robotState)
+        self.subsystems.swerveDrive.robotPeriodic(self.robotState)
         self.time.periodic(self.robotState)
 
     def autonomousPeriodic(self) -> None:
