@@ -8,14 +8,18 @@ class SubsystemMethodError(Exception):
 
 
 class Subsystem(NetworkTablesMixin):
-    def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
-        super().__init__(table=table, instance=instance)
+    def __init__(self, *, table: str = "telemetry", inst: bool = True):
+        super().__init__(table=table, inst=inst)
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
+    def phaseInit(
+        self, robotState: RobotState
+    ) -> RobotState:  # TODO: stop returning RobotState as it is now unused
         self._warn(self.phaseInit)
         return robotState
 
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(
+        self, robotState: RobotState
+    ) -> RobotState:  # TODO: stop returning RobotState for the same reason ^^^
         self._warn(self.periodic)
         return robotState
 

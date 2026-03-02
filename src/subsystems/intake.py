@@ -1,7 +1,8 @@
-from subsystems.subsystem import Subsystem
+from enum import Enum
 from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
-from enum import Enum
+from subsystems.subsystem import Subsystem
+from wpilib import getTime
 import wpilib
 
 
@@ -14,24 +15,24 @@ class IntakeState(Enum):
 
 
 class Intake(Subsystem):
-
     # defines all motors that are used in the subsystem
-    def __init__(self, FrontMotorID, BackMotorID, RaiseMotorID):
+    def __init__(self, frontMotorID: int, backMotorID: int, raiseMotorID: int):
         super().__init__()
-        self.intakeMotorManual = RevMotor(deviceID=FrontMotorID)
-        self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
-        self.intakeMotorAutomatic = RevMotor(deviceID=BackMotorID)
+        self.intakeMotorManual = RevMotor(deviceID=frontMotorID)
+        self.intakeMotorRaise = RevMotor(deviceID=raiseMotorID)
+        self.intakeMotorAutomatic = RevMotor(deviceID=backMotorID)
         self.downLimitSwitch = self.intakeMotorRaise.getLimitSwitch(0)
-        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(1)
+        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(
+            1
+        )  # TODO add real IDs
 
         self.AUTOMATIC_MODE = False
 
-        self.publishFloat("intake_speed (0 to 1)", 0.2)
-        self.publishFloat("reverse_speed (0 to 1)", 0.2)
+        self.publishFloat("intake_speed (0 to 1)", 0.7)
+        self.publishFloat("reverse_speed (0 to 1)", 0.7)
         self.publishFloat("indexer_speed (0 to 1)", 0.4)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-
         self.intakeMotorAutomatic.configure(config=RevMotor.INDEXER_MOTOR_CONFIG)
         self.intakeMotorManual.configure(config=RevMotor.INTAKE_MOTOR_CONFIG)
         self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
@@ -84,7 +85,7 @@ class Intake(Subsystem):
                     self.state = IntakeState.GOING_DOWN
 
             if self.state == IntakeState.GOING_DOWN:
-                if wpilib.getTime() - self.startTime < 0.3:
+                if getTime() - self.startTime < 0.3:
                     self.raiseThrottle = self.raiseDownSetpoint
                 else:
                     self.raiseThrottle = 0
@@ -111,6 +112,7 @@ class Intake(Subsystem):
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:
             self.automaticThrottle = self.indexerSetpoint
+            self.manualThrottle = self.motorForwardSetpoint
         else:
             self.automaticThrottle = 0
 
