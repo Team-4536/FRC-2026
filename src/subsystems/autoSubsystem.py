@@ -20,6 +20,7 @@ class AutoRoutines(Enum):
     GET_BALLS_AND_BRING_BACK_LEFT = "Get Balls And Bring Back Left"
     FORWARD = "Forward"
     FORWARD_AND_INTAKE = "Forward And Intake"
+    FORWARD_AND_SHOOT = "Forward And Shoot"
 
 
 class AutoSubsystem(Subsystem):
@@ -191,5 +192,9 @@ def routineChooser(
                 ),
                 OperateIntake(5),
             ]
+
+        case AutoRoutines.FORWARD_AND_SHOOT:
+            routine["Forward"] = [FollowTrajectory("Drive Forward Test", isFlipped)]
+            routine["shoot"] = [OperateTurret(True, 0.5, isFlipped)]
 
     return routine
