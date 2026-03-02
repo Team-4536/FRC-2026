@@ -35,17 +35,13 @@ class Subsystems(NamedTuple):
         for s in self:
             s.disabled()
 
-    def publish(self) -> None:
-        for s in self:
-            s.publish()
-
 
 @dataclass
 class SubsystemManager(NetworkTablesMixin):
-    subsystems: Subsystems
     inputs: Inputs
     cameras: CameraManager
     time: TimeData
+    subsystems: Subsystems
     robotState: RobotState
 
     RUN_PUBLISH: bool = True
@@ -78,8 +74,8 @@ class SubsystemManager(NetworkTablesMixin):
             if not isinstance(i, Subsystems):
                 self.publishBoolean(f"publish{i.__class__.__name__}?", True, "specific")
 
+        self.disabled()  # TODO: have subsystems make sure that their class attributes are initialized on class initialization
         for s in self:
-            s.disabled()  # TODO: have subsystems make sure that their class attributes are initialized on class initialization
             self._publish(True)
         nt.debugging = self.DEBUGGING
         self.publishBoolean("debugging", self.DEBUGGING)
@@ -117,6 +113,7 @@ class SubsystemManager(NetworkTablesMixin):
         for s in self.subsystems:
             s.periodic(self.robotState)
 
+    # TODO: maybe move some of this back into Subsystems
     def _publish(self, force: bool = False) -> None:
         if not force:
             nt.debugging = self.getBoolean("debugging", inst=False, default=False)
@@ -132,6 +129,7 @@ class SubsystemManager(NetworkTablesMixin):
                     default=True,
                 ):
                     i.publish()
+                continue
             for s in self.subsystems:
                 if self.getBoolean(
                     f"publish{s.__class__.__name__}?",

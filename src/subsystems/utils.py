@@ -108,8 +108,7 @@ class _MatchData:
         return DriverStation.isTeleopEnabled()
 
     def isDisabled(self) -> bool:
-        return timeData.isDisabled()  # TODO: figure out a way to improve this
-        # return DriverStation.isDisabled()
+        return DriverStation.isDisabled()
 
     @property
     def allianceSide(self) -> Optional[DriverStation.Alliance]:

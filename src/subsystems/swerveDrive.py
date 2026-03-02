@@ -213,11 +213,7 @@ class SwerveDrive(Subsystem):
 
     def disabled(self) -> None:
         self._modules.stopModules()
-        if (
-            not self._disabledModules
-            and matchData.isDisabled()  # TODO: find a way to not require this
-            and matchData.timeSincePhaseInit > 1.5
-        ):
+        if not self._disabledModules and matchData.timeSincePhaseInit > 3:
             self._disableModules()
             self._disabledModules = True
 
