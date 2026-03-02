@@ -1,19 +1,31 @@
 from functools import partial
-from ntcore import NetworkTableInstance, Value
+from ntcore import NetworkTable, NetworkTableInstance, Value
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
 from wpimath.kinematics import SwerveModuleState
 
 Struct: TypeAlias = object
+debugging: bool = True
 
 
 class NetworkTablesMixin:
-    def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
-        self.table = self._getTable(table, instance)
-        self._ntPersist: Dict[str, object] = {}
+    _table: NetworkTable
+    _ntPersist: Dict[str, object]
+
+    def __init__(self, *, table: str = "telemetry", inst: bool = True):
+        self._table = self._getTable(table, inst)
+        self._ntPersist = {}
 
     def __publish(
-        self, name: str, value: Any, topicFn: Callable[[str], Any], *subtables: str
+        self,
+        name: str,
+        value: Any,
+        topicFn: Callable[[str], Any],
+        *subtables: str,
+        debug: bool,
     ) -> None:
+        if debug and not debugging:
+            return
+
         if subtables:
             name = "/".join((*subtables, name))
 
@@ -25,47 +37,78 @@ class NetworkTablesMixin:
 
         pub.set(value)  # type: ignore[attr-defined]
 
-    def publishString(self, name: str, value: str, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getStringTopic, *subtables)
+    def publishString(
+        self, name: str, value: str, *subtables: str, debug: bool = False
+    ) -> None:
+        self.__publish(name, value, self._table.getStringTopic, *subtables, debug=debug)
 
     def publishStringArray(
-        self, name: str, value: Sequence[str], *subtables: str
+        self, name: str, value: Sequence[str], *subtables: str, debug: bool = False
     ) -> None:
-        self.__publish(name, value, self.table.getStringArrayTopic, *subtables)
+        self.__publish(
+            name, value, self._table.getStringArrayTopic, *subtables, debug=debug
+        )
 
-    def publishInteger(self, name: str, value: int, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getIntegerTopic, *subtables)
+    def publishInteger(
+        self, name: str, value: int, *subtables: str, debug: bool = False
+    ) -> None:
+        self.__publish(
+            name, value, self._table.getIntegerTopic, *subtables, debug=debug
+        )
 
     def publishIntegerArray(
-        self, name: str, value: Sequence[int], *subtables: str
+        self, name: str, value: Sequence[int], *subtables: str, debug: bool = False
     ) -> None:
-        self.__publish(name, value, self.table.getIntegerArrayTopic, *subtables)
+        self.__publish(
+            name, value, self._table.getIntegerArrayTopic, *subtables, debug=debug
+        )
 
-    def publishFloat(self, name: str, value: float, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getFloatTopic, *subtables)
+    def publishFloat(
+        self, name: str, value: float, *subtables: str, debug: bool = False
+    ) -> None:
+        self.__publish(name, value, self._table.getFloatTopic, *subtables, debug=debug)
 
     def publishFloatArray(
-        self, name: str, value: Sequence[float], *subtables: str
+        self, name: str, value: Sequence[float], *subtables: str, debug: bool = False
     ) -> None:
-        self.__publish(name, value, self.table.getFloatArrayTopic, *subtables)
+        self.__publish(
+            name, value, self._table.getFloatArrayTopic, *subtables, debug=debug
+        )
 
-    def publishBoolean(self, name: str, value: bool, *subtables: str) -> None:
-        self.__publish(name, value, self.table.getBooleanTopic, *subtables)
+    def publishBoolean(
+        self, name: str, value: bool, *subtables: str, debug: bool = False
+    ) -> None:
+        self.__publish(
+            name, value, self._table.getBooleanTopic, *subtables, debug=debug
+        )
 
     def publishBooleanArray(
-        self, name: str, value: Sequence[bool], *subtables: str
+        self, name: str, value: Sequence[bool], *subtables: str, debug: bool = False
     ) -> None:
-        self.__publish(name, value, self.table.getBooleanArrayTopic, *subtables)
+        self.__publish(
+            name, value, self._table.getBooleanArrayTopic, *subtables, debug=debug
+        )
 
-    def publishStruct(self, name: str, value: Struct, *subtables: str) -> None:
-        topicFn = partial(self.table.getStructTopic, type=value.__class__)
-        self.__publish(name, value, topicFn, *subtables)
+    def publishStruct(
+        self, name: str, value: Struct, *subtables: str, debug: bool = False
+    ) -> None:
+        topicFn = partial(self._table.getStructTopic, type=value.__class__)
+        self.__publish(name, value, topicFn, *subtables, debug=debug)
 
     def publishStructArray(
-        self, name: str, value: Sequence[Struct], *subtables: str
+        self, name: str, value: Sequence[Struct], *subtables: str, debug: bool = False
     ) -> None:
-        topicFn = partial(self.table.getStructArrayTopic, type=value[0].__class__)
-        self.__publish(name, value, topicFn, *subtables)
+        topicFn = partial(self._table.getStructArrayTopic, type=value[0].__class__)
+        self.__publish(name, value, topicFn, *subtables, debug=debug)
+
+    def publishSwerve(
+        self,
+        name: str,
+        value: Tuple[SwerveModuleState, ...],
+        *subtables: str,
+        debug: bool = False,
+    ) -> None:
+        self.publishStructArray(name, value, *subtables, debug=debug)
 
     def publishGeneric(
         self,
@@ -103,7 +146,7 @@ class NetworkTablesMixin:
         typeStr = type(value).__name__  # pyright: ignore
         pub = self._ntPersist.get(name)
         if pub is None:
-            topic = self.table.getTopic(name)
+            topic = self._table.getTopic(name)
             pub = topic.genericPublish(typeStr)
             self._ntPersist[name] = pub
 
@@ -112,109 +155,122 @@ class NetworkTablesMixin:
         except TypeError:
             self.publishGeneric("test", "Null", *subtables)
 
-    def publishSwerve(
-        self,
-        name: str,
-        value: Tuple[
-            SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState
-        ],
-        *subtables: str,
-    ) -> None:
-        self.publishStructArray(name, value, *subtables)
+    def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
+        if s:
+            n = "/".join((*s, n))
+        return t(n).getEntry(d).get()
 
-    def __get(
-        self,
-        name: str,
-        topicFn: Callable[[str], Any],
-        *subtables: str,
-        default: Any,
-    ) -> Any:
-        if subtables:
-            name = "/".join((*subtables, name))
-
-        topic = topicFn(name)
-
-        return topic.getEntry(default).get()
-
-    def _getTable(self, table: str, instance: Optional[str] = None):
-        if not instance:
+    def _getTable(self, table: Optional[str], inst: bool):
+        if table is None:
+            table = self._table.getPath()
+        if inst:
             table = f"{table}/{self.__class__.__name__}"
         return NetworkTableInstance.getDefault().getTable(table)
 
     def getString(
-        self, name: str, table: str = "telemetry", *subtables: str, default: str
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: str,
     ) -> str:
         return self.__get(
-            name, self._getTable(table).getStringTopic, *subtables, default=default
+            name, self._getTable(table, inst).getStringTopic, *subtables, d=default
         )
 
     def getStringArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[str],
     ) -> Sequence[str]:
         return self.__get(
-            name, self._getTable(table).getStringArrayTopic, *subtables, default=default
+            name,
+            self._getTable(table, inst).getStringArrayTopic,
+            *subtables,
+            d=default,
         )
 
     def getInteger(
-        self, name: str, table: str = "telemetry", *subtables: str, default: int
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: int,
     ) -> int:
         return self.__get(
-            name, self._getTable(table).getIntegerTopic, *subtables, default=default
+            name, self._getTable(table, inst).getIntegerTopic, *subtables, d=default
         )
 
     def getIntegerArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[int],
     ) -> Sequence[int]:
         return self.__get(
             name,
-            self._getTable(table).getIntegerArrayTopic,
+            self._getTable(table, inst).getIntegerArrayTopic,
             *subtables,
-            default=default,
+            d=default,
         )
 
     def getFloat(
-        self, name: str, table: str = "telemetry", *subtables: str, default: float
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: float,
     ) -> float:
         return self.__get(
-            name, self._getTable(table).getFloatTopic, *subtables, default=default
+            name, self._getTable(table, inst).getFloatTopic, *subtables, d=default
         )
 
     def getFloatArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[float],
     ) -> Sequence[float]:
         return self.__get(
-            name, self._getTable(table).getFloatArrayTopic, *subtables, default=default
+            name,
+            self._getTable(table, inst).getFloatArrayTopic,
+            *subtables,
+            d=default,
         )
 
     def getBoolean(
-        self, name: str, table: str = "telemetry", *subtables: str, default: bool
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: bool,
     ) -> bool:
         return self.__get(
-            name, self._getTable(table).getBooleanTopic, *subtables, default=default
+            name, self._getTable(table, inst).getBooleanTopic, *subtables, d=default
         )
 
     def getBooleanArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[bool],
     ) -> Sequence[bool]:
         return self.__get(
             name,
-            self._getTable(table).getBooleanArrayTopic,
+            self._getTable(table, inst).getBooleanArrayTopic,
             *subtables,
-            default=default,
+            d=default,
         )

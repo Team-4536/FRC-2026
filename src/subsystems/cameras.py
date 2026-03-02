@@ -4,13 +4,13 @@ from robotpy_apriltag import AprilTagField, AprilTagFieldLayout
 
 import wpimath.geometry
 
-import wpilib
-from photonlibpy import EstimatedRobotPose
-from subsystems.subsystem import Subsystem
-from subsystems.robotState import RobotState
-from wpimath.units import inchesToMeters
-from subsystems.networkTablesMixin import NetworkTablesMixin
 from ntcore import NetworkTableInstance
+from photonlibpy import EstimatedRobotPose
+from subsystems.networkTablesMixin import NetworkTablesMixin
+from subsystems.robotState import RobotState
+from subsystems.subsystem import Subsystem
+from wpimath.units import inchesToMeters
+from wpilib import getTime
 
 
 class photonCameraClass(NetworkTablesMixin):
@@ -58,7 +58,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.hasTargets = self.result.hasTargets()
 
         if self.hasTargets:
-
+            self.running = True
             self.hasTargetsRan = True
             self.target = self.result.getTargets()
             self.fiducialId = self.target[0].getFiducialId()
@@ -69,6 +69,7 @@ class photonCameraClass(NetworkTablesMixin):
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
                 == EstimatedRobotPose
             ):
+
                 self.trustworthy = True
                 self.camEstPose = self.camPoseEst.estimateLowestAmbiguityPose(
                     self.result
@@ -89,13 +90,6 @@ class photonCameraClass(NetworkTablesMixin):
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
                     self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
-
-                    # self.publishFloat("robotXodom", self.robotX.real)
-                    # self.publishFloat("robotYodom", self.robotY.real)
-                    # self.publishFloat("robotZodom", self.robotAngle.real)
-                    self.table.putNumber("camOdomX", self.robotX)
-                    self.table.putNumber("camOdomY", self.robotY)
-                    self.table.putNumber("camOdomR", self.robotAngle)
                 elif (
                     len(self.target) > 1
                     and type(self.camPoseEst.estimateCoprocMultiTagPose(self.result))
@@ -121,19 +115,12 @@ class photonCameraClass(NetworkTablesMixin):
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
                     self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
-
-                    # self.publishFloat("robotXodom", self.robotX.real)
-                    # self.publishFloat("robotYodom", self.robotY.real)
-                    # self.publishFloat("robotZodom", self.robotAngle.real)
-                    self.table.putNumber("camOdomX", self.robotX)
-                    self.table.putNumber("camOdomY", self.robotY)
-                    self.table.putNumber("camOdomR", self.robotAngle)
-
             else:
                 pass
         else:
             self.ambiguity = 1
             self.fiducialId = -1
+            self.running = False
 
 
 class CameraManager(Subsystem):
@@ -143,7 +130,7 @@ class CameraManager(Subsystem):
         self.photonCameraRight = photonCameraClass(
             "Camera1",
             15,
-            -33,
+            -30,
             inchesToMeters(27 / 2) - (9.1 / 100),
             inchesToMeters(27 / 2) - (4.4 / 100),
             27.5 / 100,
@@ -151,7 +138,7 @@ class CameraManager(Subsystem):
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             15,
-            27,
+            30,
             inchesToMeters(27 / 2) - (15.3 / 100),
             inchesToMeters(27 / 2) - (4.4 / 100),
             27.5 / 100,
@@ -171,25 +158,28 @@ class CameraManager(Subsystem):
 
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
+        self.publishBoolean("cam1 running", self.photonCameraRight.running)
+
+        self.publishBoolean("cam2 running", self.photonCameraLeft.running)
+
         # self.photonCameraMiddle.update()
 
         if self.photonCameraLeft.trustworthy:
             robotState.odometry.addVisionMeasurement(
-                self.photonCameraLeft.camEstPose2d, wpilib.getTime()
+                self.photonCameraLeft.camEstPose2d, getTime()
             )
         # if self.photonCameraMiddle.trustworthy:
 
         #     robotState.odometry.addVisionMeasurement(
-        #         self.photonCameraMiddle.camEstPose2d, wpilib.getTime()
+        #         self.photonCameraMiddle.camEstPose2d, getTime()
         #     )
 
         if self.photonCameraRight.trustworthy:
             robotState.odometry.addVisionMeasurement(
-                self.photonCameraRight.camEstPose2d, wpilib.getTime()
+                self.photonCameraRight.camEstPose2d, getTime()
             )
-        self.publish()
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
-        # robotState.odometry.addVisionMeasurement(self.a, wpilib.getTime())
+        # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
         robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
