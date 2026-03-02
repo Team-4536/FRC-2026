@@ -737,7 +737,9 @@ class Shooter(Subsystem):
         if not self.fullyReved:
             robotState.dontShoot = True
 
-        self.kickSpeed: RPM = self.kickMotorEncoder.getPosition()
+        self.kickSpeed = self.kickMotorEncoder.getVelocity()
+        self.revingSpeedTop = self.revTopEncoder.getVelocity()
+        self.revingSpeedBottom = self.revBottomEncoder.getVelocity()
 
         self.dependencies = (
             robotState.revSpeed,
@@ -761,14 +763,20 @@ class Shooter(Subsystem):
         self.publishFloat("RRRRRAAAAAHAHHH", self.revingSetpoint)
         self.revingSetpoint *= robotState.revSpeed  # multiplied by the trigger value
 
+        if robotState.ejectAll > 0.3 or robotState.indexerEject:
+            robotState.kickShooter = -1
+
+        if robotState.intakeIndexer:
+            robotState.kickShooter = 1
+
         self.revShooters(self.revingSetpoint)
 
         self.kickSetPoint = KICK_SPEED * int(robotState.kickShooter)
 
         self.dontShoot = robotState.dontShoot
 
-        # if not self.dontShoot:
-        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+        if not self.dontShoot:
+            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 

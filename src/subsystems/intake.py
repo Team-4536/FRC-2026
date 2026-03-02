@@ -3,6 +3,7 @@ from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpilib import getTime
+import wpilib
 
 
 class IntakeState(Enum):
@@ -15,15 +16,16 @@ class IntakeState(Enum):
 
 class Intake(Subsystem):
     # defines all motors that are used in the subsystem
-    def __init__(self, frontMotorID: int, backMotorID: int, RaiseMotorID: int):
+    def __init__(self, frontMotorID: int, backMotorID: int, raiseMotorID: int):
         super().__init__()
         self.intakeMotorManual = RevMotor(deviceID=frontMotorID)
-        self.intakeMotorRaise = RevMotor(deviceID=RaiseMotorID)
+        self.intakeMotorRaise = RevMotor(deviceID=raiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=backMotorID)
+        self.downLimitSwitch = self.intakeMotorRaise.getLimitSwitch(0)
+        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(
+            1
+        )  # TODO add real IDs
 
-        self.state = (
-            IntakeState.UP
-        )  # DO NOT put this in phaseInit. bad things will happen
         self.AUTOMATIC_MODE = False
 
         self.publishFloat("intake_speed (0 to 1)", 0.7)
@@ -44,6 +46,13 @@ class Intake(Subsystem):
         self.raiseThrottle = 0
         self.manualThrottle = 0
         self.automaticThrottle = 0
+
+        if self.downLimitSwitch:
+            self.state = IntakeState.DOWN
+        elif self.upLimitSwitch:
+            self.state = IntakeState.UP
+        else:
+            self.state = IntakeState.OH_NO
 
         return robotState
 
@@ -67,36 +76,34 @@ class Intake(Subsystem):
             else:
                 self.raiseThrottle = 0  # dead
 
-            self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-            if robotState.intakeMode:
-                self.AUTOMATIC_MODE = False  # pyright: ignore
+        elif self.AUTOMATIC_MODE:  # AUTOMATIC MODE
 
-        if (
-            self.AUTOMATIC_MODE
-        ):  # AUTOMATIC MODE. !!!! MAKE SURE INTAKE IS UP !!!! BEFORE ENTERING AUTOMATIC MODE.
             if self.state == IntakeState.UP:
                 self.raiseThrottle = self.raiseStayUpSetpoint
-                if robotState.intakePos == 0:
-                    self.startTime = getTime()
+                if robotState.intakePos:
+                    self.startTime = wpilib.getTime()
                     self.state = IntakeState.GOING_DOWN
+
             if self.state == IntakeState.GOING_DOWN:
                 if getTime() - self.startTime < 0.3:
                     self.raiseThrottle = self.raiseDownSetpoint
                 else:
                     self.raiseThrottle = 0
                     self.state = IntakeState.DOWN
+
             if self.state == IntakeState.DOWN:
-                if robotState.intakePos == 180:
+                if robotState.intakePos:
                     self.state = IntakeState.GOING_UP
+
             if self.state == IntakeState.GOING_UP:
                 self.raiseThrottle = self.raiseUpSetpoint
-                if getTime() - self.startTime < 1:
+                if self.upLimitSwitch:
                     self.state = IntakeState.UP
-            self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-            if robotState.intakeMode:
-                self.AUTOMATIC_MODE = False  # pyright: ignore
 
-        # initial motor that intakes, should be the only one you press a button for
+        self.intakeMotorRaise.setThrottle(self.raiseThrottle)
+        self.AUTOMATIC_MODE = not robotState.intakeMode
+
+        # initial motor that intakes
         if robotState.initialIntake:
             self.manualThrottle = self.motorForwardSetpoint
         else:
@@ -105,6 +112,7 @@ class Intake(Subsystem):
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:
             self.automaticThrottle = self.indexerSetpoint
+            self.manualThrottle = self.motorForwardSetpoint
         else:
             self.automaticThrottle = 0
 
@@ -115,6 +123,9 @@ class Intake(Subsystem):
 
         if robotState.intakeEject:
             self.manualThrottle = self.motorReverseSetpoint
+
+        if robotState.indexerEject:
+            self.automaticThrottle = self.motorReverseSetpoint
 
         self.intakeMotorAutomatic.setThrottle(self.automaticThrottle)
         self.intakeMotorManual.setThrottle(self.manualThrottle)

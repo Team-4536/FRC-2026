@@ -28,7 +28,8 @@ class RobotState(NetworkTablesMixin):
     initialIntake: bool
     intakeIndexer: bool
     intakeEject: bool
-    intakePos: int
+    indexerEject: bool
+    intakePos: bool
     intakeMode: bool
     resetGyro: bool
     odometry: SwerveDrive4PoseEstimator
