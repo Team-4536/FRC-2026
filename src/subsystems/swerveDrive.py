@@ -145,6 +145,11 @@ class SwerveModules(NamedTuple):
 class SwerveDrive(Subsystem):
     MAX_MODULE_SPEED: meters_per_second = 5.15
 
+    MIN_MAX_MANUAL_X: meters_per_second = 2.0
+    MIN_MAX_X_NAME: str = f"x_speed (-{MIN_MAX_MANUAL_X} to {MIN_MAX_MANUAL_X})"
+
+    SUPER_chassis_speeds = ChassisSpeeds()
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -175,6 +180,8 @@ class SwerveDrive(Subsystem):
         self._swerveStates = self._kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
+
+        self.publishFloat(self.MIN_MAX_X_NAME, 0.0)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
@@ -217,9 +224,19 @@ class SwerveDrive(Subsystem):
     def drive(
         self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: meters_per_second
     ) -> None:
+        xTest = min(
+            self.MIN_MAX_MANUAL_X,
+            max(
+                -self.MIN_MAX_MANUAL_X, self.getFloat(self.MIN_MAX_X_NAME, default=0.0)
+            ),
+        )
+        isTest = abs(xTest) <= 0.01
+        xSpeed = fieldSpeeds.vx if isTest else xTest
+        ySpeed = fieldSpeeds.vy * (1 if isTest else xTest / 2.5)
+
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            fieldSpeeds.vx,
-            fieldSpeeds.vy,
+            xSpeed,
+            ySpeed,
             fieldSpeeds.omega,
             self._gyro.getRotation2d(),
         )
@@ -234,6 +251,8 @@ class SwerveDrive(Subsystem):
             state.optimize(module.modulePosition.angle)
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
+
+        self.SUPER_chassis_speeds = chassisSpeeds
 
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)

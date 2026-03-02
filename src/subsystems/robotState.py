@@ -16,7 +16,7 @@ class RobotState(NetworkTablesMixin):
 
     def __post_init__(self) -> None:
         self.myField: Field2d = Field2d()
-        SmartDashboard.putData("Field", self.myField)
+        SmartDashboard.putData("Odom Field", self.myField)
         super().__init__()
 
     def publish(self) -> None:
