@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import partial
 from ntcore import NetworkTable, NetworkTableInstance, Value
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
@@ -117,6 +118,8 @@ class NetworkTablesMixin:
             Union[
                 int,
                 Sequence[int],
+                bool,
+                Sequence[bool],
                 str,
                 Sequence[str],
                 float,
@@ -126,22 +129,29 @@ class NetworkTablesMixin:
             ]
         ],
         *subtables: str,
+        debug: bool = False,
     ) -> None:
         if value is None:
             return
 
-        if hasattr(value, "WPIStruct"):
-            self.publishStruct(name, value)
+        if hasattr(value, "WPIStruct") and value is not None:
+            self.publishStruct(name, value, *subtables, debug=debug)
             return
         elif isinstance(value, Sequence) and all(
             v is not None and hasattr(v, "WPIStruct") for v in value  # pyright: ignore
         ):
-            self.publishStructArray(name, value)  # pyright: ignore
+            self.publishStructArray(
+                name, value, *subtables, debug=debug  # pyright: ignore
+            )
+            return
+        elif isinstance(value, Enum):
+            self.publishString(name, value.name, *subtables, debug=debug)
+            return
+        elif isinstance(value, bool):
+            self.publishBoolean(name, value, *subtables, debug=debug)
+            return
         elif subtables:
             name = "/".join((*subtables, name))
-
-        if value is None:
-            self.publishString(name, "Null", *subtables)
 
         typeStr = type(value).__name__  # pyright: ignore
         pub = self._ntPersist.get(name)
@@ -153,7 +163,7 @@ class NetworkTablesMixin:
         try:
             pub.set(Value.makeValue(value))  # type: ignore
         except TypeError:
-            self.publishGeneric("test", "Null", *subtables)
+            return
 
     def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
         if s:

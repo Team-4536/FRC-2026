@@ -5,6 +5,7 @@ from subsystems.intake import Intake
 from subsystems.LEDSignals import LEDSignals
 from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
+from subsystems.tester import Tester
 from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
 from wpilib import TimedRobot
@@ -30,6 +31,7 @@ class Robot(TimedRobot):
             inputs=Inputs(),
             cameras=CameraManager(),
             time=timeData,
+            tests=Tester(),
             robotState=RobotState.empty(),
         )
 
@@ -51,11 +53,14 @@ class Robot(TimedRobot):
     def teleopExit(self) -> None:
         self.disabledInit()
 
+    def testInit(self) -> None:
+        self.subsystems.init()
+
+    def testPeriodic(self) -> None:
+        self.subsystems.testPeriodic()
+
     def disabledInit(self) -> None:
         self.disabledPeriodic()
 
     def disabledPeriodic(self) -> None:
-        self.subsystems.disabled()
-
-    def testPeriodic(self) -> None:
         self.subsystems.disabled()

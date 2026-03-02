@@ -67,6 +67,9 @@ class Inputs(Subsystem):
     def disabled(self) -> None:
         pass
 
+    def publish(self) -> None:
+        pass
+
     def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
         self._circularDriveScalar.setMagnitude(maxSpeed)
         vx, vy = self._circularDriveScalar(
