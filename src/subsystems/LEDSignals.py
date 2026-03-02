@@ -26,6 +26,9 @@ class LEDSignals(Subsystem):
     def disabled(self) -> None:
         self.update(b8=0)  # EXAMPLE
 
+    def publish(self) -> None:
+        pass
+
     def update(
         self,
         *,

@@ -9,6 +9,7 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.turretSystem import Turret, Shooter
+from subsystems.tester import Tester
 from subsystems.utils import matchData, TimeData
 from typing import Generator, NamedTuple, Union
 from wpimath.estimator import SwerveDrive4PoseEstimator
@@ -31,6 +32,10 @@ class Subsystems(NamedTuple):
         for s in self:
             s.periodic(state)
 
+    def robotPeriodic(self, state: RobotState) -> None:
+        for s in self:
+            s.robotPeriodic(state)
+
     def disabled(self) -> None:
         for s in self:
             s.disabled()
@@ -39,6 +44,7 @@ class Subsystems(NamedTuple):
 @dataclass
 class SubsystemManager(NetworkTablesMixin):
     inputs: Inputs
+    tests: Tester
     cameras: CameraManager
     time: TimeData
     subsystems: Subsystems
@@ -92,6 +98,7 @@ class SubsystemManager(NetworkTablesMixin):
 
     def robotPeriodic(self) -> None:
         self._publish()
+        self.subsystems.robotPeriodic(self.robotState)
         self.robotState.publish()
 
         self.cameras.periodic(self.robotState)
@@ -104,6 +111,10 @@ class SubsystemManager(NetworkTablesMixin):
     def teleopPeriodic(self) -> None:
         self.inputs.periodic(self.robotState)
         self._periodic()
+
+    def testPeriodic(self) -> None:
+        self.tests.periodic(self.robotState)
+        self._periodic
 
     def disabled(self) -> None:
         for s in self:

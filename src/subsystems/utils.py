@@ -107,6 +107,9 @@ class _MatchData:
     def isTeleop(self) -> bool:
         return DriverStation.isTeleopEnabled()
 
+    def isTest(self) -> bool:
+        return DriverStation.isTestEnabled()
+
     def isDisabled(self) -> bool:
         return DriverStation.isDisabled()
 
