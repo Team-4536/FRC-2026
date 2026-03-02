@@ -33,6 +33,9 @@ class RobotState(NetworkTablesMixin):
     resetGyro: bool
     odometry: SwerveDrive4PoseEstimator
 
+    climb: bool
+    downClimb: bool
+
     revSpeed: float
     kickShooter: bool
     optimalTurretAngle: radians  # REMOVE (local var)
