@@ -131,17 +131,17 @@ class CameraManager(Subsystem):
             "Camera1",
             15,
             -33,
-            inchesToMeters(27 / 2) - (8 / 100),
-            inchesToMeters(27 / 2) - (6.6 / 100),
-            28.3 / 100,
+            inchesToMeters(27 / 2) - (9 / 100),
+            -(inchesToMeters(27 / 2) - (6.6 / 100)),
+            (25.4 + 3.9) / 100,
         )
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             15,
             27,
-            inchesToMeters(27 / 2) - (8 / 100),
-            inchesToMeters(27 / 2) - (12.5 / 100),
-            28.3 / 100,
+            inchesToMeters(27 / 2) - (9 / 100),
+            -(inchesToMeters(27 / 2) - (12.5 / 100)),
+            (25.4 + 3.9) / 100,
         )
         # self.photonCameraMiddle = photonCameraClass(
         #     "longCam", strip.show();
