@@ -4,28 +4,60 @@
     {
       "anchor": {
         "x": 6.0,
-        "y": 0.6940476190476192
+        "y": 0.694
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.03671875,
-        "y": 0.8180282738095241
+        "x": 7.051781846695454,
+        "y": 0.8482565864831129
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.27,
-        "y": 1.2
+        "x": 9.333623511904761,
+        "y": 1.8555505952380953
       },
       "prevControl": {
-        "x": 8.27,
-        "y": 0.5477700034336028
+        "x": 9.397180273753595,
+        "y": 0.8730610406984475
       },
       "nextControl": {
-        "x": 8.27,
-        "y": 2.021928518830001
+        "x": 9.261775158490762,
+        "y": 2.9662153724654816
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.782232142857143,
+        "y": 3.4346726190476193
+      },
+      "prevControl": {
+        "x": 6.731533543487547,
+        "y": 2.319369437253428
+      },
+      "nextControl": {
+        "x": 6.827582559372979,
+        "y": 4.432322740840488
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 9.150915178571427,
+        "y": 4.654903273809524
+      },
+      "prevControl": {
+        "x": 8.725221201577774,
+        "y": 3.848807063995994
+      },
+      "nextControl": {
+        "x": 9.578056261291312,
+        "y": 5.4637397301479265
       },
       "isLocked": false,
       "linkedName": null
@@ -33,23 +65,18 @@
     {
       "anchor": {
         "x": 8.27,
-        "y": 7.127991071428571
+        "y": 7.128
       },
       "prevControl": {
         "x": 8.27,
-        "y": 6.489378092100521
+        "y": 5.05449627395712
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],

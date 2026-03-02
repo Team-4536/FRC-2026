@@ -16,8 +16,11 @@ class AutoRoutines(Enum):
     TEST_INTAKE = "Test Intake"
     DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
     WONKY = "Wonky"
-    GET_BALLS_AND_BRING_BACK_RIGHT = "Get Balls And Bring Back Right"
-    GET_BALLS_AND_BRING_BACK_LEFT = "Get Balls And Bring Back Left"
+    GET_BALLS_RIGHT_FROM_HUB = "Get Balls Right From Hub"
+    GET_BALLS_LEFT_FROM_HUB = "Get Balls Left From Hub"
+    GET_BALLS_RIGHT_FROM_START = "Get Balls Right From START"
+    GET_BALLS_LEFT_FROM_START = "Get Balls Left From START"
+    MESS_WITH_MIDDLE_FROM_RIGHT = "Mess With Middle From Right"
     FORWARD = "Forward"
     FORWARD_AND_INTAKE = "Forward And Intake"
     FORWARD_AND_SHOOT = "Forward And Shoot"
@@ -107,10 +110,10 @@ def routineChooser(
     match selectedRoutine:
         case AutoRoutines.DO_NOTHING:
             pass
-        case AutoRoutines.GET_BALLS_AND_BRING_BACK_RIGHT:
-            routine["Under Right Trench"] = [
+        case AutoRoutines.GET_BALLS_RIGHT_FROM_HUB:
+            routine["Under Right Trench From Hub"] = [
                 FollowTrajectory(
-                    "under right trench",
+                    "under right trench from hub",
                     isFlipped,
                 )
             ]
@@ -119,19 +122,18 @@ def routineChooser(
                     "right to balls",
                     isFlipped,
                 ),
-                # OperateIntake(),
             ]
-            routine["Back Under Left Trench"] = [
+            routine["Under Left Trench To Hub"] = [
                 FollowTrajectory(
-                    "back under left trench",
+                    "under left trench to hub",
                     isFlipped,
                 )
             ]
 
-        case AutoRoutines.GET_BALLS_AND_BRING_BACK_LEFT:
-            routine["Under Left Trench"] = [
+        case AutoRoutines.GET_BALLS_LEFT_FROM_HUB:
+            routine["Under Left Trench From Hub"] = [
                 FollowTrajectory(
-                    "under left trench",
+                    "under left trench from hub",
                     isFlipped,
                 )
             ]
@@ -140,11 +142,70 @@ def routineChooser(
                     "left to balls",
                     isFlipped,
                 ),
-                # OperateIntake(),
             ]
-            routine["Back Under Right Trench"] = [
+            routine["Under Right Trench To Hub"] = [
                 FollowTrajectory(
-                    "back under right trench",
+                    "under right trench to hub",
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.GET_BALLS_RIGHT_FROM_START:
+            routine["Under Right Trench From START"] = [
+                FollowTrajectory(
+                    "under right trench from start",
+                    isFlipped,
+                )
+            ]
+            routine["Right To Balls"] = [
+                FollowTrajectory(
+                    "right to balls",
+                    isFlipped,
+                ),
+            ]
+            routine["Under Left Trench To Hub"] = [
+                FollowTrajectory(
+                    "under left trench to hub",
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.GET_BALLS_LEFT_FROM_START:
+            routine["Under Left Trench From START"] = [
+                FollowTrajectory(
+                    "under left trench from start",
+                    isFlipped,
+                )
+            ]
+            routine["Left To Balls"] = [
+                FollowTrajectory(
+                    "left to balls",
+                    isFlipped,
+                ),
+            ]
+            routine["Under Right Trench To Hub"] = [
+                FollowTrajectory(
+                    "under right trench to hub",
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.MESS_WITH_MIDDLE_FROM_RIGHT:
+            routine["Under Right Trench From Hub"] = [
+                FollowTrajectory(
+                    "under right trench from hub",
+                    isFlipped,
+                )
+            ]
+            routine["Mess With Middle From Right"] = [
+                FollowTrajectory(
+                    "mess with middle from right",
+                    isFlipped,
+                ),
+            ]
+            routine["Under Left Trench To Hub"] = [
+                FollowTrajectory(
+                    "under left trench to hub",
                     isFlipped,
                 )
             ]
