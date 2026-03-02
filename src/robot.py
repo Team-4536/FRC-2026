@@ -1,26 +1,36 @@
-from subsystemManager import SubsystemManager
-from subsystems.inputs import Inputs
-from subsystems.LEDSignals import LEDSignals
-from subsystems.turretSystem import Shooter, Turret
-from subsystems.motor import RevMotor
-from subsystems.swerveDrive import SwerveDrive
-from subsystems.utils import TimeData
-from subsystems.intake import Intake
-from wpilib import TimedRobot
+from subsystemManager import SubsystemManager, Subsystems
 from subsystems.cameras import CameraManager
+from subsystems.inputs import Inputs
+from subsystems.intake import Intake
+from subsystems.LEDSignals import LEDSignals
+from subsystems.subsystem import RobotState
+from subsystems.swerveDrive import SwerveDrive
+from subsystems.turretSystem import Shooter, Turret
+from subsystems.utils import timeData
+from wpilib import TimedRobot
+from wpimath.units import inchesToMeters, meters
 
 
 class Robot(TimedRobot):
+    subsystems: SubsystemManager
+
     def robotInit(self) -> None:
-        self.subsystems: SubsystemManager = SubsystemManager(
+        WHEEL_DISTANCE: meters = inchesToMeters(10.875)
+
+        self.subsystems = SubsystemManager(
+            subsystems=Subsystems(
+                intake=Intake(10, 30, 9),
+                ledSignals=LEDSignals(deviceID=0),
+                shooter=Shooter(kickerID=18, revTopID=12, revBottomID=11),
+                swerveDrive=SwerveDrive.symmetricDrive(
+                    xPos=WHEEL_DISTANCE, yPos=WHEEL_DISTANCE
+                ),
+                turret=Turret(yawMotorID=14, pitchMotorID=13),
+            ),
             inputs=Inputs(),
             cameras=CameraManager(),
-            ledSignals=LEDSignals(deviceID=0),
-            swerveDrive=SwerveDrive(),
-            time=TimeData(),
-            turret=Turret(yawMotorID=14, pitchMotorID=13),
-            shooter=Shooter(kickerID=18, revTopID=12, revBottomID=11),
-            intake=Intake(10, 30, 9),
+            time=timeData,
+            robotState=RobotState.empty(),
         )
 
     def robotPeriodic(self) -> None:

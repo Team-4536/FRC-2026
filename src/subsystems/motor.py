@@ -1,25 +1,29 @@
+from phoenix6.units import volt as voltage
 from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
+    FeedForwardConfig,
+    LimitSwitchConfig,
     MAXMotionConfig,
     PersistMode,
     ResetMode,
+    SoftLimitConfig,
     SparkBaseConfig,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
-    LimitSwitchConfig,
-    SoftLimitConfig,
-    FeedForwardConfig,
 )
-from wpimath.units import radians
-from wpimath.units import revolutions_per_minute as RPM, radiansToRotations
+from wpimath.units import radians, radiansToRotations, revolutions_per_minute
 
 
 class RevMotor:
+    _ctrlr: SparkMax
+    _encoder: SparkRelativeEncoder
+
     def __init__(self, *, deviceID: int) -> None:
         self._ctrlr = SparkMax(deviceID, SparkMax.MotorType.kBrushless)
+        self._encoder = self._ctrlr.getEncoder()
 
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
@@ -31,18 +35,13 @@ class RevMotor:
     def stopMotor(self) -> None:
         self._ctrlr.set(0)
 
-    def setThrottle(self, throttle: float) -> None:
+    def setThrottle(self, throttle: voltage) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
-    def setVelocity(self, rpm: RPM) -> None:
+    def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,
-            ctrl=SparkMax.ControlType.kVelocity,
-        )
-
-    def setMaxMotionVelocity(self, rpm) -> None:
-        self._ctrlr.getClosedLoopController().setReference(
-            setpoint=rpm, ctrl=SparkMax.ControlType.kMAXMotionVelocityControl
+            ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
 
     def setVoltage(self, volts: float) -> None:
@@ -55,7 +54,7 @@ class RevMotor:
         )
 
     def getEncoder(self) -> SparkRelativeEncoder:
-        return self._ctrlr.getEncoder()
+        return self._encoder
 
     DRIVE_GEARiNG: float = 6.12
 
@@ -66,6 +65,7 @@ class RevMotor:
         .smartCurrentLimit(40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .voltageCompensation(12)
         .apply(
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00205)
@@ -184,7 +184,7 @@ class RevMotor:
             .pidf(0.08, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
+            .positionWrappingEnabled(False)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
@@ -210,14 +210,14 @@ class RevMotor:
     TURRET_PITCH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(20, 20)
-        .inverted(False)
+        .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
             .pidf(0.035, 0, 0, 0.05)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
