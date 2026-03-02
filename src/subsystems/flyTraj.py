@@ -39,19 +39,18 @@ class FlyTraj(Subsystem):
     def periodic(self, robotState: RobotState)->RobotState:
         if robotState.flyTest and self.state == 0:
             print("stage = 0")
-            #self.manager.setStartPosition(Translation2d(robotState.pose.X(), robotState.pose.Y()))
-            #self.manager.setGoalPosition(Translation2d(0,0))
-            self.state = 1
-        
-        elif robotState.flyTest and self.state == 1:
-
-            # self.publishBoolean("A button works", True, "telemetry")
-
             if self.manager.isNewPathAvailable():
                 print("stage = 1")
                 self.manager.setStartPosition(start_position=Translation2d(robotState.odometry.getEstimatedPosition().X(), robotState.odometry.getEstimatedPosition().Y()))
                 # self.manager.setStartPosition(start_position=Translation2d(7, 7))
                 self.manager.setGoalPosition(goal_position=Translation2d(1,1))
+            #self.manager.setStartPosition(Translation2d(robotState.pose.X(), robotState.pose.Y()))
+            #self.manager.setGoalPosition(Translation2d(0,0))
+                self.state = 1
+        
+        elif robotState.flyTest and self.state == 1:
+
+            # self.publishBoolean("A button works", True, "telemetry"
                 self.p: PathPlannerPath = self.manager.getCurrentPath(PathConstraints(5.0, 2.5, 0.7, 0.35, 12, True), GoalEndState(0, Rotation2d(0)))
                 
                 if self.p is not None:
@@ -61,7 +60,7 @@ class FlyTraj(Subsystem):
                     for point in self.wayPointsList:
                         listy.append(point.position)
     
-                    with open("C:\Repos\FRC-2026\src\subsystems\wayPoints.txt","a", encoding="utf-8") as f:
+                    with open("/home/lvuser/py/subsystems/wayPoints.txt","a", encoding="utf-8") as f:
                         f.write(str(listy)+"\n")
                     print("path type not none" )
                 
