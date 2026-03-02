@@ -87,9 +87,7 @@ class RobotState(NetworkTablesMixin):
 
     def publish(self) -> None:
         if self.limelightPose != None:
-            self.myField.setRobotPose(
-                self.limelightPose
-            )  # Switched field location form fields
+            self.myField.setRobotPose(self.limelightPose)
 
         for field in fields(self):
             name = field.name
