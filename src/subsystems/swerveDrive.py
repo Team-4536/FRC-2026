@@ -7,7 +7,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import getTangentAngle, getContributedRotation
-from typing import NamedTuple, Tuple
+from typing import NamedTuple, Self, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
     ChassisSpeeds,
@@ -15,7 +15,7 @@ from wpimath.kinematics import (
     SwerveModulePosition,
     SwerveModuleState,
 )
-from wpimath.units import inchesToMeters, meters_per_second, meters
+from wpimath.units import meters_per_second, meters
 
 
 class SwerveModule(NetworkTablesMixin):
@@ -124,12 +124,6 @@ class SwerveModules(NamedTuple):
     backLeft: SwerveModule
     backRight: SwerveModule
 
-    def symmetricPosition(self, x: meters, y: meters) -> None:
-        self.frontLeft.setPosition(x, y)
-        self.frontRight.setPosition(x, -y)
-        self.backLeft.setPosition(-x, y)
-        self.backRight.setPosition(-x, -y)
-
     def stopModules(self) -> None:
         for m in self:
             m.stopModule()
@@ -158,27 +152,10 @@ class SwerveDrive(Subsystem):
     _kinematics: SwerveDrive4Kinematics
     _swerveStates: Tuple[SwerveModuleState, ...]
 
-    def __init__(self) -> None:
+    def __init__(self, swerveModules: SwerveModules) -> None:
         super().__init__()
 
-        WHEEL_DISTANCE: meters = inchesToMeters(10.875)
-
-        self._modules = self._symmetricDrive(
-            FL_DriveID=2,
-            FR_DriveID=4,
-            BL_DriveID=6,
-            BR_DriveID=8,
-            FL_AzimuthID=1,
-            FR_AzimuthID=3,
-            BL_AzimuthID=5,
-            BR_AzimuthID=7,
-            FL_EncoderID=21,
-            FR_EncoderID=22,
-            BL_EncoderID=23,
-            BR_EncoderID=24,
-            xPos=WHEEL_DISTANCE,
-            yPos=WHEEL_DISTANCE,
-        )
+        self._modules = swerveModules
 
         self._kinematics = SwerveDrive4Kinematics(*self._modules.positions)
         self._gyro = AHRS(AHRS.NavXComType.kMXP_SPI)
@@ -311,44 +288,6 @@ class SwerveDrive(Subsystem):
         for module in self._modules:
             module.configureAzimuthMotor(config=config)
 
-    def _symmetricDrive(
-        self,
-        *,
-        FL_DriveID: int,
-        FL_AzimuthID: int,
-        FL_EncoderID: int,
-        FR_DriveID: int,
-        FR_AzimuthID: int,
-        FR_EncoderID: int,
-        BL_DriveID: int,
-        BL_AzimuthID: int,
-        BL_EncoderID: int,
-        BR_DriveID: int,
-        BR_AzimuthID: int,
-        BR_EncoderID: int,
-        xPos: meters,
-        yPos: meters,
-    ) -> SwerveModules:
-        modules = SwerveModules(
-            *(
-                SwerveModule(
-                    driveMotorID=drive,
-                    azimuthMotorID=azimuth,
-                    azimuthEncoderID=encoder,
-                    position=Translation2d(x, y),
-                )
-                for drive, azimuth, encoder, x, y in [
-                    (FL_DriveID, FL_AzimuthID, FL_EncoderID, xPos, yPos),
-                    (FR_DriveID, FR_AzimuthID, FR_EncoderID, xPos, -yPos),
-                    (BL_DriveID, BL_AzimuthID, BL_EncoderID, -xPos, yPos),
-                    (BR_DriveID, BR_AzimuthID, BR_EncoderID, -xPos, -yPos),
-                ]
-            )
-        )
-        modules.symmetricPosition(xPos, yPos)
-
-        return modules
-
     @property
     def kinematics(self) -> SwerveDrive4Kinematics:
         return self._kinematics
@@ -365,3 +304,41 @@ class SwerveDrive(Subsystem):
     @property
     def roboAngle(self) -> Rotation2d:
         return self._gyro.getRotation2d()
+
+    @classmethod
+    def symmetricDrive(  # TODO: remove defaults and set IDs in robot.py
+        cls,
+        *,
+        FL_DriveID: int = 2,
+        FR_DriveID: int = 4,
+        BL_DriveID: int = 6,
+        BR_DriveID: int = 8,
+        FL_AzimuthID: int = 1,
+        FR_AzimuthID: int = 3,
+        BL_AzimuthID: int = 5,
+        BR_AzimuthID: int = 7,
+        FL_EncoderID: int = 21,
+        FR_EncoderID: int = 22,
+        BL_EncoderID: int = 23,
+        BR_EncoderID: int = 24,
+        xPos: meters,
+        yPos: meters,
+    ) -> Self:
+        modules = SwerveModules(
+            *(
+                SwerveModule(
+                    driveMotorID=drive,
+                    azimuthMotorID=azimuth,
+                    azimuthEncoderID=encoder,
+                    position=Translation2d(x, y),
+                )
+                for drive, azimuth, encoder, x, y in [
+                    (FL_DriveID, FL_AzimuthID, FL_EncoderID, xPos, yPos),
+                    (FR_DriveID, FR_AzimuthID, FR_EncoderID, xPos, -yPos),
+                    (BL_DriveID, BL_AzimuthID, BL_EncoderID, -xPos, yPos),
+                    (BR_DriveID, BR_AzimuthID, BR_EncoderID, -xPos, -yPos),
+                ]
+            )
+        )
+
+        return cls(modules)

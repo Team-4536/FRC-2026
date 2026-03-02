@@ -8,18 +8,23 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
 from wpilib import TimedRobot
+from wpimath.units import inchesToMeters, meters
 
 
 class Robot(TimedRobot):
     subsystems: SubsystemManager
 
     def robotInit(self) -> None:
+        WHEEL_DISTANCE: meters = inchesToMeters(10.875)
+
         self.subsystems = SubsystemManager(
             subsystems=Subsystems(
                 intake=Intake(10, 30, 9),
                 ledSignals=LEDSignals(deviceID=0),
                 shooter=Shooter(kickerId=18, revTopId=12, revBottomId=11),
-                swerveDrive=SwerveDrive(),
+                swerveDrive=SwerveDrive.symmetricDrive(
+                    xPos=WHEEL_DISTANCE, yPos=WHEEL_DISTANCE
+                ),
                 turret=Turret(yawMotorID=14, pitchMotorID=13),
             ),
             inputs=Inputs(),
