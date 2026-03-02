@@ -283,18 +283,25 @@ class SwerveDrive(Subsystem):
         for i, state in enumerate(self._swerveStates):
             module, name = self._modules[i], self._modules._fields[i]
 
-            self.publishFloat(f"{name}_desired_speed", state.speed, "drive")
-            self.publishFloat(f"{name}_actual_speed", module.driveVelocity, "drive")
+            self.publishFloat(f"{name}_desired_speed", state.speed, "drive", debug=True)
             self.publishFloat(
-                f"{name}_speed_delta", state.speed - module.driveVelocity, "drive"
+                f"{name}_actual_speed", module.driveVelocity, "drive", debug=True
+            )
+            self.publishFloat(
+                f"{name}_speed_delta",
+                state.speed - module.driveVelocity,
+                "drive",
+                debug=True,
             )
 
             absRot = module.absoluteAzimuthRotation.radians()
             relRot = module.azimuthRotation.radians()
 
-            self.publishFloat(f"{name}_desired_angle", state.angle.radians(), "azimuth")
-            self.publishFloat(f"{name}_absolute_angle", absRot, "azimuth")
-            self.publishFloat(f"{name}_relative_angle", relRot, "azimuth")
+            self.publishFloat(
+                f"{name}_desired_angle", state.angle.radians(), "azimuth", debug=True
+            )
+            self.publishFloat(f"{name}_absolute_angle", absRot, "azimuth", debug=True)
+            self.publishFloat(f"{name}_relative_angle", relRot, "azimuth", debug=True)
 
     def _configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
         for module in self._modules:

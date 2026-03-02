@@ -1,4 +1,5 @@
 from dataclasses import dataclass, fields
+from subsystems import networkTablesMixin as nt
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
@@ -48,18 +49,10 @@ class SubsystemManager(NetworkTablesMixin):
     robotState: RobotState
 
     RUN_PUBLISH: bool = True
+    DEBUGGING: bool = False
 
     def __post_init__(self) -> None:
         super().__init__(table="SubsystemManager", inst=False)
-
-        self.publishBoolean("runPublish", self.RUN_PUBLISH)
-        for s in self.subsystems:
-            self.publishBoolean(
-                f"publish{s.__class__.__name__}?", True, "specific", "subsystems"
-            )
-        for i in self:
-            if not isinstance(i, Subsystems):
-                self.publishBoolean(f"publish{i.__class__.__name__}?", True, "specific")
 
         drive = self.subsystems.swerveDrive
         initPos = (
@@ -76,9 +69,20 @@ class SubsystemManager(NetworkTablesMixin):
             initPos,
         )
 
+        self.publishBoolean("runPublish", self.RUN_PUBLISH)
+        for s in self.subsystems:
+            self.publishBoolean(
+                f"publish{s.__class__.__name__}?", True, "specific", "subsystems"
+            )
+        for i in self:
+            if not isinstance(i, Subsystems):
+                self.publishBoolean(f"publish{i.__class__.__name__}?", True, "specific")
+
         for s in self:
             s.disabled()  # TODO: have subsystems make sure that their class attributes are initialized on class initialization
-            self._publish()
+            self._publish(True)
+        nt.debugging = self.DEBUGGING
+        self.publishBoolean("debugging", self.DEBUGGING)
 
     def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
         for f in fields(self):
@@ -113,9 +117,11 @@ class SubsystemManager(NetworkTablesMixin):
         for s in self.subsystems:
             s.periodic(self.robotState)
 
-    def _publish(self) -> None:
-        if not self.getBoolean("runPublish", inst=False, default=False):
-            return
+    def _publish(self, force: bool = False) -> None:
+        if not force:
+            nt.debugging = self.getBoolean("debugging", inst=False, default=False)
+            if not self.getBoolean("runPublish", inst=False, default=False):
+                return
         for i in self:
             if not isinstance(i, Subsystems):
                 if self.getBoolean(
