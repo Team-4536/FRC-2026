@@ -38,13 +38,14 @@ class RobotState(NetworkTablesMixin):
     initialIntake: bool
     intakeIndexer: bool
     intakeEject: bool
-    intakePos: int
+    indexerEject: bool
+    intakePos: bool
     intakeMode: bool
     resetGyro: bool
     odometry: SwerveDrive4PoseEstimator
 
     revSpeed: float
-    kickShooter: bool
+    kickShooter: int
     optimalTurretAngle: radians  # REMOVE (local var)
     targetDistance: meters  # REMOVE (local var)
     targetHeight: meters  # REMOVE (local var)
@@ -69,12 +70,11 @@ class RobotState(NetworkTablesMixin):
         teamSide = TeamSide.SIDE_BLUE
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
-    ejectAll = 0.0
-    intakePosYAxis = 0.0
+    ejectAll: float = 0.0
+    intakePosYAxis: float = 0.0
 
     def __post_init__(self) -> None:
-
-        super().__init__()
+        super().__init__(table="RobotState", inst=False)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
 

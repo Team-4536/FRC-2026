@@ -23,11 +23,14 @@ class Subsystem(NetworkTablesMixin):
         self._warn(self.periodic)
         return robotState
 
+    def robotPeriodic(self, robotState: RobotState) -> RobotState:
+        return robotState
+
     def disabled(self) -> None:
         self._warn(self.disabled)
 
     def publish(self) -> None:
-        pass
+        self._warn(self.publish)
 
     def _warn(self, method: Callable[..., Optional[RobotState]]) -> None:
         methodName = getattr(method, "__name__")

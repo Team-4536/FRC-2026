@@ -708,7 +708,7 @@ class Shooter(Subsystem):
         self.dependencies: Tuple[Any, ...] = (None,)
 
         self.kickSetPoint = 0
-        self.kickShooter: bool = False
+        self.kickShooter: int = False
 
         # self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
         # self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
@@ -722,7 +722,7 @@ class Shooter(Subsystem):
         self.dependencies = (None,)
 
         self.kickSetPoint = 0
-        self.kickShooter: bool = False
+        self.kickShooter: int = False
 
         self.dontShoot = False
 
@@ -737,7 +737,9 @@ class Shooter(Subsystem):
         if not self.fullyReved:
             robotState.dontShoot = True
 
-        self.kickSpeed: RPM = self.kickMotorEncoder.getPosition()
+        self.kickSpeed = self.kickMotorEncoder.getVelocity()
+        self.revingSpeedTop = self.revTopEncoder.getVelocity()
+        self.revingSpeedBottom = self.revBottomEncoder.getVelocity()
 
         self.dependencies = (
             robotState.revSpeed,
@@ -761,14 +763,20 @@ class Shooter(Subsystem):
         self.publishFloat("RRRRRAAAAAHAHHH", self.revingSetpoint)
         self.revingSetpoint *= robotState.revSpeed  # multiplied by the trigger value
 
+        if robotState.ejectAll > 0.3 or robotState.indexerEject:
+            robotState.kickShooter = -1
+
+        if robotState.intakeIndexer:
+            robotState.kickShooter = 1
+
         self.revShooters(self.revingSetpoint)
 
-        self.kickSetPoint = KICK_SPEED * int(robotState.kickShooter)
+        self.kickSetPoint = KICK_SPEED * robotState.kickShooter
 
         self.dontShoot = robotState.dontShoot
 
-        # if not self.dontShoot:
-        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+        if not self.dontShoot:
+            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 
@@ -841,7 +849,7 @@ class Shooter(Subsystem):
             "bottom reving motor encoder rpm", self.revBottomEncoder.getVelocity()
         )
         self.publishBoolean("Fully Reved", self.fullyReved)
-        self.publishBoolean("kick shooter spinning", self.kickShooter)
+        self.publishFloat("kick shooter spinning", self.kickShooter)
         self.publishFloat("kick setpoint", self.kickSetPoint)
         self.publishBoolean("bad limited angle", self.badLimitedAngle)
 

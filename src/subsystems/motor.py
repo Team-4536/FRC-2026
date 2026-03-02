@@ -13,6 +13,7 @@ from rev import (
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
+    SparkLimitSwitch,
 )
 from wpimath.units import radians, radiansToRotations, revolutions_per_minute
 
@@ -37,6 +38,12 @@ class RevMotor:
 
     def setThrottle(self, throttle: voltage) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
+
+    def getLimitSwitch(self, switch: int) -> SparkLimitSwitch | None:
+        if switch == 0:
+            return self._ctrlr.getReverseLimitSwitch()
+        elif switch == 1:
+            return self._ctrlr.getForwardLimitSwitch()
 
     def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(
