@@ -1,19 +1,29 @@
 from dataclasses import dataclass, fields, MISSING
+from math import pi as PI, tau as TAU
+import numpy as np
 from enum import Enum
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
-from wpilib import Field2d, SmartDashboard
+from wpilib import Field2d, SmartDashboard, DriverStation
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import meters_per_second, meters, radians
+from wpimath.units import meters_per_second, meters, radians, inchesToMeters
+
+ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
+BATTERY_VOLTS: float = 12
+
+
+class TeamSide(Enum):
+    SIDE_RED = 1
+    SIDE_BLUE = 2
 
 
 class TurretTarget(Enum):
     NONE = 0
     HUB = 1
-    SHUTTLE_RIGHT = 2
-    SHUTTLE_LEFT = 3
+    SHUTTLE_TOP = 2
+    SHUTTLE_BOTTOM = 3
 
 
 class TurretMode(Enum):
@@ -39,6 +49,8 @@ class RobotState(NetworkTablesMixin):
     targetDistance: meters  # REMOVE (local var)
     targetHeight: meters  # REMOVE (local var)
     turretSwitchMode: bool
+    turretShuttle: float
+    turretShuttleOff: float
     turretManualSetpoint: float
     turretSwitchTarget: bool
     turretSwitchEnabled: bool
@@ -50,13 +62,18 @@ class RobotState(NetworkTablesMixin):
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
+    alliance = DriverStation.getAlliance()
 
+    teamSide: TeamSide = TeamSide.SIDE_RED
+    if alliance == DriverStation.Alliance.kBlue:
+        teamSide = TeamSide.SIDE_BLUE
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll = 0.0
     intakePosYAxis = 0.0
 
     def __post_init__(self) -> None:
+
         super().__init__()
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
