@@ -6,7 +6,7 @@ from subsystems.motor import RevMotor
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from subsystems.utils import getTangentAngle, getContributedRotation
+from subsystems.utils import getTangentAngle, getContributedRotation, matchData
 from typing import NamedTuple, Self, Tuple
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
@@ -128,6 +128,14 @@ class SwerveModules(NamedTuple):
         for m in self:
             m.stopModule()
 
+    def configureAzimuthMotors(self, *, config: SparkBaseConfig):
+        for m in self:
+            m.configureAzimuthMotor(config=config)
+
+    def configureDriveMotors(self, *, config: SparkBaseConfig):
+        for m in self:
+            m.configureDriveMotor(config=config)
+
     @property
     def positions(
         self,
@@ -152,6 +160,8 @@ class SwerveDrive(Subsystem):
     _kinematics: SwerveDrive4Kinematics
     _swerveStates: Tuple[SwerveModuleState, ...]
 
+    _disabledModules: bool = True
+
     def __init__(self, swerveModules: SwerveModules) -> None:
         super().__init__()
 
@@ -165,9 +175,12 @@ class SwerveDrive(Subsystem):
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
 
+        self._disableModules()
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
-        self._configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
-        self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
+        self._modules.configureDriveMotors(config=RevMotor.DRIVE_CONFIG)
+        self._modules.configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
+        self._disabledModules = False
 
         for m in self._modules:
             m.resetAzimuthEncoder()
@@ -200,8 +213,13 @@ class SwerveDrive(Subsystem):
 
     def disabled(self) -> None:
         self._modules.stopModules()
-        self._configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
-        self._configureAzimuthMotors(config=RevMotor.AZIMUTH_CONFIG)
+        if (
+            not self._disabledModules
+            and matchData.isDisabled()  # TODO: find a way to not require this
+            and matchData.timeSincePhaseInit > 1.5
+        ):
+            self._disableModules()
+            self._disabledModules = True
 
     def getLinearVelocity(self) -> Translation2d:
         vector = Translation2d()
@@ -280,13 +298,9 @@ class SwerveDrive(Subsystem):
             self.publishFloat(f"{name}_absolute_angle", absRot, "azimuth", debug=True)
             self.publishFloat(f"{name}_relative_angle", relRot, "azimuth", debug=True)
 
-    def _configureDriveMotors(self, *, config: SparkBaseConfig) -> None:
-        for module in self._modules:
-            module.configureDriveMotor(config=config)
-
-    def _configureAzimuthMotors(self, *, config: SparkBaseConfig) -> None:
-        for module in self._modules:
-            module.configureAzimuthMotor(config=config)
+    def _disableModules(self) -> None:
+        self._modules.configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
+        self._modules.configureAzimuthMotors(config=RevMotor.DISABLED_AZIMUTH_CONFIG)
 
     @property
     def kinematics(self) -> SwerveDrive4Kinematics:

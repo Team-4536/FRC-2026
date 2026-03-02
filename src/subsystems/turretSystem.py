@@ -841,8 +841,8 @@ class Shooter(Subsystem):
         self.revingSetpoint = MPSToRPM(mpsSetpoint, FLYWHEEL_CIRCUMFRENCE)
 
     def revShooters(self, speed: RPM):
-        self.revingMotorBottom.setMaxMotionVelocity(speed)
-        self.revingMotorTop.setMaxMotionVelocity(speed)
+        self.revingMotorBottom.setVelocity(speed)
+        self.revingMotorTop.setVelocity(speed)
 
     def getFullyReved(self) -> bool:
 

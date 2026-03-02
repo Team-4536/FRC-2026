@@ -44,11 +44,6 @@ class RevMotor:
             ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
 
-    def setMaxMotionVelocity(self, rpm: revolutions_per_minute) -> None:
-        self._ctrlr.getClosedLoopController().setReference(
-            setpoint=rpm, ctrl=SparkMax.ControlType.kMAXMotionVelocityControl
-        )
-
     def setVoltage(self, volts: float) -> None:
         self._ctrlr.setVoltage(volts)
 
@@ -70,6 +65,7 @@ class RevMotor:
         .smartCurrentLimit(40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .voltageCompensation(12)
         .apply(
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00205)

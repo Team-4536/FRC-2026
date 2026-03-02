@@ -26,6 +26,7 @@ class TimeData(Subsystem):
 
     _prevTime: seconds = 0
     _deltaTime: seconds = 0
+    _isDisabled: bool = True
 
     def __init__(self) -> None:
         super().__init__()
@@ -34,10 +35,12 @@ class TimeData(Subsystem):
         self._phaseTime = Timer()
 
         self._matchTime.start()
+        self._phaseTime.start()
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self._phaseTime.reset()
         self._phaseTime.start()
+        self._isDisabled = False
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -47,13 +50,18 @@ class TimeData(Subsystem):
         return robotState
 
     def disabled(self) -> None:
-        self._phaseTime.stop()
-        self._phaseTime.reset()
+        if not self._isDisabled:
+            self._phaseTime.reset()
+            self._phaseTime.start()
+            self._isDisabled = True
 
     def publish(self) -> None:
         self.publishFloat("delta_time", self.dt)
         self.publishFloat("time_since_init", self.timeSinceInit)
         self.publishFloat("time_since_phase_init", self.timeSincePhaseInit)
+
+    def isDisabled(self) -> bool:
+        return self._isDisabled
 
     @property
     def dt(self) -> seconds:
@@ -100,7 +108,8 @@ class _MatchData:
         return DriverStation.isTeleopEnabled()
 
     def isDisabled(self) -> bool:
-        return DriverStation.isDisabled()
+        return timeData.isDisabled()  # TODO: figure out a way to improve this
+        # return DriverStation.isDisabled()
 
     @property
     def allianceSide(self) -> Optional[DriverStation.Alliance]:
