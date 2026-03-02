@@ -10,8 +10,8 @@ class NetworkTablesMixin:
     _table: NetworkTable
     _ntPersist: Dict[str, object]
 
-    def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
-        self._table = self._getTable(table, instance)
+    def __init__(self, *, table: str = "telemetry", inst: bool = True):
+        self._table = self._getTable(table, inst)
         self._ntPersist = {}
 
     def __publish(
@@ -70,6 +70,11 @@ class NetworkTablesMixin:
         topicFn = partial(self._table.getStructArrayTopic, type=value[0].__class__)
         self.__publish(name, value, topicFn, *subtables)
 
+    def publishSwerve(
+        self, name: str, value: Tuple[SwerveModuleState, ...], *subtables: str
+    ) -> None:
+        self.publishStructArray(name, value, *subtables)
+
     def publishGeneric(
         self,
         name: str,
@@ -115,107 +120,122 @@ class NetworkTablesMixin:
         except TypeError:
             self.publishGeneric("test", "Null", *subtables)
 
-    def publishSwerve(
-        self,
-        name: str,
-        value: Tuple[SwerveModuleState, ...],
-        *subtables: str,
-    ) -> None:
-        self.publishStructArray(name, value, *subtables)
+    def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
+        if s:
+            n = "/".join((*s, n))
+        return t(n).getEntry(d).get()
 
-    def __get(
-        self,
-        name: str,
-        topicFn: Callable[[str], Any],
-        *subtables: str,
-        default: Any,
-    ) -> Any:
-        if subtables:
-            name = "/".join((*subtables, name))
-
-        topic = topicFn(name)
-
-        return topic.getEntry(default).get()
-
-    def _getTable(self, table: str, instance: Optional[str] = None):
-        if not instance:
+    def _getTable(self, table: Optional[str], inst: bool):
+        if table is None:
+            table = self._table.getPath()
+        if inst:
             table = f"{table}/{self.__class__.__name__}"
         return NetworkTableInstance.getDefault().getTable(table)
 
     def getString(
-        self, name: str, table: str = "telemetry", *subtables: str, default: str
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: str,
     ) -> str:
         return self.__get(
-            name, self._getTable(table).getStringTopic, *subtables, default=default
+            name, self._getTable(table, inst).getStringTopic, *subtables, d=default
         )
 
     def getStringArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[str],
     ) -> Sequence[str]:
         return self.__get(
-            name, self._getTable(table).getStringArrayTopic, *subtables, default=default
+            name,
+            self._getTable(table, inst).getStringArrayTopic,
+            *subtables,
+            d=default,
         )
 
     def getInteger(
-        self, name: str, table: str = "telemetry", *subtables: str, default: int
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: int,
     ) -> int:
         return self.__get(
-            name, self._getTable(table).getIntegerTopic, *subtables, default=default
+            name, self._getTable(table, inst).getIntegerTopic, *subtables, d=default
         )
 
     def getIntegerArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[int],
     ) -> Sequence[int]:
         return self.__get(
             name,
-            self._getTable(table).getIntegerArrayTopic,
+            self._getTable(table, inst).getIntegerArrayTopic,
             *subtables,
-            default=default,
+            d=default,
         )
 
     def getFloat(
-        self, name: str, table: str = "telemetry", *subtables: str, default: float
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: float,
     ) -> float:
         return self.__get(
-            name, self._getTable(table).getFloatTopic, *subtables, default=default
+            name, self._getTable(table, inst).getFloatTopic, *subtables, d=default
         )
 
     def getFloatArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[float],
     ) -> Sequence[float]:
         return self.__get(
-            name, self._getTable(table).getFloatArrayTopic, *subtables, default=default
+            name,
+            self._getTable(table, inst).getFloatArrayTopic,
+            *subtables,
+            d=default,
         )
 
     def getBoolean(
-        self, name: str, table: str = "telemetry", *subtables: str, default: bool
+        self,
+        name: str,
+        table: Optional[str] = None,
+        *subtables: str,
+        inst: bool = True,
+        default: bool,
     ) -> bool:
         return self.__get(
-            name, self._getTable(table).getBooleanTopic, *subtables, default=default
+            name, self._getTable(table, inst).getBooleanTopic, *subtables, d=default
         )
 
     def getBooleanArray(
         self,
         name: str,
-        table: str = "telemetry",
+        table: Optional[str] = None,
         *subtables: str,
+        inst: bool = True,
         default: Sequence[bool],
     ) -> Sequence[bool]:
         return self.__get(
             name,
-            self._getTable(table).getBooleanArrayTopic,
+            self._getTable(table, inst).getBooleanArrayTopic,
             *subtables,
-            default=default,
+            d=default,
         )

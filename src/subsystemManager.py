@@ -3,6 +3,7 @@ from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
 from subsystems.LEDSignals import LEDSignals
+from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
@@ -21,13 +22,13 @@ class Subsystems(NamedTuple):
     swerveDrive: SwerveDrive
     turret: Turret
 
-    def phaseInit(self, rs: RobotState) -> None:
+    def phaseInit(self, state: RobotState) -> None:
         for s in self:
-            s.phaseInit(rs)
+            s.phaseInit(state)
 
-    def periodic(self, rs: RobotState) -> None:
+    def periodic(self, state: RobotState) -> None:
         for s in self:
-            s.periodic(rs)
+            s.periodic(state)
 
     def disabled(self) -> None:
         for s in self:
@@ -39,14 +40,27 @@ class Subsystems(NamedTuple):
 
 
 @dataclass
-class SubsystemManager:
+class SubsystemManager(NetworkTablesMixin):
     subsystems: Subsystems
     inputs: Inputs
     cameras: CameraManager
     time: TimeData
     robotState: RobotState
 
+    RUN_PUBLISH: bool = True
+
     def __post_init__(self) -> None:
+        super().__init__(table="SubsystemManager", inst=False)
+
+        self.publishBoolean("runPublish", self.RUN_PUBLISH)
+        for s in self.subsystems:
+            self.publishBoolean(
+                f"publish{s.__class__.__name__}?", True, "specific", "subsystems"
+            )
+        for i in self:
+            if not isinstance(i, Subsystems):
+                self.publishBoolean(f"publish{i.__class__.__name__}?", True, "specific")
+
         drive = self.subsystems.swerveDrive
         initPos = (
             Pose2d(x=2, y=4, rotation=Rotation2d())
@@ -62,6 +76,10 @@ class SubsystemManager:
             initPos,
         )
 
+        for s in self:
+            s.disabled()  # TODO: have subsystems make sure that their class attributes are initialized on class initialization
+            self._publish()
+
     def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
         for f in fields(self):
             v = getattr(self, f.name)
@@ -73,8 +91,7 @@ class SubsystemManager:
             s.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
-        for s in self:
-            s.publish()
+        self._publish()
         self.robotState.publish()
 
         self.cameras.periodic(self.robotState)
@@ -88,10 +105,34 @@ class SubsystemManager:
         self.inputs.periodic(self.robotState)
         self._periodic()
 
+    def disabled(self) -> None:
+        for s in self:
+            s.disabled()
+
     def _periodic(self) -> None:
         for s in self.subsystems:
             s.periodic(self.robotState)
 
-    def disabled(self) -> None:
-        for s in self:
-            s.disabled()
+    def _publish(self) -> None:
+        if not self.getBoolean("runPublish", inst=False, default=False):
+            return
+        for i in self:
+            if not isinstance(i, Subsystems):
+                if self.getBoolean(
+                    f"publish{i.__class__.__name__}?",
+                    None,
+                    "specific",
+                    inst=False,
+                    default=True,
+                ):
+                    i.publish()
+            for s in self.subsystems:
+                if self.getBoolean(
+                    f"publish{s.__class__.__name__}?",
+                    None,
+                    "specific",
+                    "subsystems",
+                    inst=False,
+                    default=True,
+                ):
+                    s.publish()

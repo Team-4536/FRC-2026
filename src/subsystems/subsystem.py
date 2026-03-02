@@ -8,8 +8,8 @@ class SubsystemMethodError(Exception):
 
 
 class Subsystem(NetworkTablesMixin):
-    def __init__(self, *, table: str = "telemetry", instance: Optional[str] = None):
-        super().__init__(table=table, instance=instance)
+    def __init__(self, *, table: str = "telemetry", inst: bool = True):
+        super().__init__(table=table, inst=inst)
 
     def phaseInit(
         self, robotState: RobotState
