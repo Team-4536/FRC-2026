@@ -120,9 +120,9 @@ def routineChooser(
                 ),
                 # OperateIntake(),
             ]
-            routine["Back Under Left Trench"] = [
+            routine["Under Left Trench To Hub"] = [
                 FollowTrajectory(
-                    "back under left trench",
+                    "under left trench to hub",
                     isFlipped,
                 )
             ]
@@ -141,9 +141,9 @@ def routineChooser(
                 ),
                 # OperateIntake(),
             ]
-            routine["Back Under Right Trench"] = [
+            routine["Under Right Trench To Hub"] = [
                 FollowTrajectory(
-                    "back under right trench",
+                    "under right trench to hub",
                     isFlipped,
                 )
             ]
