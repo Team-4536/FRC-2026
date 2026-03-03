@@ -25,6 +25,7 @@ class AutoRoutines(Enum):
     FORWARD = "Forward"
     FORWARD_AND_INTAKE = "Forward And Intake"
     FORWARD_AND_SHOOT = "Forward And Shoot"
+    L_TEST = "L Test"
 
 
 class AutoSubsystem(Subsystem):
@@ -114,6 +115,15 @@ def routineChooser(
 
         case AutoRoutines.DROP_INTAKE:
             routine["Drop Intake"] = [
+                OperateIntake(),
+            ]
+
+        case AutoRoutines.L_TEST:
+            routine["L Test"] = [
+                FollowTrajectory(
+                    "l test",
+                    isFlipped,
+                ),
                 OperateIntake(),
             ]
 
