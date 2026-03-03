@@ -10,10 +10,10 @@ from rev import (
     ResetMode,
     SoftLimitConfig,
     SparkBaseConfig,
+    SparkLimitSwitch,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
-    SparkLimitSwitch,
 )
 from wpimath.units import radians, radiansToRotations, revolutions_per_minute
 

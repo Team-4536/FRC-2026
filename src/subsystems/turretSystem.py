@@ -12,8 +12,8 @@ from subsystems.utils import (
     FIELD_WIDTH,
     getTangentAngle,
     MPSToRPM,
-    RPMToVolts,  # pyright: ignore
-    scaleTranslation2D,  # pyright: ignore
+    RPMToVolts,
+    scaleTranslation2D,
     wrapAngle,
 )
 from typing import Any, Tuple

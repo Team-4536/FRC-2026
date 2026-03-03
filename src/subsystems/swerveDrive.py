@@ -229,7 +229,7 @@ class SwerveDrive(Subsystem):
 
         vector = Translation2d(
             distance=vector.distance(Translation2d()) / 4,
-            angle=vector.angle(),
+            angle=Rotation2d() if vector.norm() == 0 else vector.angle(),
         )
 
         return vector.rotateBy(roboRotation)
