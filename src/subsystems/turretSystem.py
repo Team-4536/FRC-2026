@@ -619,11 +619,11 @@ class Turret(Subsystem):
         self.publishBoolean("Target Locked", self.targetLocked)
         self.publishBoolean(
             "Yaw forward soft limit",
-            self.yawMotor._ctrlr.getForwardSoftLimit().isReached(),  # pyright: ignore
+            self.yawMotor._ctrlr.getForwardLimitSwitch().get(),  # pyright: ignore
         )
         self.publishBoolean(
             "Yaw reverse soft limit",
-            self.yawMotor._ctrlr.getReverseSoftLimit().isReached(),  # pyright: ignore
+            self.yawMotor._ctrlr.getReverseLimitSwitch().get(),  # pyright: ignore
         )
         self.publishFloat(
             "(Radians) Yaw Motor Actual Setpoint",
@@ -636,9 +636,7 @@ class Turret(Subsystem):
         self.publishFloat("pitch setpoint", self.pitchSetpoint)
         self.publishFloat("Relative pitch setpoint", self.relativePitchSetpoint)
         self.publishFloat("pitch angle", self.pitchAngle)
-        self.publishFloat(
-            "Pitch motor pos", rotationsToRadians(self.pitchEncoder.getPosition())
-        )
+        self.publishFloat("Pitch motor pos", self.pitchEncoder.getPosition())
         self.publishStruct("Turret field pose", self.odom.pose)
         self.publishBoolean("Impossible dynamic", self.impossibleDynamic)
         self.publishBoolean("Initial dynamic calculation failed", self.dynamicFail)

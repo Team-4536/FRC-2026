@@ -201,16 +201,20 @@ class RevMotor:
             .apply(FeedForwardConfig().kA(0))
         )
         .apply(
-            LimitSwitchConfig().limitSwitchPositionSensor(
-                FeedbackSensor.kPrimaryEncoder
+            LimitSwitchConfig()
+            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+            .forwardLimitSwitchEnabled(True)
+            .reverseLimitSwitchEnabled(True)
+            .forwardLimitSwitchPosition(16.66)
+            .reverseLimitSwitchPosition(0)
+            .reverseLimitSwitchTriggerBehavior(
+                LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
             )
-        )
-        .apply(
-            SoftLimitConfig()
-            .forwardSoftLimit(16.67)
-            .reverseSoftLimit(0)
-            .forwardSoftLimitEnabled(True)
-            .reverseSoftLimitEnabled(True)
+            .forwardLimitSwitchTriggerBehavior(
+                LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+            )
+            .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
         )
     )
 
