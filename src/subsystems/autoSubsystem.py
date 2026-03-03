@@ -21,6 +21,7 @@ class AutoRoutines(Enum):
     GET_BALLS_RIGHT_FROM_START = "Get Balls Right From START"
     GET_BALLS_LEFT_FROM_START = "Get Balls Left From START"
     MESS_WITH_MIDDLE_FROM_RIGHT = "Mess With Middle From Right"
+    DROP_INTAKE = "Drop Intake"
     FORWARD = "Forward"
     FORWARD_AND_INTAKE = "Forward And Intake"
 
@@ -109,6 +110,12 @@ def routineChooser(
     match selectedRoutine:
         case AutoRoutines.DO_NOTHING:
             pass
+
+        case AutoRoutines.DROP_INTAKE:
+            routine["Drop Intake"] = [
+                OperateIntake(),
+            ]
+
         case AutoRoutines.GET_BALLS_RIGHT_FROM_HUB:
             routine["Under Right Trench From Hub"] = [
                 FollowTrajectory(
@@ -121,6 +128,7 @@ def routineChooser(
                     "right to balls",
                     isFlipped,
                 ),
+                OperateIntake(),
             ]
             routine["Under Left Trench To Hub"] = [
                 FollowTrajectory(
@@ -141,6 +149,7 @@ def routineChooser(
                     "left to balls",
                     isFlipped,
                 ),
+                OperateIntake(),
             ]
             routine["Under Right Trench To Hub"] = [
                 FollowTrajectory(
@@ -161,6 +170,7 @@ def routineChooser(
                     "right to balls",
                     isFlipped,
                 ),
+                OperateIntake(),
             ]
             routine["Under Left Trench To Hub"] = [
                 FollowTrajectory(
@@ -181,7 +191,9 @@ def routineChooser(
                     "left to balls",
                     isFlipped,
                 ),
+                OperateIntake(),
             ]
+
             routine["Under Right Trench To Hub"] = [
                 FollowTrajectory(
                     "under right trench to hub",
@@ -216,8 +228,10 @@ def routineChooser(
                     isFlipped,
                 )
             ]
+
         case AutoRoutines.TEST_INTAKE:
             routine["Drop & Run Intake"] = [OperateIntake(10.5)]
+
         case AutoRoutines.DRIVE_FORWARD_BACK_TEST:
             routine["Forward"] = [
                 FollowTrajectory(
