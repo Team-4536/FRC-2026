@@ -264,16 +264,16 @@ class Turret(Subsystem):
         velocity = 0
         time = 0
 
-        self.publishFloat("d", d)
-        self.publishFloat("h", h)
-        self.publishFloat("xPass", self.getXPass(d))
-        self.publishFloat("ypass", self.getYPass())
+        self.publishFloat("d", d, debug=True)
+        self.publishFloat("h", h, debug=True)
+        self.publishFloat("xPass", self.getXPass(d), debug=True)
+        self.publishFloat("ypass", self.getYPass(), debug=True)
         try:
             angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
             velocity = _calculateVelocity(angle, d, h)
-            self.publishFloat("velocity", velocity)
+            self.publishFloat("velocity", velocity, debug=True)
             time = calculateTime(velocity, d)
-            self.publishFloat("time", time)
+            self.publishFloat("time", time, debug=True)
 
         except:
             self.dynamicFail = True
@@ -291,6 +291,7 @@ class Turret(Subsystem):
                     else robotState.robotLinearVelocity.angle().radians()
                 ),
             ),
+            debug=True,
         )
 
         self.compensateSetpoint(
@@ -412,7 +413,7 @@ class Turret(Subsystem):
     ) -> Translation3d:
 
         pos: Translation3d = self.targetPos
-        self.publishString("TEAM side", side.name)
+        self.publishString("TEAM side", side.name, debug=True)
 
         if side == DriverStation.Alliance.kBlue:
             match target:
@@ -467,6 +468,7 @@ class Turret(Subsystem):
         self.publishFloatArray(
             "Tangent velocity",
             (tanVel.distance(Translation2d()), tanVel.angle().radians()),
+            debug=True,
         )
 
         # add the mps values
@@ -760,7 +762,7 @@ class Shooter(Subsystem):
         else:
             return robotState
 
-        self.publishFloat("RRRRRAAAAAHAHHH", self.revingSetpoint)
+        self.publishFloat("RRRRRAAAAAHAHHH", self.revingSetpoint, debug=True)
         self.revingSetpoint *= robotState.revSpeed  # multiplied by the trigger value
 
         if robotState.ejectAll > 0.3 or robotState.indexerEject:
