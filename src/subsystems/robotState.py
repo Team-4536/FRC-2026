@@ -63,17 +63,15 @@ class RobotState(NetworkTablesMixin):
         SmartDashboard.putData("odomField", self.odomField)
 
     def publish(self) -> None:
-        if self.limelightPose != None:
-            self.odomField.setRobotPose(self.limelightPose)
-            print("Done")
-
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
         self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
-
+        if self.limelightPose != None:
+            self.odomField.setRobotPose(self.limelightPose)
+            print("Done")
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )

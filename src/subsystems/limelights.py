@@ -82,7 +82,6 @@ class llCams(Subsystem):
             self.botposeWPI[5]
         )
         # robotState.myField.setRobotPose(self.limelightPose)
-        pass
 
 
 # # X and Y are converted coordinates from inches to meters
