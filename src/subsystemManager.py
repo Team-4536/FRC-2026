@@ -37,10 +37,12 @@ class SubsystemManager(NamedTuple):
         self.inputs.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
-        # self.robotState.publish()  # TODO: uncomment
-        # for s in self:
-        #     s.publish()
-        pass
+        global robotState
+        self.robotState.publish()
+        robotState = self.cameras.periodic(self.robotState)
+        robotState = self.swerveDrive.robotPeriodic(self.robotState)
+        for s in self:
+            s.publish()
 
     def autonomousPeriodic(self) -> None:
         global robotState
@@ -65,6 +67,7 @@ class SubsystemManager(NamedTuple):
     def dependantSubsytems(self) -> Sequence[Subsystem]:  # dependant subsystems
         return [
             self.ledSignals,
+            self.cameras,
             self.swerveDrive,
             self.time,
             # self.turret, TODO: Turn me back on

@@ -4,7 +4,7 @@ from pathplannerlib.path import (  # pyright: ignore
     PathPlannerPath,
     PathPlannerTrajectory,
 )
-from subsystems.robotState import RobotState
+from subsystems.robotState import RobotState, TeamSide
 from wpilib import getTime
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
@@ -199,13 +199,16 @@ class OperateTurret(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, unload: bool = False, runTime: float = 0):
+    def __init__(self, unload: bool = False, runTime: float = 0, flipped: bool = False):
         self.pathDone = False
         self.runTime = runTime
         self.unload = unload
+        self.flipped = flipped
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = getTime()
+        if not self.flipped:
+            robotState.teamSide = TeamSide.SIDE_BLUE
 
         return robotState
 
@@ -220,8 +223,9 @@ class OperateTurret(AutoStages):
         return self.robotState
 
     def end(self, robotState: RobotState) -> RobotState:
-        self.robotState.revSpeed = 0
-        self.robotState.kickShooter = False
+
+        robotState.revSpeed = 0
+        robotState.kickShooter = False
 
         return self.robotState
 

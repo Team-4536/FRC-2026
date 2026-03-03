@@ -11,7 +11,7 @@ from subsystems.robotState import (
     ROBOT_RADIUS,
 )
 from subsystems.utils import (
-    getTangentalVelocity,
+    getTangentAngle,
     getContributedRotation,
     RPMToMPS,
 )
@@ -187,7 +187,7 @@ class SwerveDrive(Subsystem):
             yPos=WHEEL_DISTANCE,
         )
 
-        self.initPos = Pose2d()
+        self.initPos = Pose2d(y=4.1, x=inchesToMeters(62.6), rotation=Rotation2d())
         self._kinematics = SwerveDrive4Kinematics(*self._modules.positions)
         self._gyro = AHRS(AHRS.NavXComType.kMXP_SPI)
         self._gyro.reset()
@@ -206,6 +206,13 @@ class SwerveDrive(Subsystem):
         for m in self._modules:
             m.resetAzimuthEncoder()
 
+        return robotState
+
+    def robotPeriodic(self, robotState: RobotState) -> RobotState:
+        robotState.odometry.update(
+            self._gyro.getRotation2d(),
+            self._modules.modulePositions,
+        )
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -230,11 +237,6 @@ class SwerveDrive(Subsystem):
                 robotState.autosInitPose,
             )
             robotState.autosGyroResetToggle = False
-
-        robotState.odometry.update(
-            self._gyro.getRotation2d(),
-            self._modules.modulePositions,
-        )  # UNUSED
 
         self.drive(
             fieldSpeeds=robotState.fieldSpeeds,
@@ -262,7 +264,12 @@ class SwerveDrive(Subsystem):
         vector = Translation2d()
 
         for module in self._modules:
-            vector = vector.__add__(self.getDriveVelocity(module))
+            vector += self.getDriveVelocity(module)
+
+        vector = Translation2d(
+            distance=(vector.distance(Translation2d())) / 4,
+            angle=Rotation2d(),  # TODO TODO TODO EMMET HELP
+        )
 
         return vector
 
@@ -271,25 +278,21 @@ class SwerveDrive(Subsystem):
         sum = 0
         for module in self._modules:
 
-            tanVel = getTangentalVelocity(
-                module._position,
-                self.getDriveVelocity(module).distance(Translation2d()),
-            )
+            tanVel = getTangentAngle(module._position)
 
             sum += getContributedRotation(
                 tanVel,
                 rotationsToRadians(module._azimuthMotor.getEncoder().getPosition()),
+                self.getDriveVelocity(module).distance(Translation2d()),
             )
 
-        return sum / 4 / ROBOT_RADIUS
+        return sum / 4
 
     def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
-        rpm: RPM = module._driveMotor.getEncoder().getVelocity()
-        speed = RPMToMPS(rpm, self._modules[0]._wheelCircumferance)
-        angle: radians = rotationsToRadians(
-            module._azimuthMotor.getEncoder().getVelocity()
-        )
-        vector = Translation2d(speed * math.cos(angle), speed * math.sin(angle))
+        ## (MPS)
+        speed: MPS = module.driveVelocity
+        angle: radians = rotationsToRadians(module.azimuthRotation)
+        vector = Translation2d(distance=speed, angle=Rotation2d(angle))
         return vector
 
     def drive(self, fieldSpeeds: ChassisSpeeds, attainableMaxSpeed: MPS) -> None:

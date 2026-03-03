@@ -16,6 +16,7 @@ class Robot(TimedRobot):
     def robotInit(self) -> None:
         self.subsystems: SubsystemManager = SubsystemManager(
             inputs=Inputs(),
+            cameras=CameraManager(),
             ledSignals=LEDSignals(deviceID=0),
             swerveDrive=SwerveDrive(),
             time=TimeData(),
@@ -23,7 +24,6 @@ class Robot(TimedRobot):
             turret=Turret(yawMotorID=14, pitchMotorID=13),
             shooter=Shooter(kickerId=18, revTopId=12, revBottomId=11),
             intake=Intake(10, 30, 9),
-            cameras=CameraManager(),
         )
 
     def robotPeriodic(self) -> None:
