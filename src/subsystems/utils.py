@@ -79,6 +79,7 @@ class TimeData(Subsystem):
 timeData: TimeData = TimeData()
 
 
+# TODO: maybe make some of these properties that get set in __init__ and phaseInit so that there is no need to recall methods that don't need to be
 class _MatchData:
     red: DriverStation.Alliance = DriverStation.Alliance.kRed
     blue: DriverStation.Alliance = DriverStation.Alliance.kBlue
@@ -263,10 +264,10 @@ def MPSToRPM(speed: meters_per_second, circ: meters) -> revolutions_per_minute:
 
 
 def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
-    angle = translation.angle().radians()
+    angle = 0 if translation.norm() == 0 else translation.angle().radians()
     hyp = translation.distance(Translation2d())
-    xScale = hyp * cos(angle)
-    yScale = hyp * sin(angle)
+    xScale = hyp * scalar * cos(angle)  # TODO: Might break things
+    yScale = hyp * scalar * sin(angle)
 
     return Translation2d(xScale, yScale)
 

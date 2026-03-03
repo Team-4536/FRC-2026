@@ -54,6 +54,8 @@ class SwerveModule(NetworkTablesMixin):
         self._driveEncoder.setPosition(0)
         self.resetAzimuthEncoder()
 
+        self._simDrivePosition: meters = 0.0
+
     @property
     def driveDistance(self) -> meters:
         motorRot = self._driveEncoder.getPosition()
@@ -229,7 +231,7 @@ class SwerveDrive(Subsystem):
 
         vector = Translation2d(
             distance=vector.distance(Translation2d()) / 4,
-            angle=vector.angle(),
+            angle=Rotation2d() if vector.norm() == 0 else vector.angle(),
         )
 
         return vector.rotateBy(roboRotation)
