@@ -1,42 +1,22 @@
 from dataclasses import dataclass, fields, MISSING
-from math import pi as PI, tau as TAU
-import numpy as np
-import math
 from enum import Enum
-from wpimath.estimator import SwerveDrive4PoseEstimator
-
-from wpilib import Field2d
-from wpilib import SmartDashboard
-
-from wpimath.geometry import Pose2d
-from wpilib import Field2d, SmartDashboard, SendableChooser
-from ntcore import NetworkTable
 from subsystems.networkTablesMixin import NetworkTablesMixin
-from wpimath.geometry import Pose2d, Translation2d, Pose3d
-from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import meters_per_second as MPS
-from wpimath.units import revolutions_per_minute as RPM
-from wpimath.units import (
-    radians,
-    meters,
-    inchesToMeters,
-)
 from typing import Any, Self
+from wpilib import Field2d, SmartDashboard
+from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.geometry import Pose2d, Translation2d
+from wpimath.kinematics import ChassisSpeeds
+from wpimath.units import inchesToMeters, meters_per_second, meters, radians
 
 ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 BATTERY_VOLTS: float = 12
 
 
-class TeamSide(Enum):
-    SIDE_RED = 1
-    SIDE_BLUE = 2
-
-
 class TurretTarget(Enum):
     NONE = 0
     HUB = 1
-    SHUTTLE_RIGHT = 2
-    SHUTTLE_LEFT = 3
+    SHUTTLE_TOP = 2
+    SHUTTLE_BOTTOM = 3
 
 
 class TurretMode(Enum):
@@ -47,55 +27,49 @@ class TurretMode(Enum):
 
 @dataclass
 class RobotState(NetworkTablesMixin):
-    motorDesiredState: float
+    fieldSpeeds: ChassisSpeeds
+    initialIntake: bool
+    intakeIndexer: bool
+    intakeEject: bool
+    indexerEject: bool
+    intakePos: bool
+    intakeMode: bool
+    resetGyro: bool
+    odometry: SwerveDrive4PoseEstimator
 
     revSpeed: float
-    kickShooter: bool
-    optimalTurretAngle: radians
-    targetDistance: meters
-    targetHeight: meters
-
+    kickShooter: int
+    optimalTurretAngle: radians  # REMOVE (local var)
+    targetDistance: meters  # REMOVE (local var)
+    targetHeight: meters  # REMOVE (local var)
     turretSwitchMode: bool
+    turretShuttle: float
+    turretShuttleOff: float
     turretManualSetpoint: float
-    fullyreved: bool
-    targetLocked: bool
     turretSwitchTarget: bool
     turretSwitchEnabled: bool
-    turretResetYawEncdoer: bool
-    dontShoot: bool
-    impossibleDynamic: bool
-    forceDynamicTurret: bool
+    turretResetYawEncdoer: bool  # REMOVE (local var)
+    dontShoot: bool  # REMOVE (local var)
+    impossibleDynamic: bool  # REMOVE (local var)
+    forceDynamicTurret: bool  # REMOVE (local var)
     turretVelocitySetpoint: Translation2d
 
-    robotOmegaSpeed: MPS
+    robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
 
-    fieldSpeeds: ChassisSpeeds
-    resetGyro: bool
-    pose: Pose2d
-    odometry: SwerveDrive4PoseEstimator
-    autosInitPose: Pose2d
-    initialIntake: bool = False  # TODO: change vals later, very temp
-    intakeIndexer: bool = False
-    intakeSensorTest: bool = False
-    intakeEject: bool = False
-    intakePosYAxis: float = 0.0
-    intakePos: int = False
-    intakeMode: bool = False
-    autosGyroResetToggle: bool = False
-    autosGyroReset: float = 0.0
-
-    teamSide: TeamSide = TeamSide.SIDE_RED
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll: float = 0.0
+    intakePosYAxis: float = 0.0
+
+    autosGyroResetToggle: bool = False
+    autosGyroReset: float = 0.0
+    autosInitPose: Pose2d = Pose2d()
 
     def __post_init__(self) -> None:
-        self.myField: Field2d = Field2d()
-        SmartDashboard.putData("odomField", self.myField)
-        # SendableChooser().addOption("SIDE_RED")
-        super().__init__()
-        self.publish
+        super().__init__(table="RobotState", inst=False)
+        self.odomField: Field2d = Field2d()
+        SmartDashboard.putData("odomField", self.odomField)
 
     def publish(self) -> None:
         for field in fields(self):
@@ -103,12 +77,8 @@ class RobotState(NetworkTablesMixin):
             value = getattr(self, name)
             self.publishGeneric(name, value)
 
-            self.publishGeneric(name, value)
+        self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
 
-        self.publishFloat("vx", self.fieldSpeeds.vx, "FieldSpeeds")
-        self.publishFloat("vy", self.fieldSpeeds.vy, "FieldSpeeds")
-        self.publishFloat("omega", self.fieldSpeeds.omega, "FieldSpeeds")
-        self.myField.setRobotPose(self.odometry.getEstimatedPosition())
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )
@@ -125,4 +95,5 @@ class RobotState(NetworkTablesMixin):
                 data[f.name] = f.default_factory()
             else:
                 data[f.name] = None
-        return cls(**data)  # type: ignore
+
+        return cls(**data)  # pyright: ignore

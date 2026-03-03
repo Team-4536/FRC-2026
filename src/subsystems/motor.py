@@ -1,25 +1,34 @@
+from math import tau
+from phoenix6.units import rotation, volt as voltage
 from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
+    FeedForwardConfig,
+    LimitSwitchConfig,
     MAXMotionConfig,
     PersistMode,
     ResetMode,
+    SoftLimitConfig,
     SparkBaseConfig,
+    SparkLimitSwitch,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
-    LimitSwitchConfig,
-    SoftLimitConfig,
-    FeedForwardConfig,
 )
-from wpimath.units import radians
-from wpimath.units import revolutions_per_minute as RPM, radiansToRotations
+from subsystems.utils import matchData
+from wpimath.units import radians, radiansToRotations, revolutions_per_minute
 
 
 class RevMotor:
+    _ctrlr: SparkMax
+    _encoder: SparkRelativeEncoder
+    _simPosition: rotation
+
     def __init__(self, *, deviceID: int) -> None:
         self._ctrlr = SparkMax(deviceID, SparkMax.MotorType.kBrushless)
+        self._encoder = self._ctrlr.getEncoder()
+        self._simPosition = 0
 
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
@@ -31,19 +40,23 @@ class RevMotor:
     def stopMotor(self) -> None:
         self._ctrlr.set(0)
 
-    def setThrottle(self, throttle: float) -> None:
+    def setThrottle(self, throttle: voltage) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
-    def setVelocity(self, rpm: RPM) -> None:
+    def getLimitSwitch(self, switch: int) -> SparkLimitSwitch | None:
+        if switch == 0:
+            return self._ctrlr.getReverseLimitSwitch()
+        elif switch == 1:
+            return self._ctrlr.getForwardLimitSwitch()
+
+    def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(
             setpoint=rpm,
-            ctrl=SparkMax.ControlType.kVelocity,
+            ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
-
-    def setMaxMotionVelocity(self, rpm) -> None:
-        self._ctrlr.getClosedLoopController().setReference(
-            setpoint=rpm, ctrl=SparkMax.ControlType.kMAXMotionVelocityControl
-        )
+        if matchData.isSimulation():
+            self._simPosition += rpm * matchData.dt / 60
+            self._encoder.setPosition(self._simPosition)
 
     def setVoltage(self, volts: float) -> None:
         self._ctrlr.setVoltage(volts)
@@ -53,9 +66,11 @@ class RevMotor:
             setpoint=radiansToRotations(rot),
             ctrl=SparkMax.ControlType.kPosition,
         )
+        if matchData.isSimulation():
+            self._encoder.setPosition(rot / tau)
 
     def getEncoder(self) -> SparkRelativeEncoder:
-        return self._ctrlr.getEncoder()
+        return self._encoder
 
     DRIVE_GEARiNG: float = 6.12
 
@@ -66,6 +81,7 @@ class RevMotor:
         .smartCurrentLimit(40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .voltageCompensation(12)
         .apply(
             ClosedLoopConfig()
             .pidf(0.00019, 0, 0, 0.00205)
@@ -184,7 +200,7 @@ class RevMotor:
             .pidf(0.08, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
+            .positionWrappingEnabled(False)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
@@ -210,14 +226,14 @@ class RevMotor:
     TURRET_PITCH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(20, 20)
-        .inverted(False)
+        .inverted(True)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
             .pidf(0.035, 0, 0, 0.05)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(False)
+            .positionWrappingEnabled(True)
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)

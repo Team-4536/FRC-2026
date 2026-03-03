@@ -4,7 +4,8 @@ from pathplannerlib.path import (  # pyright: ignore
     PathPlannerPath,
     PathPlannerTrajectory,
 )
-from subsystems.robotState import RobotState, TeamSide
+from subsystems.robotState import RobotState
+from subsystems.utils import matchData
 from wpilib import getTime
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
@@ -207,8 +208,6 @@ class OperateTurret(AutoStages):
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = getTime()
-        if not self.flipped:
-            robotState.teamSide = TeamSide.SIDE_BLUE
 
         return robotState
 
