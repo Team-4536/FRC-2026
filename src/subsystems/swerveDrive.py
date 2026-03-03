@@ -54,6 +54,8 @@ class SwerveModule(NetworkTablesMixin):
         self._driveEncoder.setPosition(0)
         self.resetAzimuthEncoder()
 
+        self._simDrivePosition: meters = 0.0
+
     @property
     def driveDistance(self) -> meters:
         motorRot = self._driveEncoder.getPosition()
@@ -99,12 +101,14 @@ class SwerveModule(NetworkTablesMixin):
         self._position = Translation2d(x, y)
 
     def setDrive(self, velocity: meters_per_second) -> None:
+        self._simVelocity(velocity)
         wheelRPS = velocity / self.WHEEL_CIRCUMFERENCE
         motorRPS = wheelRPS * self.DRIVE_GEARING
         motorRPM = motorRPS * 60
         self._driveMotor.setVelocity(motorRPM)
 
     def setAzimuth(self, angle: Rotation2d) -> None:
+        self._simAzimuth(angle)
         motorRot = self.AZIMUTH_GEARING * angle.radians()
         self._azimuthMotor.setPosition(motorRot)
 
@@ -116,6 +120,18 @@ class SwerveModule(NetworkTablesMixin):
         absRot = self.absoluteAzimuthRotation.radians() / tau
         motorRot = absRot * self.AZIMUTH_GEARING
         self._azimuthEncoder.setPosition(motorRot)
+
+    def _simVelocity(self, velocity: meters_per_second) -> None:
+        if matchData.isSimulation():
+            self._simDrivePosition += velocity * matchData.dt
+            wheelRot = self._simDrivePosition / self.WHEEL_CIRCUMFERENCE
+            motorRot = wheelRot * self.DRIVE_GEARING
+            self._driveEncoder.setPosition(motorRot)
+
+    def _simAzimuth(self, angle: Rotation2d) -> None:
+        if matchData.isSimulation():
+            motorRot = (angle.radians() / tau) * self.AZIMUTH_GEARING
+            self._azimuthEncoder.setPosition(motorRot)
 
 
 class SwerveModules(NamedTuple):
