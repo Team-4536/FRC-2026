@@ -7,12 +7,14 @@ from subsystems.autoStages import (
 )
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
+from subsystems.utils import matchData
 from typing import List
 from wpilib import SendableChooser, SmartDashboard
 
 
 class AutoRoutines(Enum):
     DO_NOTHING = "Do Nothing"
+    JUST_SHOOT = "Just Shoot"
     TEST_INTAKE = "Test Intake"
     DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
     WONKY = "Wonky"
@@ -39,9 +41,6 @@ class AutoSubsystem(Subsystem):
     def __init__(self):
         super().__init__()
 
-        AUTO_SIDE_BLUE = "blue"
-        AUTO_SIDE_RED = "red"
-
         self.autoRoutineChooser.setDefaultOption(
             AutoRoutines.DO_NOTHING.value,
             AutoRoutines.DO_NOTHING,
@@ -49,17 +48,11 @@ class AutoSubsystem(Subsystem):
         for routine in AutoRoutines:
             self.autoRoutineChooser.addOption(routine.value, routine)
 
-        self.autoSideChooser.setDefaultOption(AUTO_SIDE_BLUE, AUTO_SIDE_BLUE)
-        self.autoSideChooser.addOption(AUTO_SIDE_RED, AUTO_SIDE_RED)
-
         SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
-
-        SmartDashboard.putData("auto side chooser", self.autoSideChooser)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.routine: dict[str, List[AutoStages]] = routineChooser(
-            self.autoRoutineChooser.getSelected(),
-            self.autoSideChooser.getSelected() == "red",
+            self.autoRoutineChooser.getSelected(), matchData.isBlue()
         )
 
         self.currentPath = 0
@@ -102,7 +95,6 @@ class AutoSubsystem(Subsystem):
             SmartDashboard.putString("current path", self.routineKeys[self.currentPath])
         else:
             SmartDashboard.putString("current path", "empty/done")
-        SmartDashboard.putString("auto side", self.autoSideChooser.getSelected())
 
 
 def routineChooser(
@@ -275,7 +267,7 @@ def routineChooser(
                     "Drive Forward Test",
                     isFlipped,
                 ),
-                OperateIntake(5),
+                # OperateIntake(5),
             ]
 
         case AutoRoutines.FORWARD_AND_SHOOT:
@@ -289,6 +281,15 @@ def routineChooser(
                 OperateTurret(
                     True,
                     0.5,
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.JUST_SHOOT:
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    15,
                     isFlipped,
                 )
             ]

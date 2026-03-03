@@ -28,34 +28,36 @@ class TurretMode(Enum):
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
-    initialIntake: bool
-    intakeIndexer: bool
     intakeEject: bool
     indexerEject: bool
     intakePos: bool
-    intakeMode: bool
     resetGyro: bool
     odometry: SwerveDrive4PoseEstimator
-
-    revSpeed: float
-    kickShooter: int
-    optimalTurretAngle: radians  # REMOVE (local var)
-    targetDistance: meters  # REMOVE (local var)
-    targetHeight: meters  # REMOVE (local var)
-    turretSwitchMode: bool
-    turretShuttle: float
-    turretShuttleOff: float
-    turretManualSetpoint: float
-    turretSwitchTarget: bool
-    turretSwitchEnabled: bool
-    turretResetYawEncdoer: bool  # REMOVE (local var)
-    dontShoot: bool  # REMOVE (local var)
-    impossibleDynamic: bool  # REMOVE (local var)
-    forceDynamicTurret: bool  # REMOVE (local var)
-    turretVelocitySetpoint: Translation2d
+    autosInitPose: Pose2d
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
+
+    dontShoot: bool  # REMOVE (local var)
+    impossibleDynamic: bool  # REMOVE (local var)
+    forceDynamicTurret: bool  # REMOVE (local var)
+    turretResetYawEncdoer: bool
+    turretVelocitySetpoint: Translation2d
+    revSpeed: float = 0
+    kickShooter: int = 0
+    optimalTurretAngle: radians = 0  # REMOVE (local var)
+    targetDistance: meters = 0  # REMOVE (local var)
+    targetHeight: meters = 0  # REMOVE (local var)
+    turretSwitchMode: bool = False
+    turretShuttle: float = -1
+    turretShuttleOff: float = -1
+    turretManualSetpoint: float = 0
+    turretSwitchTarget: bool = False
+    turretSwitchEnabled: bool = False
+
+    initialIntake: bool = False
+    intakeIndexer: bool = False
+    intakeMode: bool = False
 
     turretTarget: TurretTarget = TurretTarget.NONE
     turretMode: TurretMode = TurretMode.MANUAL
@@ -64,7 +66,6 @@ class RobotState(NetworkTablesMixin):
 
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
-    autosInitPose: Pose2d = Pose2d()
 
     def __post_init__(self) -> None:
         super().__init__(table="RobotState", inst=False)

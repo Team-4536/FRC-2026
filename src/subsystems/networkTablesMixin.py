@@ -36,7 +36,10 @@ class NetworkTablesMixin:
             pub = topic.publish()
             self._ntPersist[name] = pub
 
-        pub.set(value)  # type: ignore[attr-defined]
+        try:
+            pub.set(value)  # type: ignore[attr-defined]
+        except TypeError:
+            pass
 
     def publishString(
         self, name: str, value: str, *subtables: str, debug: bool = False

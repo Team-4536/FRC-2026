@@ -26,7 +26,7 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     freeSpeed: radians_per_second = (5676 * tau) / 60
 
     wheelRadiusMeters = 0.0508
-    maxVelocity: meters_per_second = 3
+    maxVelocity: meters_per_second = 5
     wheelCOF = 1
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
@@ -216,7 +216,6 @@ class OperateTurret(AutoStages):
         self.pathTime = getTime() - self.startTime
 
         self.robotState.forceDynamicTurret = True
-        self.robotState.revSpeed = 1
         self.robotState.kickShooter = self.unload
 
         return self.robotState
