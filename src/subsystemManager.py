@@ -95,7 +95,6 @@ class SubsystemManager(NetworkTablesMixin):
     def robotPeriodic(self) -> None:
         self._publish()
         self.robotState.publish()
-
         self.cameras.periodic(self.robotState)
         self.llCam.periodic(self.robotState)
         self.time.periodic(self.robotState)

@@ -65,6 +65,7 @@ class RobotState(NetworkTablesMixin):
     def publish(self) -> None:
         if self.limelightPose != None:
             self.odomField.setRobotPose(self.limelightPose)
+            print("Done")
 
         for field in fields(self):
             name = field.name

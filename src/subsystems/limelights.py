@@ -9,7 +9,7 @@ from subsystems.robotState import RobotState
 
 class llCams(Subsystem):
     netTbl: NetworkTableInstance
-    llTbl: NetworkTable
+    limelightTbl: NetworkTable
 
     # botposeWPIBLUE: any = [0,0,0,0,0,0,0,0,0,0,0]
     # botposeWPIRED: any = [0,0,0,0,0,0,0,0,0,0,0]
@@ -25,16 +25,16 @@ class llCams(Subsystem):
         )  # sets DS or deafults to blue side
 
         self.netTbl = NetworkTableInstance.getDefault()
-        self.llTbl = self.netTbl.getTable("limelight")
+        self.limelightTbl = self.netTbl.getTable("limelight")
 
         if self.Team == DriverStation.Alliance.kRed:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
+            self.botposeWPI = self.limelightTbl.getEntry(
+                "botpose_wpired"
+            ).getDoubleArray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         elif self.Team == DriverStation.Alliance.kBlue:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
+            self.botposeWPI = self.limelightTbl.getEntry(
+                "botpose_wpiblue"
+            ).getDoubleArray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         # picks pose based on side
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
@@ -43,13 +43,13 @@ class llCams(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
         # # botpose_wpiblue uses a 11 value array (index 0 = x, 2 = z, 5 = yaw)
         if self.Team == DriverStation.Alliance.kRed:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpired").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
+            self.botposeWPI = self.limelightTbl.getEntry(
+                "botpose_wpired"
+            ).getDoubleArray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         elif self.Team == DriverStation.Alliance.kBlue:
-            self.botposeWPI = self.llTbl.getEntry("botpose_wpiblue").getDoubleArray(
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            )
+            self.botposeWPI = self.limelightTbl.getEntry(
+                "botpose_wpiblue"
+            ).getDoubleArray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
         llx = self.botposeWPI[0]  # sets x pose
         lly = self.botposeWPI[1]  # sets y pose
