@@ -56,12 +56,16 @@ class Inputs(Subsystem):
         # Intake Controls
         robotState.initialIntake = self._mechCtrlr.getAButton()
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
-        robotState.intakeEject = self._mechCtrlr.getBButton()
-        robotState.indexerEject = (
-            self._mechCtrlr.getRightTriggerAxis()
-        )  # TODO chagne to not overlap with revspeed
+        robotState.intakeEject = (
+            self._mechCtrlr.getBButton()
+        )  # TODO: Check if we should keep this by rearranging it.
+        robotState.indexerEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
-        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.intakeMode = (
+            not robotState.intakeMode
+            if self._mechCtrlr.getLeftBumperPressed()
+            else robotState.intakeMode
+        )
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
         robotState.intakePos = self._mechCtrlr.getBackButton()
 

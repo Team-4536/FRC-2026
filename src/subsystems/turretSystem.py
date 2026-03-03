@@ -708,7 +708,7 @@ class Shooter(Subsystem):
         self.dependencies: Tuple[Any, ...] = (None,)
 
         self.kickSetPoint = 0
-        self.kickShooter: bool = False
+        self.kickShooter: int = False
 
         # self.kickMotor.configure(config=RevMotor.KICK_CONFIG)
         # self.revingMotorBottom.configure(config=RevMotor.FLYWHEEL_CONFIG)
@@ -722,7 +722,7 @@ class Shooter(Subsystem):
         self.dependencies = (None,)
 
         self.kickSetPoint = 0
-        self.kickShooter: bool = False
+        self.kickShooter = False
 
         self.dontShoot = False
 
@@ -849,7 +849,7 @@ class Shooter(Subsystem):
             "bottom reving motor encoder rpm", self.revBottomEncoder.getVelocity()
         )
         self.publishBoolean("Fully Reved", self.fullyReved)
-        self.publishBoolean("kick shooter spinning", self.kickShooter)
+        self.publishInteger("kick shooter spinning", self.kickShooter)
         self.publishFloat("kick setpoint", self.kickSetPoint)
         self.publishBoolean("bad limited angle", self.badLimitedAngle)
 

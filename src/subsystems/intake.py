@@ -21,12 +21,14 @@ class Intake(Subsystem):
         self.intakeMotorManual = RevMotor(deviceID=frontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=raiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=backMotorID)
-        self.downLimitSwitch = self.intakeMotorRaise.getLimitSwitch(0)
-        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(
-            1
-        )  # TODO add real IDs
+        self.downLimitSwitch = self.intakeMotorRaise.getReverseLimitSwitch()
+        self.upLimitSwitch = self.intakeMotorRaise.getForwardLimitSwitch()
 
         self.AUTOMATIC_MODE = False
+        self.intakeRaiseEncoder = self.intakeMotorRaise.getEncoder()
+        self.intakeRaiseEncoder.setPosition(0)
+
+        self.state = IntakeState.UP
 
         self.publishFloat("intake_speed (0 to 1)", 0.7)
         self.publishFloat("reverse_speed (0 to 1)", 0.7)
@@ -53,6 +55,8 @@ class Intake(Subsystem):
             self.state = IntakeState.UP
         else:
             self.state = IntakeState.OH_NO
+
+        robotState.intakePos = False
 
         return robotState
 
@@ -84,24 +88,35 @@ class Intake(Subsystem):
                     self.startTime = wpilib.getTime()
                     self.state = IntakeState.GOING_DOWN
 
-            if self.state == IntakeState.GOING_DOWN:
+            elif self.state == IntakeState.GOING_DOWN:
                 if getTime() - self.startTime < 0.3:
                     self.raiseThrottle = self.raiseDownSetpoint
                 else:
                     self.raiseThrottle = 0
                     self.state = IntakeState.DOWN
 
-            if self.state == IntakeState.DOWN:
+            elif self.state == IntakeState.DOWN:
                 if robotState.intakePos:
                     self.state = IntakeState.GOING_UP
 
-            if self.state == IntakeState.GOING_UP:
+            elif self.state == IntakeState.GOING_UP:
                 self.raiseThrottle = self.raiseUpSetpoint
-                if self.upLimitSwitch:
-                    self.state = IntakeState.UP
 
-        self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-        self.AUTOMATIC_MODE = not robotState.intakeMode
+        # DOWN: 23.857    UP: -0.35
+        if self.downLimitSwitch.get() or self.intakeRaiseEncoder.getPosition() > 20:
+            self.state = IntakeState.DOWN
+            if self.raiseThrottle > 0:
+                self.intakeMotorRaise.stopMotor()
+        elif self.upLimitSwitch.get() or self.intakeRaiseEncoder.getPosition() < 0:
+            self.state = IntakeState.UP
+            if self.raiseThrottle < 0:
+                self.intakeMotorRaise.stopMotor()
+            if self.upLimitSwitch.get():
+                self.intakeRaiseEncoder.setPosition(-0.35)  # TODO: NOT ACTUAL VALUE
+        else:
+            self.intakeMotorRaise.setThrottle(self.raiseThrottle)
+
+        self.AUTOMATIC_MODE = robotState.intakeMode  # pyright: ignore
 
         # initial motor that intakes
         if robotState.initialIntake:

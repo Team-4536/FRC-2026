@@ -10,6 +10,7 @@ from rev import (
     ResetMode,
     SoftLimitConfig,
     SparkBaseConfig,
+    SparkLimitSwitch,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
@@ -38,11 +39,11 @@ class RevMotor:
     def setThrottle(self, throttle: voltage) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
-    def getLimitSwitch(self, switch: int) -> None:
-        if switch == 0:
-            return self._ctrlr.getReverseLimitSwitch()
-        elif switch == 1:
-            return self._ctrlr.getForwardLimitSwitch()
+    def getReverseLimitSwitch(self) -> SparkLimitSwitch:
+        return self._ctrlr.getReverseLimitSwitch()
+
+    def getForwardLimitSwitch(self) -> SparkLimitSwitch:
+        return self._ctrlr.getForwardLimitSwitch()
 
     def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(

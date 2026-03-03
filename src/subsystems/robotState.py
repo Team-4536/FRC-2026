@@ -35,7 +35,7 @@ class RobotState(NetworkTablesMixin):
     odometry: SwerveDrive4PoseEstimator
 
     revSpeed: float
-    kickShooter: bool
+    kickShooter: int
     optimalTurretAngle: radians  # REMOVE (local var)
     targetDistance: meters  # REMOVE (local var)
     targetHeight: meters  # REMOVE (local var)
