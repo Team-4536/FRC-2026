@@ -1,4 +1,5 @@
-from phoenix6.units import volt as voltage
+from math import tau
+from phoenix6.units import rotation, volt as voltage
 from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
@@ -15,16 +16,19 @@ from rev import (
     SparkMaxConfig,
     SparkRelativeEncoder,
 )
+from subsystems.utils import matchData
 from wpimath.units import radians, radiansToRotations, revolutions_per_minute
 
 
 class RevMotor:
     _ctrlr: SparkMax
     _encoder: SparkRelativeEncoder
+    _simPosition: rotation
 
     def __init__(self, *, deviceID: int) -> None:
         self._ctrlr = SparkMax(deviceID, SparkMax.MotorType.kBrushless)
         self._encoder = self._ctrlr.getEncoder()
+        self._simPosition = 0
 
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
@@ -50,6 +54,9 @@ class RevMotor:
             setpoint=rpm,
             ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
         )
+        if matchData.isSimulation():
+            self._simPosition += rpm * matchData.dt / 60
+            self._encoder.setPosition(self._simPosition)
 
     def setVoltage(self, volts: float) -> None:
         self._ctrlr.setVoltage(volts)
@@ -59,6 +66,8 @@ class RevMotor:
             setpoint=radiansToRotations(rot),
             ctrl=SparkMax.ControlType.kPosition,
         )
+        if matchData.isSimulation():
+            self._encoder.setPosition(rot / tau)
 
     def getEncoder(self) -> SparkRelativeEncoder:
         return self._encoder
