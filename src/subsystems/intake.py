@@ -27,6 +27,7 @@ class Intake(Subsystem):
         )  # TODO add real IDs
 
         self.AUTOMATIC_MODE = False
+        self.state = IntakeState.OH_NO
 
         self.publishFloat("intake_speed (0 to 1)", 0.7)
         self.publishFloat("reverse_speed (0 to 1)", 0.7)

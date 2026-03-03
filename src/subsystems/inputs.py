@@ -57,12 +57,13 @@ class Inputs(Subsystem):
         robotState.initialIntake = self._mechCtrlr.getAButton()
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
         robotState.intakeEject = self._mechCtrlr.getBButton()
-        robotState.indexerEject = (
-            self._mechCtrlr.getRightTriggerAxis()
-        )  # TODO chagne to not overlap with revspeed
+        # TODO chagne to not overlap with revspeed
+        robotState.indexerEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
         robotState.intakeMode = self._mechCtrlr.getLeftBumper()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
+        robotState.turretShuttle = self._mechCtrlr.getLeftY()
+        robotState.turretShuttleOff = self._mechCtrlr.getLeftX()
         robotState.intakePos = self._mechCtrlr.getBackButton()
 
         return robotState
