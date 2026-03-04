@@ -98,7 +98,7 @@ class RevMotor:
 
     INTAKE_MOTOR_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(15)
+        .smartCurrentLimit(15, 15)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
@@ -117,7 +117,7 @@ class RevMotor:
 
     INDEXER_MOTOR_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(20)
+        .smartCurrentLimit(15, 15)
         .disableFollowerMode()
         .inverted(False)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
@@ -137,7 +137,7 @@ class RevMotor:
 
     INTAKE_RAISE_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(15)
+        .smartCurrentLimit(15, 15)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
@@ -207,7 +207,6 @@ class RevMotor:
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(0.2)
             )
-            .apply(FeedForwardConfig().kA(0))
         )
         .apply(
             LimitSwitchConfig()

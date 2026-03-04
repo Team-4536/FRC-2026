@@ -13,7 +13,6 @@ BATTERY_VOLTS: float = 12
 
 
 class TurretTarget(Enum):
-    NONE = 0
     HUB = 1
     SHUTTLE_TOP = 2
     SHUTTLE_BOTTOM = 3
@@ -39,25 +38,19 @@ class RobotState(NetworkTablesMixin):
 
     revSpeed: float
     kickShooter: int
-    optimalTurretAngle: radians  # REMOVE (local var)
-    targetDistance: meters  # REMOVE (local var)
-    targetHeight: meters  # REMOVE (local var)
     turretSwitchMode: bool
-    turretShuttle: float
-    turretShuttleOff: float
     turretManualSetpoint: float
     turretSwitchTarget: bool
     turretSwitchEnabled: bool
-    turretResetYawEncdoer: bool  # REMOVE (local var)
-    dontShoot: bool  # REMOVE (local var)
-    impossibleDynamic: bool  # REMOVE (local var)
-    forceDynamicTurret: bool  # REMOVE (local var)
+    dontShoot: bool
+    impossibleDynamic: bool
+    forceDynamicTurret: bool
     turretVelocitySetpoint: Translation2d
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
 
-    turretTarget: TurretTarget = TurretTarget.NONE
+    turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll: float = 0.0
     intakePosYAxis: float = 0.0

@@ -49,7 +49,6 @@ class Inputs(Subsystem):
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
-        robotState.turretResetYawEncdoer = self._mechCtrlr.getStartButtonPressed()
         robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
 
@@ -60,10 +59,8 @@ class Inputs(Subsystem):
         # TODO chagne to not overlap with revspeed
         robotState.indexerEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
-        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        robotState.intakeMode = not self._mechCtrlr.getLeftBumper()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
-        robotState.turretShuttle = self._mechCtrlr.getLeftY()
-        robotState.turretShuttleOff = self._mechCtrlr.getLeftX()
         robotState.intakePos = self._mechCtrlr.getBackButton()
 
         return robotState

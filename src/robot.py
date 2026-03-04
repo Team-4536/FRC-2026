@@ -20,7 +20,7 @@ class Robot(TimedRobot):
 
         self.subsystems = SubsystemManager(
             subsystems=Subsystems(
-                intake=Intake(10, 30, 9),
+                intake=Intake(10, 17, 9),
                 ledSignals=LEDSignals(deviceID=0),
                 shooter=Shooter(kickerID=18, revTopID=12, revBottomID=11),
                 swerveDrive=SwerveDrive.symmetricDrive(
