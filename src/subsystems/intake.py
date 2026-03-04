@@ -57,8 +57,6 @@ class Intake(Subsystem):
 
         return robotState
 
-        return robotState
-
     def periodic(self, robotState: RobotState) -> RobotState:
         self.motorForwardSetpoint = -max(
             min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0
@@ -69,6 +67,8 @@ class Intake(Subsystem):
         self.indexerSetpoint = -max(
             min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
         )
+
+        print("this is working")
 
         if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
             # change these values if you need to decrease/increase raise and lowering speed
@@ -104,7 +104,7 @@ class Intake(Subsystem):
                     self.state = IntakeState.UP
 
         self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-        self.AUTOMATIC_MODE = not robotState.intakeMode
+        # self.AUTOMATIC_MODE = not robotState.intakeMode
 
         # initial motor that intakes
         if robotState.initialIntake:
@@ -134,6 +134,8 @@ class Intake(Subsystem):
 
         self.intakeMotorAutomatic.setThrottle(self.automaticThrottle)
         self.intakeMotorManual.setThrottle(self.manualThrottle)
+
+        print("THIS IS THE MODE", self.AUTOMATIC_MODE)
 
         return robotState
 

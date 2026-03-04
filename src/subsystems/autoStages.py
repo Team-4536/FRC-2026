@@ -169,18 +169,19 @@ class OperateIntake(AutoStages):
         self.pathTime = getTime() - self.startTime
 
         if self.pathTime < 0.5:  # TODO: make this not work like this
-            self.robotState.intakePosYAxis = 0.5
+            self.robotState.intakePosYAxis = 0.4
         else:
             self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
-            self.robotState.intakeIndexer = True
+
+            if self.pathTime > self.pathTime:
+                self.robotState.initialIntake = False
 
         return self.robotState
 
     def end(self, robotState: RobotState) -> RobotState:
         robotState.intakePosYAxis = 0
         robotState.initialIntake = False
-        robotState.intakeIndexer = False
 
         return self.robotState
 
@@ -217,6 +218,7 @@ class OperateTurret(AutoStages):
 
         self.robotState.forceDynamicTurret = True
         self.robotState.kickShooter = self.unload
+        self.robotState.intakeIndexer = True
 
         return self.robotState
 
@@ -224,6 +226,7 @@ class OperateTurret(AutoStages):
 
         robotState.revSpeed = 0
         robotState.kickShooter = False
+        robotState.intakeIndexer = False
 
         return self.robotState
 

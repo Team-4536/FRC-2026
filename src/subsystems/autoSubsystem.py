@@ -33,7 +33,6 @@ class AutoRoutines(Enum):
 class AutoSubsystem(Subsystem):
     # Declare Variables
     autoRoutineChooser: SendableChooser = SendableChooser()
-    autoSideChooser: SendableChooser = SendableChooser()
     routineFinished: bool = False
     routineKeys: List[str] = list()
     currentPath: int = 0
@@ -88,13 +87,7 @@ class AutoSubsystem(Subsystem):
         pass
 
     def publish(self) -> None:
-        SmartDashboard.putString(
-            "auto routine", self.autoRoutineChooser.getSelected().value
-        )
-        if self.routineKeys and not self.routineFinished:
-            SmartDashboard.putString("current path", self.routineKeys[self.currentPath])
-        else:
-            SmartDashboard.putString("current path", "empty/done")
+        pass
 
 
 def routineChooser(

@@ -60,7 +60,7 @@ class Inputs(Subsystem):
         # TODO chagne to not overlap with revspeed
         robotState.indexerEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
-        robotState.intakeMode = self._mechCtrlr.getLeftBumper()
+        # robotState.intakeMode = self._mechCtrlr.getLeftBumper()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
         robotState.turretShuttle = self._mechCtrlr.getLeftY()
         robotState.turretShuttleOff = self._mechCtrlr.getLeftX()
