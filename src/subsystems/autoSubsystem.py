@@ -274,17 +274,10 @@ def routineChooser(
                 OperateTurret(
                     True,
                     0.5,
-                    isFlipped,
                 )
             ]
 
         case AutoRoutines.JUST_SHOOT:
-            routine["shoot"] = [
-                OperateTurret(
-                    True,
-                    15,
-                    isFlipped,
-                )
-            ]
+            routine["shoot"] = [OperateTurret(True, 15)]
 
     return routine

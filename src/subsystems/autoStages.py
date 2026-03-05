@@ -201,11 +201,10 @@ class OperateTurret(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, unload: bool = False, runTime: float = 0, flipped: bool = False):
+    def __init__(self, unload: bool = False, runTime: float = 0):
         self.pathDone = False
         self.runTime = runTime
         self.unload = unload
-        self.flipped = flipped
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = getTime()
@@ -218,7 +217,9 @@ class OperateTurret(AutoStages):
 
         self.robotState.forceDynamicTurret = True
         self.robotState.kickShooter = self.unload
-        self.robotState.intakeIndexer = True
+        self.robotState.revSpeed = 1
+        if self.robotState.fullyReved:
+            self.robotState.intakeIndexer = True
 
         return self.robotState
 

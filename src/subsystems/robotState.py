@@ -42,6 +42,7 @@ class RobotState(NetworkTablesMixin):
     forceDynamicTurret: bool  # REMOVE (local var)
     turretResetYawEncdoer: bool
     turretVelocitySetpoint: Translation2d
+    fullyReved: bool = False
     revSpeed: float = 0
     kickShooter: int = 0
     optimalTurretAngle: radians = 0  # REMOVE (local var)
