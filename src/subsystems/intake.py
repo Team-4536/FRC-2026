@@ -69,7 +69,7 @@ class Intake(Subsystem):
         )
 
         # if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
-            # change these values if you need to decrease/increase raise and lowering speed
+        # change these values if you need to decrease/increase raise and lowering speed
         if robotState.intakePosYAxis < -0.1:
             self.raiseThrottle = robotState.intakePosYAxis * 0.2  # down
         elif robotState.intakePosYAxis > 0.1:
