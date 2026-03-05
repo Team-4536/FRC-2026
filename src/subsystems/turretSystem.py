@@ -571,7 +571,7 @@ class Turret(Subsystem):
             self.homeSet = True
 
         else:
-            self.yawMotor.setVoltage(-1)
+            self.yawMotor.setVoltage(-2) #changed to -2 from -1
 
     def disabled(self):
         self.yawMotor.stopMotor()
