@@ -211,19 +211,22 @@ class RevMotor:
         .apply(
             LimitSwitchConfig()
             .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
-            .forwardLimitSwitchEnabled(True)
+            .forwardLimitSwitchEnabled(
+                False
+            )  # TODO when forward limit switch exists again change
             .reverseLimitSwitchEnabled(True)
-            .forwardLimitSwitchPosition(16.66)
+            # .forwardLimitSwitchPosition(16.66)
             .reverseLimitSwitchPosition(0)
             .reverseLimitSwitchTriggerBehavior(
                 LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
             )
-            .forwardLimitSwitchTriggerBehavior(
-                LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
-            )
-            .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+            # .forwardLimitSwitchTriggerBehavior(
+            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+            # )
+            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
             .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
         )
+        .apply(SoftLimitConfig().forwardSoftLimit(16.66).forwardSoftLimitEnabled(True))
     )
 
     TURRET_PITCH_CONFIG: SparkBaseConfig = (
