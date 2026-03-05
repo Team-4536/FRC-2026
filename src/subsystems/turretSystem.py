@@ -144,7 +144,7 @@ class Turret(Subsystem):
         self.yawLimitSwitch = DigitalInput(10)
         self.pitchLimitSwitch = DigitalInput(0)  # TODO chage to be correct
 
-        self.homeSet: bool = False
+        self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
@@ -175,7 +175,7 @@ class Turret(Subsystem):
         )
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-        self.homeSet: bool = False
+        self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
@@ -279,7 +279,7 @@ class Turret(Subsystem):
         self.publishFloatArray(
             "Robot Linear veloity",
             (
-                robotState.robotLinearVelocity.distance(Translation2d()),
+                robotState.robotLinearVelocity.norm(),
                 (
                     0
                     if robotState.robotLinearVelocity.norm() == 0
@@ -379,7 +379,6 @@ class Turret(Subsystem):
                 if not (self.mode == TurretMode.DISABLED)
                 else self.mode
             )
-            return mode
 
         if rs.turretSwitchMode:
             mode = (
@@ -578,7 +577,7 @@ class Turret(Subsystem):
         self.pitchMotor.stopMotor()
         # do we need these .configure lines when revmotor allready does this?
 
-        self.homeSet = False
+        self.homeSet = True
 
     def publish(self):
         self.publishBoolean("Home Set", self.homeSet)
@@ -596,10 +595,10 @@ class Turret(Subsystem):
         self.publishBoolean("Target Locked", self.targetLocked)
         self.publishBoolean(
             "Yaw forward soft limit",
-            self.yawMotor._ctrlr.getForwardLimitSwitch().get(),  # pyright: ignore
+            self.yawMotor._ctrlr.getForwardSoftLimit().isReached(),  # pyright: ignore
         )
         self.publishBoolean(
-            "Yaw reverse soft limit",
+            "Yaw reverse hard limit",
             self.yawMotor._ctrlr.getReverseLimitSwitch().get(),  # pyright: ignore
         )
         self.publishFloat(
@@ -714,6 +713,9 @@ class Shooter(Subsystem):
         self.dependencies = (
             robotState.revSpeed,
             robotState.kickShooter,
+            robotState.indexerEject,
+            robotState.ejectAll,
+            robotState.dontShoot,
         )
 
         self.kickShooter = robotState.kickShooter
@@ -753,7 +755,10 @@ class Shooter(Subsystem):
         self.revingSetpoint = MANUAL_REV_SPEED
 
     def dynamicUpdate(self, robotState: RobotState) -> None:
-        depend: Tuple[Any, ...] = (robotState.impossibleDynamic,)
+        depend: Tuple[Any, ...] = (
+            robotState.impossibleDynamic,
+            robotState.turretVelocitySetpoint,
+        )
 
         if not checkDependencies(depend):
             return
