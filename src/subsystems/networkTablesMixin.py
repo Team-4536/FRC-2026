@@ -12,7 +12,7 @@ class NetworkTablesMixin:
     _table: NetworkTable
     _ntPersist: Dict[str, object]
 
-    def __init__(self, *, table: str = "telemetry", inst: bool = True):
+    def __init__(self, *, table: str = "telemetry", inst: bool = False):
         self._table = self._getTable(table, inst)
         self._ntPersist = {}
 
@@ -182,7 +182,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: str,
     ) -> str:
         return self.__get(
@@ -194,7 +194,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: Sequence[str],
     ) -> Sequence[str]:
         return self.__get(
@@ -209,7 +209,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: int,
     ) -> int:
         return self.__get(
@@ -221,7 +221,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: Sequence[int],
     ) -> Sequence[int]:
         return self.__get(
@@ -236,7 +236,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: float,
     ) -> float:
         return self.__get(
@@ -248,7 +248,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: Sequence[float],
     ) -> Sequence[float]:
         return self.__get(
@@ -263,7 +263,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: bool,
     ) -> bool:
         return self.__get(
@@ -275,7 +275,7 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
+        inst: bool = False,
         default: Sequence[bool],
     ) -> Sequence[bool]:
         return self.__get(
