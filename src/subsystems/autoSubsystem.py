@@ -13,6 +13,13 @@ from wpilib import SendableChooser, SmartDashboard
 
 
 class AutoRoutines(Enum):
+    A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_MID = "Empty and get balls and shoot from mid"
+    A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_RIGHT = (
+        "Empty and get balls and shoot from right"
+    )
+    A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_LEFT = (
+        "Empty and get balls and shoot from left"
+    )
     DO_NOTHING = "Do Nothing"
     JUST_SHOOT = "Just Shoot"
     TEST_INTAKE = "Test Intake"
@@ -97,6 +104,109 @@ def routineChooser(
     match selectedRoutine:
         case AutoRoutines.DO_NOTHING:
             pass
+
+        case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_MID:
+            routine["Back and rev"] = [
+                FollowTrajectory(
+                    "Backward",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    5,
+                )
+            ]
+            routine["under right trench from start middle"] = [
+                FollowTrajectory(
+                    "under right trench from start middle",
+                    isFlipped,
+                )
+            ]
+            routine["right to balls"] = [
+                FollowTrajectory(
+                    "right to balls",
+                    isFlipped,
+                )
+            ]
+            routine["under left trench to hub"] = [
+                FollowTrajectory(
+                    "under left trench to hub",
+                    isFlipped,
+                )
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    8,
+                )
+            ]
+
+        case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_RIGHT:
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    5,
+                )
+            ]
+            routine["under right trench from start"] = [
+                FollowTrajectory(
+                    "under right trench from start",
+                    isFlipped,
+                )
+            ]
+            routine["right to balls"] = [
+                FollowTrajectory(
+                    "right to balls",
+                    isFlipped,
+                )
+            ]
+            routine["under left trench to hub"] = [
+                FollowTrajectory(
+                    "under left trench to hub",
+                    isFlipped,
+                )
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    8,
+                )
+            ]
+
+        case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_LEFT:
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    5,
+                )
+            ]
+            routine["under left trench from start"] = [
+                FollowTrajectory(
+                    "under left trench from start",
+                    isFlipped,
+                )
+            ]
+            routine["left to balls"] = [
+                FollowTrajectory(
+                    "left to balls",
+                    isFlipped,
+                )
+            ]
+            routine["under right trench to hub"] = [
+                FollowTrajectory(
+                    "under right trench to hub",
+                    isFlipped,
+                )
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    8,
+                )
+            ]
 
         case AutoRoutines.DROP_INTAKE:
             routine["Drop Intake"] = [
