@@ -260,7 +260,7 @@ def routineChooser(
                     "Drive Forward Test",
                     isFlipped,
                 ),
-                # OperateIntake(5),
+                OperateIntake(5),
             ]
 
         case AutoRoutines.FORWARD_AND_SHOOT:
