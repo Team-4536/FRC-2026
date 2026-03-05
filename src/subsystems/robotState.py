@@ -13,7 +13,6 @@ BATTERY_VOLTS: float = 12
 
 
 class TurretTarget(Enum):
-    NONE = 0
     HUB = 1
     SHUTTLE_TOP = 2
     SHUTTLE_BOTTOM = 3
@@ -59,7 +58,7 @@ class RobotState(NetworkTablesMixin):
     intakeIndexer: bool = False
     intakeMode: bool = False
 
-    turretTarget: TurretTarget = TurretTarget.NONE
+    turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll: float = 0.0
     intakePosYAxis: float = 0.0
