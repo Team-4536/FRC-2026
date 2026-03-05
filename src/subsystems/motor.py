@@ -137,7 +137,7 @@ class RevMotor:
 
     INTAKE_RAISE_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(15, 15)
+        .smartCurrentLimit(20, 20)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(

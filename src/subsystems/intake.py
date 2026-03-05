@@ -73,7 +73,7 @@ class Intake(Subsystem):
         if robotState.intakePosYAxis < -0.1:
             self.raiseThrottle = robotState.intakePosYAxis * 0.2  # down
         elif robotState.intakePosYAxis > 0.1:
-            self.raiseThrottle = robotState.intakePosYAxis * 0.5  # up
+            self.raiseThrottle = robotState.intakePosYAxis * 0.2  # up
         else:
             self.raiseThrottle = 0  # dead
 
