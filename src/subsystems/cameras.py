@@ -130,7 +130,7 @@ class CameraManager(Subsystem):
         self.photonCameraRight = photonCameraClass(
             "Camera1",
             15,
-            -33,
+            -30,
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (6.6 / 100)),
             (25.4 + 3.9) / 100,
@@ -138,7 +138,7 @@ class CameraManager(Subsystem):
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             15,
-            27,
+            30,
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
             (25.4 + 3.9) / 100,

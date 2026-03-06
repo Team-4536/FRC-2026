@@ -18,7 +18,7 @@ from subsystems.utils import (
     wrapAngle,
 )
 from typing import Any, Tuple
-from wpilib import DigitalInput, DriverStation, getTime
+from wpilib import DriverStation, getTime
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Translation3d
 from wpimath.units import (
     degreesToRadians,
@@ -50,8 +50,8 @@ PITCH_GEARING: float = 16 * ARC_RATIO  # two 4:1 gearboxes make 25
 TURRET_HEIGHT: meters = inchesToMeters(15)
 
 BALL_RADIUS: inches = 5.91 / 2
-Y_PASS_DIFF_HUB: meters = inchesToMeters(15 + BALL_RADIUS)
-GOAL_HEIGHT: meters = 1  # not entirly correct, distance between goal and turret opening
+Y_PASS_DIFF_HUB: meters = inchesToMeters(25 + BALL_RADIUS)
+GOAL_HEIGHT: meters = inchesToMeters(72 - 15)
 Y_PASS_HUB: meters = GOAL_HEIGHT + Y_PASS_DIFF_HUB
 HUB_RADIUS: inches = 41.7 / 2
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
@@ -64,7 +64,9 @@ SHUTTLE_X_PASS_DIFF: meters = (
 
 MAX_RPM: RPM = 5676
 
-HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS)
+HUB_DIST_X: meters = (
+    inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS) + inchesToMeters(10)
+)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15)
 
@@ -72,7 +74,6 @@ SHUTTLE_DIST_X: meters = 3
 RIGHT_SHUTTLE_DIST_Y: meters = 3
 LEFT_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
 
-# TODO find feild positions for each
 # x and y should be the same as what the robot thinks those are, z is height (in meters)
 RED_TOP_SHUTTLE_POS: Translation3d = Translation3d(
     FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - RIGHT_SHUTTLE_DIST_Y, 0
@@ -97,15 +98,17 @@ BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 
-FLYWHEEL_DIAMETER: inches = 3  # diameter of the wheels build decides to use
-FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(FLYWHEEL_DIAMETER) * PI
+BOTTOM_FLYWHEEL_DIAMETER: inches = 3.5  # diameter of the wheels build decides to use
+TOP_FLYWHEEL_DIAMETER: inches = 3
+BOTTOM_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(BOTTOM_FLYWHEEL_DIAMETER) * PI
+TOP_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(TOP_FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
-MANUAL_REV_SPEED: RPM = 3500  # TODO change to what emmet wants
-MANUAL_SPEED: RPM = 50  # TODO tune, for the pitch and yaw speed
+MANUAL_REV_SPEED: MPS = 13.96
+MANUAL_SPEED: RPM = 50
 KICK_SPEED: RPM = 2000
 
 # in percent
-REV_ALLOWED_ERROR: float = 10  # TODO fine tune all these
+REV_ALLOWED_ERROR: float = 10
 # in radians
 YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
@@ -141,9 +144,6 @@ class Turret(Subsystem):
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
 
-        self.yawLimitSwitch = DigitalInput(10)
-        self.pitchLimitSwitch = DigitalInput(0)  # TODO chage to be correct
-
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
@@ -155,12 +155,12 @@ class Turret(Subsystem):
         self.targetLocked: bool = False
 
         self.target: TurretTarget = TurretTarget.HUB
-        self.mode: TurretMode = TurretMode.MANUAL
+        self.mode: TurretMode = TurretMode.DYNAMIC
 
         self.turretManDependencies: Tuple[Any, ...] = (None,)
         self.turretGenDepedencies: Tuple[Any, ...] = (None,)
         self.turretGenDepedencies: Tuple[Any, ...] = (None,)
-        # these velocity values are only used when in manual mode
+        # these velocity values are only used when in DYNAMIC mode
         self.yawVelocity: RPM = 0
         self.pitchVelocity: RPM = 0
 
@@ -666,6 +666,7 @@ class Shooter(Subsystem):
         self.revBottomEncoder = self.revingMotorBottom.getEncoder()
 
         self.revingSetpoint: RPM = 0
+        self.mpsSetpoint: MPS = 0
         self.revingSpeedTop: RPM = 0
         self.revingSpeedBottom: RPM = 0
         self.kickSpeed: RPM = self.kickMotorEncoder.getPosition()  # read value
@@ -727,7 +728,7 @@ class Shooter(Subsystem):
         else:
             return robotState
 
-        self.revingSetpoint *= robotState.revSpeed  # multiplied by the trigger value
+        self.mpsSetpoint *= robotState.revSpeed  # multiplied by the trigger value
 
         if robotState.ejectAll > 0.3 or robotState.indexerEject:
             robotState.kickShooter = -1
@@ -735,19 +736,19 @@ class Shooter(Subsystem):
         if robotState.intakeIndexer:
             robotState.kickShooter = 1
 
-        self.revShooters(self.revingSetpoint)
+        self.revShooters(self.mpsSetpoint)
 
         self.kickSetPoint = KICK_SPEED * robotState.kickShooter
 
         self.dontShoot = robotState.dontShoot
 
-        if not self.dontShoot:
+        if self.fullyReved:
             self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 
     def manualUpdate(self):
-        self.revingSetpoint = MANUAL_REV_SPEED
+        self.mpsSetpoint = MANUAL_REV_SPEED
 
     def dynamicUpdate(self, robotState: RobotState) -> None:
         depend: Tuple[Any, ...] = (
@@ -761,14 +762,15 @@ class Shooter(Subsystem):
         if robotState.impossibleDynamic:
             return
 
-        mpsSetpoint: MPS = 0
+        self.mpsSetpoint: MPS = 0
 
-        mpsSetpoint = robotState.turretVelocitySetpoint.distance(Translation2d())
-        self.revingSetpoint = MPSToRPM(mpsSetpoint, FLYWHEEL_CIRCUMFRENCE)
+        self.mpsSetpoint = robotState.turretVelocitySetpoint.distance(Translation2d())
 
-    def revShooters(self, speed: RPM):
-        self.revingMotorBottom.setVelocity(speed)
-        self.revingMotorTop.setVelocity(speed)
+    def revShooters(self, speed: MPS):
+        top: RPM = MPSToRPM(speed, TOP_FLYWHEEL_CIRCUMFRENCE)
+        bottom: RPM = MPSToRPM(speed, BOTTOM_FLYWHEEL_CIRCUMFRENCE)
+        self.revingMotorBottom.setVelocity(bottom)
+        self.revingMotorTop.setVelocity(top)
 
     def getFullyReved(self) -> bool:
 
@@ -801,9 +803,10 @@ class Shooter(Subsystem):
             "(MPS) reving read speed",
             RPMToMPS(
                 (self.revingSpeedBottom + self.revingSpeedTop) / 2,
-                FLYWHEEL_CIRCUMFRENCE,
+                BOTTOM_FLYWHEEL_CIRCUMFRENCE,
             ),
         )
+        self.publishFloat("avg rev speed", self.getRevSpeed())
 
 
 def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radians:
@@ -834,5 +837,5 @@ def checkDependencies(depends: Tuple[Any, ...]) -> bool:
 
 def compensateSpeed(speed: MPS) -> MPS:
     # desmos best fit line :D
-    actual: MPS = -0.0178164 * (speed**2) + 0.807272 * speed - 0.616551
-    return speed * (speed / actual)
+    actual: MPS = 2.55728 * (speed) - 4.04025
+    return actual
