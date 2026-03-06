@@ -20,20 +20,23 @@ class AutoRoutines(Enum):
     A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_LEFT = (
         "Empty and get balls and shoot from left"
     )
+    A_BACK_UP_AND_SHOOT = "Back up and shoot"
+    A_SHOOT_AND_LEAVE_MID = "Shoot and leave from middle"
+    A_SHOOT_AND_LEAVE_RIGHT = "Shoot and leave from right"
+    A_SHOOT_AND_LEAVE_LEFT = "Shoot and leave from left"
+    A_SYSTEM_CHECK = "System Check"
     DO_NOTHING = "Do Nothing"
     JUST_SHOOT = "Just Shoot"
     TEST_INTAKE = "Test Intake"
-    DRIVE_FORWARD_BACK_TEST = "Drive Forward Back Test"
-    WONKY = "Wonky"
+    DRIVE_FORWARD_BACK_TEST = "Test Drive Forward Back"
     GET_BALLS_RIGHT_FROM_HUB = "Get Balls Right From Hub"
     GET_BALLS_LEFT_FROM_HUB = "Get Balls Left From Hub"
     GET_BALLS_RIGHT_FROM_START = "Get Balls Right From START"
     GET_BALLS_LEFT_FROM_START = "Get Balls Left From START"
-    MESS_WITH_MIDDLE_FROM_RIGHT = "Mess With Middle From Right"
     DROP_INTAKE = "Drop Intake"
-    FORWARD = "Forward"
-    FORWARD_AND_INTAKE = "Forward And Intake"
-    FORWARD_AND_SHOOT = "Forward And Shoot"
+    FORWARD = "Test Forward"
+    FORWARD_AND_INTAKE = "Test Forward And Intake"
+    FORWARD_AND_SHOOT = "Test Forward And Shoot"
     L_TEST = "L Test"
 
 
@@ -104,6 +107,27 @@ def routineChooser(
     match selectedRoutine:
         case AutoRoutines.DO_NOTHING:
             pass
+
+        case AutoRoutines.A_SYSTEM_CHECK:
+            routine["rev turret"] = [
+                OperateTurret(False, 2),
+            ]
+            routine["shoot turret"] = [
+                OperateTurret(True, 2),
+            ]
+            routine["intake"] = [
+                OperateIntake(3),
+            ]
+            routine["swerve"] = [
+                FollowTrajectory(
+                    "Backward",
+                    isFlipped,
+                ),
+                FollowTrajectory(
+                    "Forward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_MID:
             routine["Back and rev"] = [
@@ -208,6 +232,84 @@ def routineChooser(
                 )
             ]
 
+        case AutoRoutines.A_BACK_UP_AND_SHOOT:
+            routine["backward"] = [
+                FollowTrajectory(
+                    "Backward",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    19,
+                )
+            ]
+
+        case AutoRoutines.A_SHOOT_AND_LEAVE_MID:
+            routine["backward"] = [
+                FollowTrajectory(
+                    "Backward",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    5,
+                )
+            ]
+            routine["get out of the way from mid"] = [
+                FollowTrajectory(
+                    "get out of the way from mid",
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.A_SHOOT_AND_LEAVE_RIGHT:
+            routine["backward"] = [
+                FollowTrajectory(
+                    "Backward",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    5,
+                )
+            ]
+            routine["get out of the way from right"] = [
+                FollowTrajectory(
+                    "get out of the way from right",
+                    isFlipped,
+                )
+            ]
+
+        case AutoRoutines.A_SHOOT_AND_LEAVE_LEFT:
+            routine["backward"] = [
+                FollowTrajectory(
+                    "Backward",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["shoot"] = [
+                OperateTurret(
+                    True,
+                    5,
+                )
+            ]
+            routine["get out of the way from left"] = [
+                FollowTrajectory(
+                    "get out of the way from left",
+                    isFlipped,
+                )
+            ]
+
         case AutoRoutines.DROP_INTAKE:
             routine["Drop Intake"] = [
                 OperateIntake(),
@@ -307,26 +409,6 @@ def routineChooser(
                 )
             ]
 
-        case AutoRoutines.MESS_WITH_MIDDLE_FROM_RIGHT:
-            routine["Under Right Trench From Hub"] = [
-                FollowTrajectory(
-                    "under right trench from hub",
-                    isFlipped,
-                )
-            ]
-            routine["Mess With Middle From Right"] = [
-                FollowTrajectory(
-                    "mess with middle from right",
-                    isFlipped,
-                ),
-            ]
-            routine["Under Left Trench To Hub"] = [
-                FollowTrajectory(
-                    "under left trench to hub",
-                    isFlipped,
-                )
-            ]
-
         case AutoRoutines.FORWARD:
             routine["Forward"] = [
                 FollowTrajectory(
@@ -351,19 +433,7 @@ def routineChooser(
                     isFlipped,
                 )
             ]
-        case AutoRoutines.WONKY:
-            routine["Wonky 1"] = [
-                FollowTrajectory(
-                    "Wonky 1",
-                    isFlipped,
-                )
-            ]
-            routine["Wonky 2"] = [
-                FollowTrajectory(
-                    "Wonky 2",
-                    isFlipped,
-                )
-            ]
+
         case AutoRoutines.FORWARD_AND_INTAKE:
             routine["Forward"] = [
                 FollowTrajectory(
