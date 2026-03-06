@@ -4,7 +4,6 @@ from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
-    FeedForwardConfig,
     LimitSwitchConfig,
     MAXMotionConfig,
     PersistMode,

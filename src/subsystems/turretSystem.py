@@ -32,7 +32,7 @@ from wpimath.units import (
     seconds,
 )
 
-ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
+ROBOT_RADIUS = inchesToMeters(Translation2d(11, 11).norm())
 
 MAX_PITCH: radians = degreesToRadians(90)  # in relation to feild
 MIN_PITCH: radians = degreesToRadians(40)
@@ -51,17 +51,11 @@ TURRET_HEIGHT: meters = inchesToMeters(15)
 
 BALL_RADIUS: inches = 5.91 / 2
 
-SHUTTLE_Y_PASS_DIFF: meters = 0.1
-SHUTTLE_Y_PASS: meters = SHUTTLE_Y_PASS_DIFF
-SHUTTLE_X_PASS_DIFF: meters = (
-    1  # TODO the distance between where you want it to land and where you want it to clear
-)
-
 MAX_RPM: RPM = 5676
 HUB_RADIUS: inches = 41.7 / 2
-HUB_DIST_X: meters = (
-    inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS) + inchesToMeters(10)
-)
+HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(
+    HUB_RADIUS
+)  # + inchesToMeters(10)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15)
 Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
@@ -81,7 +75,7 @@ RED_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 )
 RED_SCORE_POS: Translation3d = Translation3d(
     FIELD_LEN - HUB_DIST_X,
-    HUB_DIST_Y,
+    FIELD_WIDTH,
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 BLUE_TOP_SHUTTLE_POS: Translation3d = Translation3d(
@@ -109,10 +103,10 @@ KICK_SPEED: RPM = 3500
 REV_ALLOWED_ERROR: float = 3
 # in radians
 YAW_ALLOWED_ERROR: radians = 0.1
-PITCH_ALLOWED_ERROR: radians = 0.05
+PITCH_ALLOWED_ERROR: radians = 0.1
 
 
-TURRET_DIST_FROM_CENTER: meters = inchesToMeters(7.5)  # TODO make correct
+TURRET_DIST_FROM_CENTER: meters = inchesToMeters(27 - (6 + 1 / 2))  # TODO make correct
 TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
 
 
@@ -211,6 +205,9 @@ class Turret(Subsystem):
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
+
+        if not self.targetLocked:
+            robotState.dontShoot = True
 
         self.turretManDependencies = (robotState.turretManualSetpoint,)
         self.turretGenDepedencies = (robotState.odometry,)
@@ -431,7 +428,11 @@ class Turret(Subsystem):
         return Translation3d()
 
     def getTargetLocked(self) -> bool:
-        if abs(self.relativeYawSetpoint - self.yawEncoderPos) > YAW_ALLOWED_ERROR:
+
+        if (
+            abs(self.relativeYawSetpoint - self.yawEncoderPos / YAW_GEARING)
+            > YAW_ALLOWED_ERROR
+        ):
             return False
 
         if abs(self.pitchSetpoint - self.pitchAngle) > PITCH_ALLOWED_ERROR:
@@ -449,23 +450,26 @@ class Turret(Subsystem):
 
         offset: Translation2d = self.odom.posFromRobot
         turretRotSpeed: MPS = roboOmegaSpeed * (TURRET_DIST_FROM_CENTER / ROBOT_RADIUS)
-        tanVel: Translation2d = Translation2d(turretRotSpeed, getTangentAngle(offset))
+        tanVel: Translation2d = Translation2d(
+            distance=turretRotSpeed, angle=Rotation2d(getTangentAngle(offset))
+        )
 
         self.publishFloatArray(
             "Tangent velocity",
-            (tanVel.distance(Translation2d()), tanVel.angle().radians()),
-            debug=True,
+            (tanVel.norm(), tanVel.angle().radians()),
         )
-
         # add the mps values
-        # compensateVector += tanVel
+        compensateVector += tanVel
         compensateVector += roboLinV
 
         # multiply by time to get the distance the ball would move
+
         compensateVector = scaleTranslation2D(compensateVector, time)
+        compensateVector.rotateBy(Rotation2d(PI))
 
         # add in the opposite direction
-        self.targetPos += Translation3d(compensateVector.rotateBy(Rotation2d(PI)))
+
+        self.targetPos += Translation3d(compensateVector.x, compensateVector.y, 0)
 
     def dontOverdoItYaw(self, angle: radians) -> radians:
         if angle > MAX_ROTATION + (TURRET_GAP / 2) or (
@@ -541,16 +545,10 @@ class Turret(Subsystem):
     def getXPass(self, d: meters) -> meters:
         xPass = d - X_PASS_DIFF_HUB  # for hub
 
-        if self.target != TurretTarget.HUB:
-            xPass = d - SHUTTLE_X_PASS_DIFF  # for shuttle positions
-
         return xPass
 
     def getYPass(self) -> meters:
         yPass = Y_PASS_HUB
-
-        if self.target != TurretTarget.HUB:
-            yPass = SHUTTLE_Y_PASS
 
         return yPass
 
@@ -632,7 +630,7 @@ class TurretOdometry:
         yawAngle = rotationsToRadians(yawRaw) / YAW_GEARING
 
         pitchRaw = pitchEncoder.getPosition()
-        pitchAngle = rotationsToRadians(pitchRaw) / PITCH_GEARING
+        pitchAngle = PI / 2 - (rotationsToRadians(pitchRaw) / PITCH_GEARING)
 
         wrappedRoboYaw = wrapAngle(roboPose.rotation().radians())
         wrappedYaw = wrapAngle(yawAngle)
@@ -740,7 +738,7 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        if self.fullyReved:
+        if not self.dontShoot:
             self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
 
         return robotState
@@ -773,7 +771,7 @@ class Shooter(Subsystem):
         if self.revingSetpoint == 0:
             return True
 
-        if 100 - (100 * self.getRevSpeed() / self.revingSetpoint) > REV_ALLOWED_ERROR:
+        if 100 - (100 * self.getMPSSpeed() / self.mpsSetpoint) > REV_ALLOWED_ERROR:
             return False
 
         return True

@@ -1,7 +1,5 @@
 from subsystems.LEDSignals import LEDSignals
-from subsystems.motor import RevMotor
 from subsystems.autoSubsystem import AutoSubsystem
-import wpilib
 from subsystemManager import SubsystemManager, Subsystems
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
