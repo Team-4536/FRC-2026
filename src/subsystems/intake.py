@@ -29,7 +29,7 @@ class Intake(Subsystem):
 
         self.publishFloat("intake_speed (0 to 1)", 0.7)
         self.publishFloat("reverse_speed (0 to 1)", 0.7)
-        self.publishFloat("indexer_speed (0 to 1)", 0.4)
+        self.publishFloat("indexer_speed (0 to 1)", 0.5)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.intakeMotorAutomatic.configure(config=RevMotor.INDEXER_MOTOR_CONFIG)
