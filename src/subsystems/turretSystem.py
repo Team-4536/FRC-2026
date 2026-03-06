@@ -209,12 +209,7 @@ class Turret(Subsystem):
         self.impossibleDynamic = False
         robotState.impossibleDynamic = False
         robotState.dontShoot = False
-
-        if robotState.forceDynamicTurret:
-            self.mode = TurretMode.DYNAMIC
-            robotState.turretMode = self.mode
-        else:
-            self.mode = self.getMode(robotState)
+        self.mode = self.getMode(robotState)
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
