@@ -2,8 +2,6 @@ from enum import Enum
 from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpilib import getTime
-import wpilib
 
 
 class IntakeState(Enum):

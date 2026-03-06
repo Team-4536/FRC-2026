@@ -746,8 +746,8 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        # if not self.dontShoot:
-        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+        if not self.dontShoot:
+            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 
@@ -776,21 +776,18 @@ class Shooter(Subsystem):
         self.revingMotorTop.setVelocity(speed)
 
     def getFullyReved(self) -> bool:
+
         if self.revingSetpoint == 0:
             return True
 
-        if (
-            100
-            - (
-                abs(self.revingSetpoint - self.revingSpeedTop)
-                / self.revingSetpoint
-                * 100
-            )
-            > REV_ALLOWED_ERROR
-        ):
+        if 100 - (100 * self.getRevSpeed() / self.revingSetpoint) > REV_ALLOWED_ERROR:
             return False
 
         return True
+
+    def getRevSpeed(self) -> RPM:
+        avg = (self.revingSpeedTop + self.revingSpeedBottom) / 2
+        return avg
 
     def disabled(self) -> None:
         self.kickMotor.setVoltage(0)
