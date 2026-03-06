@@ -109,24 +109,19 @@ def routineChooser(
             pass
 
         case AutoRoutines.A_SYSTEM_CHECK:
-            routine["rev turret"] = [
-                OperateTurret(False, 2),
+            routine["rev"] = [
+                OperateTurret(
+                    False,
+                    1,
+                )
             ]
-            routine["shoot turret"] = [
-                OperateTurret(True, 2),
-            ]
-            routine["intake"] = [
-                OperateIntake(3),
-            ]
-            routine["swerve"] = [
-                FollowTrajectory(
-                    "Backward",
-                    isFlipped,
-                ),
+            routine["other"] = [
                 FollowTrajectory(
                     "Forward",
                     isFlipped,
                 ),
+                OperateTurret(True),
+                OperateIntake(),
             ]
 
         case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_MID:
@@ -153,7 +148,8 @@ def routineChooser(
                 FollowTrajectory(
                     "right to balls",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
             routine["under left trench to hub"] = [
                 FollowTrajectory(
@@ -185,7 +181,8 @@ def routineChooser(
                 FollowTrajectory(
                     "right to balls",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
             routine["under left trench to hub"] = [
                 FollowTrajectory(
@@ -217,7 +214,8 @@ def routineChooser(
                 FollowTrajectory(
                     "left to balls",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
             routine["under right trench to hub"] = [
                 FollowTrajectory(
