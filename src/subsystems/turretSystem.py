@@ -773,7 +773,7 @@ class Shooter(Subsystem):
         if self.revingSetpoint == 0:
             return True
 
-        if 100 - (100 * self.getRevSpeed() / self.revingSetpoint) > REV_ALLOWED_ERROR:
+        if 100 - (100 * self.getMPSSpeed() / self.revingSetpoint) > REV_ALLOWED_ERROR:
             return False
 
         return True

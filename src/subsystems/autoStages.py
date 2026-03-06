@@ -215,7 +215,6 @@ class OperateTurret(AutoStages):
         self.pathTime = getTime() - self.startTime
 
         self.robotState.revSpeed = 1
-        self.robotState.kickShooter = True
         if self.robotState.fullyReved:
             self.robotState.intakeIndexer = self.unload
 
