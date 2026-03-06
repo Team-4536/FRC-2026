@@ -216,7 +216,7 @@ class OperateTurret(AutoStages):
         self.pathTime = getTime() - self.startTime
 
         self.robotState.revSpeed = 1
-        if self.pathTime < 1.0:
+        if self.pathTime < self.runTime:
             self.robotState.kickShooter = self.unload
             self.robotState.intakeIndexer = self.unload
 

@@ -376,14 +376,14 @@ def routineChooser(
         case AutoRoutines.FORWARD_AND_SHOOT:
             routine["Forward"] = [
                 FollowTrajectory(
-                    "Drive Forward Test",
+                    "Forward",
                     isFlipped,
                 )
             ]
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    0.5,
+                    10,
                 )
             ]
 
