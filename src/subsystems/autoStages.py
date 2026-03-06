@@ -168,8 +168,8 @@ class OperateIntake(AutoStages):
         self.robotState = robotState
         self.pathTime = getTime() - self.startTime
 
-        if self.pathTime < 0.5:  # TODO: make this not work like this
-            self.robotState.intakePosYAxis = 0.4
+        if self.pathTime < 1.2:  # TODO: make this not work like this
+            self.robotState.intakePosYAxis = 0.85
         else:
             self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
@@ -187,7 +187,7 @@ class OperateIntake(AutoStages):
 
     def isDone(self) -> bool:
 
-        if self.pathTime < self.runTime or self.pathTime < 0.5:
+        if self.pathTime < self.runTime or self.pathTime < 1.2:
             return False
 
         self.pathDone = True
@@ -201,11 +201,10 @@ class OperateTurret(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, unload: bool = False, runTime: float = 0, flipped: bool = False):
+    def __init__(self, unload: bool = False, runTime: float = 0):
         self.pathDone = False
         self.runTime = runTime
         self.unload = unload
-        self.flipped = flipped
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = getTime()
@@ -216,9 +215,10 @@ class OperateTurret(AutoStages):
         self.robotState = robotState
         self.pathTime = getTime() - self.startTime
 
-        self.robotState.forceDynamicTurret = True
         self.robotState.kickShooter = self.unload
-        self.robotState.intakeIndexer = True
+        self.robotState.revSpeed = 1
+        if self.robotState.fullyReved:
+            self.robotState.intakeIndexer = True
 
         return self.robotState
 

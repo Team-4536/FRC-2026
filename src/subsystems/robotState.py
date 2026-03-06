@@ -42,6 +42,7 @@ class RobotState(NetworkTablesMixin):
     forceDynamicTurret: bool  # REMOVE (local var)
     turretResetYawEncdoer: bool
     turretVelocitySetpoint: Translation2d
+    fullyReved: bool = False
     revSpeed: float = 0
     kickShooter: int = 0
     optimalTurretAngle: radians = 0  # REMOVE (local var)
@@ -70,6 +71,7 @@ class RobotState(NetworkTablesMixin):
         super().__init__(table="RobotState", inst=False)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
+        self.turretVelocitySetpoint = Translation2d()
 
     def publish(self) -> None:
         for field in fields(self):

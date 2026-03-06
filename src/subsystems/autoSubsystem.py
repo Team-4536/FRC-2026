@@ -440,7 +440,7 @@ def routineChooser(
                     "Drive Forward Test",
                     isFlipped,
                 ),
-                # OperateIntake(5),
+                OperateIntake(5),
             ]
 
         case AutoRoutines.FORWARD_AND_SHOOT:
@@ -454,17 +454,10 @@ def routineChooser(
                 OperateTurret(
                     True,
                     0.5,
-                    isFlipped,
                 )
             ]
 
         case AutoRoutines.JUST_SHOOT:
-            routine["shoot"] = [
-                OperateTurret(
-                    True,
-                    15,
-                    isFlipped,
-                )
-            ]
+            routine["shoot"] = [OperateTurret(True, 15)]
 
     return routine
