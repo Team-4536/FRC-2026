@@ -3,30 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5473894436519258,
-        "y": 7.5
+        "x": 3.15,
+        "y": 7.4
       },
       "prevControl": null,
       "nextControl": {
-<<<<<<< HEAD
-        "x": 2.6542470137593126,
-        "y": 7.5
-=======
-        "x": 2.25,
-        "y": 7.0
->>>>>>> MNDU-Comp-2026
+        "x": 2.7360469841363337,
+        "y": 7.45516610135228
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.5
+        "x": 1.5163169642857142,
+        "y": 7.57171130952381
       },
       "prevControl": {
-        "x": 2.5434236804564914,
-        "y": 7.5
+        "x": 2.2334706489924505,
+        "y": 7.489711489368952
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,7 +41,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 0.0
   },
   "reversed": false,
