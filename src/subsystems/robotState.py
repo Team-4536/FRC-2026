@@ -28,7 +28,6 @@ class TurretMode(Enum):
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
     intakeEject: bool
-    indexerEject: bool
     intakePos: bool
     resetGyro: bool
     odometry: SwerveDrive4PoseEstimator
@@ -37,11 +36,11 @@ class RobotState(NetworkTablesMixin):
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
 
-    dontShoot: bool  # REMOVE (local var)
-    impossibleDynamic: bool  # REMOVE (local var)
-    forceDynamicTurret: bool  # REMOVE (local var)
-    turretResetYawEncdoer: bool
     turretVelocitySetpoint: Translation2d
+    indexerEject: bool = False
+    dontShoot: bool = False  # REMOVE (local var)
+    impossibleDynamic: bool = False  # REMOVE (local var)
+    forceDynamicTurret: bool = False  # REMOVE (local var)
     fullyReved: bool = False
     revSpeed: float = 0
     kickShooter: int = 0
@@ -71,6 +70,7 @@ class RobotState(NetworkTablesMixin):
         super().__init__(table="RobotState", inst=False)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
+        self.turretVelocitySetpoint = Translation2d()
 
     def publish(self) -> None:
         for field in fields(self):

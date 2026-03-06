@@ -133,8 +133,6 @@ class Intake(Subsystem):
         self.intakeMotorAutomatic.setThrottle(self.automaticThrottle * 5 / 4)
         self.intakeMotorManual.setThrottle(self.manualThrottle)
 
-        print("THIS IS THE MODE", self.AUTOMATIC_MODE)
-
         return robotState
 
     # values when the robot is disabled

@@ -215,7 +215,6 @@ class OperateTurret(AutoStages):
         self.robotState = robotState
         self.pathTime = getTime() - self.startTime
 
-        self.robotState.forceDynamicTurret = True
         self.robotState.kickShooter = self.unload
         self.robotState.revSpeed = 1
         if self.robotState.fullyReved:
