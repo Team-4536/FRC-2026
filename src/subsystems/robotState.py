@@ -71,6 +71,7 @@ class RobotState(NetworkTablesMixin):
         super().__init__(table="RobotState", inst=False)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
+        self.turretVelocitySetpoint = Translation2d()
 
     def publish(self) -> None:
         for field in fields(self):
