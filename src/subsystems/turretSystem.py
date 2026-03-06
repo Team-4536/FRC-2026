@@ -75,7 +75,7 @@ RED_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 )
 RED_SCORE_POS: Translation3d = Translation3d(
     FIELD_LEN - HUB_DIST_X,
-    FIELD_WIDTH,
+    HUB_DIST_Y,
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 BLUE_TOP_SHUTTLE_POS: Translation3d = Translation3d(
