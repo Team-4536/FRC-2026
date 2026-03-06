@@ -50,25 +50,23 @@ PITCH_GEARING: float = 16 * ARC_RATIO  # two 4:1 gearboxes make 25
 TURRET_HEIGHT: meters = inchesToMeters(15)
 
 BALL_RADIUS: inches = 5.91 / 2
-Y_PASS_DIFF_HUB: meters = inchesToMeters(25 + BALL_RADIUS)
-GOAL_HEIGHT: meters = inchesToMeters(72 - 15)
-Y_PASS_HUB: meters = GOAL_HEIGHT + Y_PASS_DIFF_HUB
-HUB_RADIUS: inches = 41.7 / 2
-X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
-SHUTTLE_Y_PASS_DIFF: meters = 0.3
+SHUTTLE_Y_PASS_DIFF: meters = 0.1
 SHUTTLE_Y_PASS: meters = SHUTTLE_Y_PASS_DIFF
 SHUTTLE_X_PASS_DIFF: meters = (
     1  # TODO the distance between where you want it to land and where you want it to clear
 )
 
 MAX_RPM: RPM = 5676
-
+HUB_RADIUS: inches = 41.7 / 2
 HUB_DIST_X: meters = (
     inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS) + inchesToMeters(10)
 )
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15)
+Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
+Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
+X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
 SHUTTLE_DIST_X: meters = 3
 RIGHT_SHUTTLE_DIST_Y: meters = 3
@@ -105,12 +103,12 @@ TOP_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(TOP_FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 MANUAL_REV_SPEED: MPS = 13.96
 MANUAL_SPEED: RPM = 50
-KICK_SPEED: RPM = 2000
+KICK_SPEED: RPM = 3500
 
 # in percent
 REV_ALLOWED_ERROR: float = 3
 # in radians
-YAW_ALLOWED_ERROR: radians = 0.05
+YAW_ALLOWED_ERROR: radians = 0.1
 PITCH_ALLOWED_ERROR: radians = 0.05
 
 
@@ -261,7 +259,7 @@ class Turret(Subsystem):
         try:
             angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
             velocity = _calculateVelocity(angle, d, h)
-            self.publishFloat("velocity", velocity, debug=True)
+            self.publishFloat("velocity", velocity)
             time = calculateTime(velocity, d)
             self.publishFloat("time", time, debug=True)
 
@@ -743,7 +741,7 @@ class Shooter(Subsystem):
         self.dontShoot = robotState.dontShoot
 
         if self.fullyReved:
-            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
+            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
 
         return robotState
 
@@ -762,9 +760,7 @@ class Shooter(Subsystem):
         if robotState.impossibleDynamic:
             return
 
-        self.mpsSetpoint: MPS = 0
-
-        self.mpsSetpoint = robotState.turretVelocitySetpoint.distance(Translation2d())
+        self.mpsSetpoint = robotState.turretVelocitySetpoint.norm()
 
     def revShooters(self, speed: MPS):
         top: RPM = MPSToRPM(speed, TOP_FLYWHEEL_CIRCUMFRENCE)
@@ -786,10 +782,18 @@ class Shooter(Subsystem):
         avg = (self.revingSpeedTop + self.revingSpeedBottom) / 2
         return avg
 
+    def getMPSSpeed(self) -> MPS:
+        avg = (
+            RPMToMPS(self.revingSpeedTop, TOP_FLYWHEEL_CIRCUMFRENCE)
+            + RPMToMPS(self.revingSpeedBottom, BOTTOM_FLYWHEEL_CIRCUMFRENCE)
+        ) / 2
+        return avg
+
     def disabled(self) -> None:
         self.kickMotor.setVoltage(0)
         self.revShooters(0)
         self.revingSetpoint = 0
+        self.mpsSetpoint = 0
 
     def publish(self):
         self.publishFloat("revMotor set speed", self.revingSetpoint)
@@ -799,14 +803,9 @@ class Shooter(Subsystem):
         self.publishBoolean("Fully Reved", self.fullyReved)
         self.publishFloat("kick shooter spinning", self.kickShooter)
         self.publishFloat("kick setpoint", self.kickSetPoint)
-        self.publishFloat(
-            "(MPS) reving read speed",
-            RPMToMPS(
-                (self.revingSpeedBottom + self.revingSpeedTop) / 2,
-                BOTTOM_FLYWHEEL_CIRCUMFRENCE,
-            ),
-        )
+        self.publishFloat("(MPS) reving read speed", self.getMPSSpeed())
         self.publishFloat("avg rev speed", self.getRevSpeed())
+        self.publishFloat("MPS_setpoint", self.mpsSetpoint)
 
 
 def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radians:

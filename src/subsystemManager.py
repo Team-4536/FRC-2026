@@ -11,9 +11,9 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.utils import TimeData
 from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.intake import Intake
-from typing import List, NamedTuple
+from typing import NamedTuple
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from typing import NamedTuple, Sequence
+from typing import NamedTuple
 from subsystems.turretSystem import Turret, Shooter
 from subsystems.tester import Tester
 from subsystems.utils import matchData, TimeData
