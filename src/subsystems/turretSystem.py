@@ -108,7 +108,7 @@ MANUAL_SPEED: RPM = 50
 KICK_SPEED: RPM = 2000
 
 # in percent
-REV_ALLOWED_ERROR: float = 10
+REV_ALLOWED_ERROR: float = 3
 # in radians
 YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05

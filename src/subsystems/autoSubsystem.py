@@ -383,7 +383,7 @@ def routineChooser(
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    0.5,
+                    20,
                 )
             ]
 
