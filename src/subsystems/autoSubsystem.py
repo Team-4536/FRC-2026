@@ -378,12 +378,13 @@ def routineChooser(
                 FollowTrajectory(
                     "Forward",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    10,
+                    15,
                 )
             ]
 
