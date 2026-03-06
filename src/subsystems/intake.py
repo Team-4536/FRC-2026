@@ -130,8 +130,8 @@ class Intake(Subsystem):
         if robotState.indexerEject:
             self.automaticThrottle = self.motorReverseSetpoint
 
-        self.intakeMotorAutomatic.setThrottle(self.automaticThrottle * 5 / 4)
-        self.intakeMotorManual.setThrottle(self.manualThrottle)
+        self.intakeMotorAutomatic.setThrottle(self.automaticThrottle * 7 / 4)
+        self.intakeMotorManual.setThrottle(self.manualThrottle * 1.5)
 
         return robotState
 
