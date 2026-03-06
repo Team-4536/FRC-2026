@@ -4,7 +4,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Translation2d
+from wpimath.geometry import Pose2d, Translation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import inchesToMeters, meters_per_second, meters, radians
 
@@ -27,38 +27,50 @@ class TurretMode(Enum):
 @dataclass
 class RobotState(NetworkTablesMixin):
     fieldSpeeds: ChassisSpeeds
-    initialIntake: bool
-    intakeIndexer: bool
     intakeEject: bool
-    indexerEject: bool
     intakePos: bool
-    intakeMode: bool
     resetGyro: bool
     odometry: SwerveDrive4PoseEstimator
-
-    revSpeed: float
-    kickShooter: int
-    turretSwitchMode: bool
-    turretManualSetpoint: float
-    turretSwitchTarget: bool
-    turretSwitchEnabled: bool
-    dontShoot: bool
-    impossibleDynamic: bool
-    forceDynamicTurret: bool
-    turretVelocitySetpoint: Translation2d
+    autosInitPose: Pose2d
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
+
+    turretVelocitySetpoint: Translation2d
+    indexerEject: bool = False
+    dontShoot: bool = False  # REMOVE (local var)
+    impossibleDynamic: bool = False  # REMOVE (local var)
+    forceDynamicTurret: bool = False  # REMOVE (local var)
+    fullyReved: bool = False
+    revSpeed: float = 0
+    kickShooter: int = 0
+    optimalTurretAngle: radians = 0  # REMOVE (local var)
+    targetDistance: meters = 0  # REMOVE (local var)
+    targetHeight: meters = 0  # REMOVE (local var)
+    turretSwitchMode: bool = False
+    turretShuttle: float = -1
+    turretShuttleOff: float = -1
+    turretManualSetpoint: float = 0
+    turretSwitchTarget: bool = False
+    turretSwitchEnabled: bool = False
+
+    initialIntake: bool = False
+    intakeIndexer: bool = False
+    intakeMode: bool = False
 
     turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL
     ejectAll: float = 0.0
     intakePosYAxis: float = 0.0
 
+    autosGyroResetToggle: bool = False
+    autosGyroReset: float = 0.0
+
     def __post_init__(self) -> None:
         super().__init__(table="RobotState", inst=False)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
+        self.turretVelocitySetpoint = Translation2d()
 
     def publish(self) -> None:
         for field in fields(self):
@@ -75,7 +87,6 @@ class RobotState(NetworkTablesMixin):
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:
         data = {}
-
         for f in fields(cls):
             if f.name in kwargs:
                 data[f.name] = kwargs[f.name]

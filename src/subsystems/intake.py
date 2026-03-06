@@ -102,13 +102,15 @@ class Intake(Subsystem):
         #             self.state = IntakeState.UP
 
         self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-        self.AUTOMATIC_MODE = not robotState.intakeMode
+        # self.AUTOMATIC_MODE = not robotState.intakeMode
 
         # initial motor that intakes
         if robotState.initialIntake:
             self.manualThrottle = self.motorForwardSetpoint
         else:
             self.manualThrottle = 0
+
+        self.publishFloat("mannual_throttle", self.manualThrottle)
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:

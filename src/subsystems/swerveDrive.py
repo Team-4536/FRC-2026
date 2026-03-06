@@ -176,6 +176,9 @@ class SwerveDrive(Subsystem):
         self._swerveStates = self._kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
+        self.odomX = 0.0
+        self.odomY = 0.0
+        self.odomZ = 0.0
 
         self._disableModules()
 
@@ -207,6 +210,17 @@ class SwerveDrive(Subsystem):
                     Rotation2d(),
                 ),
             )
+            robotState.autosGyroResetToggle = False
+
+        if robotState.autosGyroResetToggle:
+            self._gyro.reset()
+            self._gyro.setAngleAdjustment(robotState.autosGyroReset)
+            robotState.odometry.resetPosition(
+                self._gyro.getRotation2d(),
+                self._modules.modulePositions,
+                robotState.autosInitPose,
+            )
+            robotState.autosGyroResetToggle = False
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 

@@ -8,6 +8,12 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
+from subsystems.utils import TimeData
+from subsystems.autoSubsystem import AutoSubsystem
+from subsystems.intake import Intake
+from typing import List, NamedTuple
+from wpimath.estimator import SwerveDrive4PoseEstimator
+from typing import NamedTuple, Sequence
 from subsystems.turretSystem import Turret, Shooter
 from subsystems.tester import Tester
 from subsystems.utils import matchData, TimeData
@@ -44,6 +50,7 @@ class Subsystems(NamedTuple):
 @dataclass
 class SubsystemManager(NetworkTablesMixin):
     inputs: Inputs
+    autos: AutoSubsystem
     tests: Tester
     cameras: CameraManager
     time: TimeData
@@ -105,7 +112,7 @@ class SubsystemManager(NetworkTablesMixin):
         self.time.periodic(self.robotState)
 
     def autonomousPeriodic(self) -> None:
-        self.inputs.periodic(self.robotState)
+        self.autos.periodic(self.robotState)
         self._periodic()
 
     def teleopPeriodic(self) -> None:

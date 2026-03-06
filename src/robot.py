@@ -1,8 +1,12 @@
+from subsystems.LEDSignals import LEDSignals
+from subsystems.motor import RevMotor
+from subsystems.autoSubsystem import AutoSubsystem
+import wpilib
 from subsystemManager import SubsystemManager, Subsystems
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
-from subsystems.LEDSignals import LEDSignals
+
 from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.tester import Tester
@@ -29,6 +33,7 @@ class Robot(TimedRobot):
                 turret=Turret(yawMotorID=14, pitchMotorID=13),
             ),
             inputs=Inputs(),
+            autos=AutoSubsystem(),
             cameras=CameraManager(),
             time=timeData,
             tests=Tester(),
