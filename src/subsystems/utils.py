@@ -5,7 +5,7 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Optional, Tuple
 from wpilib import DriverStation, RobotBase, Timer
-from wpimath.geometry import Translation2d, Rotation2d
+from wpimath.geometry import Translation2d
 from wpimath.units import (
     inchesToMeters,
     meters_per_second,
@@ -264,10 +264,10 @@ def MPSToRPM(speed: meters_per_second, circ: meters) -> revolutions_per_minute:
 
 
 def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
-    angle = 0 if translation.norm() == 0 else translation.angle().radians()
+    angle = translation.angle()
     hyp = translation.norm()
 
-    return Translation2d(distance=hyp * scalar, angle=Rotation2d(angle))
+    return Translation2d(distance=hyp * scalar, angle=angle)
 
 
 def wrapAngle(angle: radians) -> radians:

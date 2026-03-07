@@ -64,15 +64,15 @@ Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
 SHUTTLE_DIST_X: meters = 3
-RIGHT_SHUTTLE_DIST_Y: meters = 3
-LEFT_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
+TOP_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
+BOTTOM_SHUTTLE_DIST_Y: meters = 3
 
 # x and y should be the same as what the robot thinks those are, z is height (in meters)
 RED_TOP_SHUTTLE_POS: Translation3d = Translation3d(
-    FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - RIGHT_SHUTTLE_DIST_Y, 0
+    FIELD_LEN - SHUTTLE_DIST_X, TOP_SHUTTLE_DIST_Y, 0
 )
 RED_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
-    FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - LEFT_SHUTTLE_DIST_Y, 0
+    FIELD_LEN - SHUTTLE_DIST_X, BOTTOM_SHUTTLE_DIST_Y, 0
 )
 RED_SCORE_POS: Translation3d = Translation3d(
     FIELD_LEN - HUB_DIST_X,
@@ -80,10 +80,10 @@ RED_SCORE_POS: Translation3d = Translation3d(
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 BLUE_TOP_SHUTTLE_POS: Translation3d = Translation3d(
-    SHUTTLE_DIST_X, RIGHT_SHUTTLE_DIST_Y, 0
+    SHUTTLE_DIST_X, TOP_SHUTTLE_DIST_Y, 0
 )
 BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
-    SHUTTLE_DIST_X, LEFT_SHUTTLE_DIST_Y, 0
+    SHUTTLE_DIST_X, BOTTOM_SHUTTLE_DIST_Y, 0
 )
 BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_X,
@@ -170,11 +170,17 @@ class Turret(Subsystem):
         self.velocityVar = 0.0
         self.pitchVar = 0.0
 
+        self.publishFloat("YawTargetOffset", 36)
+        self.publishFloat("add", -4.54025)
+        self.publishFloat("scale", 2.55728)
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
             "fieldTargPos"
         )
         self.passThrough: FieldObject2d = robotState.odomField.getObject("passThrough")
+        shuttle: FieldObject2d = robotState.odomField.getObject("shuttle")
+        shuttle.setPose(RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d())
 
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
@@ -211,10 +217,6 @@ class Turret(Subsystem):
         robotState.impossibleDynamic = False
         robotState.dontShoot = False
         self.mode = self.getMode(robotState)
-
-        self.fieldTargPos.setPose(
-            Pose2d(Translation2d(self.targetPos.x, self.targetPos.y), Rotation2d())
-        )
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
@@ -273,6 +275,8 @@ class Turret(Subsystem):
 
         try:
             angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
+            if self.target != TurretTarget.HUB:
+                angle = degreesToRadians(40)
             velocity = _calculateVelocity(angle, d, h)
             self.publishFloat("velocity", velocity)
             time = calculateTime(velocity, d)
@@ -301,6 +305,9 @@ class Turret(Subsystem):
             time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
         )
         self.passThrough.setPose(self.odom.pose)
+        self.fieldTargPos.setPose(
+            Pose2d(Translation2d(self.targetPos.x, self.targetPos.y), Rotation2d())
+        )
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -484,7 +491,7 @@ class Turret(Subsystem):
         # multiply by time to get the distance the ball would move
 
         compensateVector = scaleTranslation2D(compensateVector, time)
-        compensateVector.rotateBy(Rotation2d(PI))
+        compensateVector = compensateVector.rotateBy(Rotation2d(PI))
 
         # add in the opposite direction
 
@@ -516,7 +523,8 @@ class Turret(Subsystem):
 
         xDiff = pointPos.X() - turretPose.X()
         # super high tech offset
-        xDiff += np.sign(xDiff) * inchesToMeters(36)
+        offset = self.getFloat("YawTargetOffset", default=36)
+        xDiff += np.sign(xDiff) * inchesToMeters(offset)
         yDiff = pointPos.Y() - turretPose.Y()
 
         quadrant = 1
@@ -553,14 +561,20 @@ class Turret(Subsystem):
 
         self.pitchSetpoint = calculateAngle(d, h, self.getXPass(d), self.getYPass())
 
+        if self.target != TurretTarget.HUB:
+            self.pitchSetpoint = degreesToRadians(40)
+
         velocity: MPS = _calculateVelocity(self.pitchSetpoint, d, h)
 
         # scale x and y independently
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
+        add = self.getFloat("add", default=-4.54025)
+        scale = self.getFloat("scale", default=2.55728)
+
         robotState.turretVelocitySetpoint = Translation2d(
-            distance=compensateSpeed(velocity),
+            distance=compensateSpeed(velocity, scale, add),
             angle=Rotation2d(self.pitchSetpoint),
         )
 
@@ -792,10 +806,13 @@ class Shooter(Subsystem):
 
     def getFullyReved(self) -> bool:
 
-        if self.revingSetpoint == 0:
+        if self.mpsSetpoint == 0:
             return True
 
         if 100 - (100 * self.getMPSSpeed() / self.mpsSetpoint) > REV_ALLOWED_ERROR:
+            self.publishFloat(
+                "percent", 100 - (100 * self.getMPSSpeed() / self.mpsSetpoint)
+            )
             return False
 
         return True
@@ -856,7 +873,7 @@ def checkDependencies(depends: Tuple[Any, ...]) -> bool:
     return True
 
 
-def compensateSpeed(speed: MPS) -> MPS:
+def compensateSpeed(speed: MPS, scale: float, add: float) -> MPS:
     # desmos best fit line :D
-    actual: MPS = 2.55728 * (speed) - 4.04025
+    actual: MPS = scale * (speed) + add
     return actual
