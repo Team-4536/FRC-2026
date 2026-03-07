@@ -868,5 +868,5 @@ def checkDependencies(depends: Tuple[Any, ...]) -> bool:
 
 def compensateSpeed(speed: MPS) -> MPS:
     # desmos best fit line :D
-    actual: MPS = 2.55728 * (speed) - 4.04025
+    actual: MPS = 2.55728 * (speed) - 4.54025
     return actual
