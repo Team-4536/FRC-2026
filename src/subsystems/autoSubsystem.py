@@ -61,7 +61,7 @@ class AutoSubsystem(Subsystem):
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.routine: dict[str, List[AutoStages]] = routineChooser(
-            self.autoRoutineChooser.getSelected(), matchData.isBlue()
+            self.autoRoutineChooser.getSelected(), matchData.isRed()
         )
 
         self.currentPath = 0

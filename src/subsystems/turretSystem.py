@@ -64,15 +64,15 @@ Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
 SHUTTLE_DIST_X: meters = 3
-RIGHT_SHUTTLE_DIST_Y: meters = 3
-LEFT_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
+TOP_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
+BOTTOM_SHUTTLE_DIST_Y: meters = 3
 
 # x and y should be the same as what the robot thinks those are, z is height (in meters)
 RED_TOP_SHUTTLE_POS: Translation3d = Translation3d(
-    FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - RIGHT_SHUTTLE_DIST_Y, 0
+    FIELD_LEN - SHUTTLE_DIST_X, TOP_SHUTTLE_DIST_Y, 0
 )
 RED_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
-    FIELD_LEN - SHUTTLE_DIST_X, FIELD_WIDTH - LEFT_SHUTTLE_DIST_Y, 0
+    FIELD_LEN - SHUTTLE_DIST_X, BOTTOM_SHUTTLE_DIST_Y, 0
 )
 RED_SCORE_POS: Translation3d = Translation3d(
     FIELD_LEN - HUB_DIST_X,
@@ -80,10 +80,10 @@ RED_SCORE_POS: Translation3d = Translation3d(
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 BLUE_TOP_SHUTTLE_POS: Translation3d = Translation3d(
-    SHUTTLE_DIST_X, RIGHT_SHUTTLE_DIST_Y, 0
+    SHUTTLE_DIST_X, TOP_SHUTTLE_DIST_Y, 0
 )
 BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
-    SHUTTLE_DIST_X, LEFT_SHUTTLE_DIST_Y, 0
+    SHUTTLE_DIST_X, BOTTOM_SHUTTLE_DIST_Y, 0
 )
 BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_X,
@@ -177,6 +177,8 @@ class Turret(Subsystem):
             "fieldTargPos"
         )
         self.passThrough: FieldObject2d = robotState.odomField.getObject("passThrough")
+        shuttle: FieldObject2d = robotState.odomField.getObject("shuttle")
+        shuttle.setPose(RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d())
 
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
@@ -275,6 +277,8 @@ class Turret(Subsystem):
 
         try:
             angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
+            if self.target != TurretTarget.HUB:
+                angle = degreesToRadians(40)
             velocity = _calculateVelocity(angle, d, h)
             self.publishFloat("velocity", velocity)
             time = calculateTime(velocity, d)
@@ -486,7 +490,7 @@ class Turret(Subsystem):
         # multiply by time to get the distance the ball would move
 
         compensateVector = scaleTranslation2D(compensateVector, time)
-        compensateVector.rotateBy(Rotation2d(PI))
+        # compensateVector.rotateBy(Rotation2d(PI))
 
         # add in the opposite direction
 
@@ -555,6 +559,9 @@ class Turret(Subsystem):
         h = pointPos.z
 
         self.pitchSetpoint = calculateAngle(d, h, self.getXPass(d), self.getYPass())
+
+        if self.target != TurretTarget.HUB:
+            self.pitchSetpoint = degreesToRadians(40)
 
         velocity: MPS = _calculateVelocity(self.pitchSetpoint, d, h)
 
