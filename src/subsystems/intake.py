@@ -108,7 +108,7 @@ class Intake(Subsystem):
         else:
             self.manualThrottle = 0
 
-        self.publishFloat("mannual_throttle", self.manualThrottle)
+        # self.publishFloat("mannual_throttle", self.manualThrottle)
 
         # second motor (intakes into subsystem), should eventually be a sensor but is a button rn
         if robotState.intakeIndexer:

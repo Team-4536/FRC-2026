@@ -116,7 +116,10 @@ class FollowTrajectory(AutoStages):
         return self.robotState
 
     def end(self, robotState: RobotState) -> RobotState:
-        return robotState
+        self.robotState = robotState
+        self.robotState.fieldSpeeds = self.trajectory.getEndState().fieldSpeeds
+
+        return self.robotState
 
     def isDone(self) -> bool:
         currXPos = self.robotState.odometry.getEstimatedPosition().x

@@ -158,9 +158,9 @@ class CameraManager(Subsystem):
 
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
-        self.publishBoolean("cam1 running", self.photonCameraRight.running)
+        # self.publishBoolean("cam1 running", self.photonCameraRight.running)
 
-        self.publishBoolean("cam2 running", self.photonCameraLeft.running)
+        # self.publishBoolean("cam2 running", self.photonCameraLeft.running)
 
         # self.photonCameraMiddle.update()
 
