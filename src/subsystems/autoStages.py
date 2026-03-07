@@ -116,10 +116,7 @@ class FollowTrajectory(AutoStages):
         return self.robotState
 
     def end(self, robotState: RobotState) -> RobotState:
-        self.robotState = robotState
-        self.robotState.fieldSpeeds = self.trajectory.getEndState().fieldSpeeds
-
-        return self.robotState
+        return robotState
 
     def isDone(self) -> bool:
         currXPos = self.robotState.odometry.getEstimatedPosition().x
@@ -218,7 +215,9 @@ class OperateTurret(AutoStages):
         self.pathTime = getTime() - self.startTime
 
         self.robotState.revSpeed = 1
-        self.robotState.kickShooter = self.unload
+        if not robotState.dontShoot:
+            self.robotState.kickShooter = self.unload
+            self.robotState.intakeIndexer = self.unload
 
         return self.robotState
 

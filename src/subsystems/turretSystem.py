@@ -58,7 +58,7 @@ HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(
     HUB_RADIUS
 )  # + inchesToMeters(10)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
-HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15)
+HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15) - TURRET_HEIGHT
 Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
 Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
@@ -91,7 +91,7 @@ BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_HEIGHT_Z - TURRET_HEIGHT,
 )
 
-BOTTOM_FLYWHEEL_DIAMETER: inches = 3.5  # diameter of the wheels build decides to use
+BOTTOM_FLYWHEEL_DIAMETER: inches = 3.5
 TOP_FLYWHEEL_DIAMETER: inches = 3
 BOTTOM_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(BOTTOM_FLYWHEEL_DIAMETER) * PI
 TOP_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(TOP_FLYWHEEL_DIAMETER) * PI
@@ -128,6 +128,7 @@ class Turret(Subsystem):
 
         self.yawEncoder = self.yawMotor.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
+        self.yawEncoder.setPosition(PI / 2 * YAW_GEARING)
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.yawAngle = 0  # yaw angle relative to the field
@@ -292,13 +293,8 @@ class Turret(Subsystem):
             "Robot Linear veloity",
             (
                 robotState.robotLinearVelocity.norm(),
-                (
-                    0
-                    if robotState.robotLinearVelocity.norm() == 0
-                    else robotState.robotLinearVelocity.angle().radians()
-                ),
+                robotState.robotLinearVelocity.angle().radians(),
             ),
-            debug=True,
         )
 
         self.compensateSetpoint(
@@ -776,8 +772,8 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        if not self.dontShoot:
-            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
+        # if not self.dontShoot:
+        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
 
         return robotState
 

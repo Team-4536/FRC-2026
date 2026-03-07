@@ -10,8 +10,9 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.tester import Tester
 from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
-from wpilib import TimedRobot
-from wpimath.units import inchesToMeters, meters
+from wpilib import TimedRobot, getTime
+from wpimath.units import inchesToMeters, meters, seconds
+from ntcore import NetworkTableInstance
 
 
 class Robot(TimedRobot):
@@ -19,6 +20,9 @@ class Robot(TimedRobot):
 
     def robotInit(self) -> None:
         WHEEL_DISTANCE: meters = inchesToMeters(10.875)
+
+        self.timeStart: seconds = getTime()
+        self.timeRunnig: seconds = 0
 
         self.subsystems = SubsystemManager(
             subsystems=Subsystems(
@@ -40,6 +44,10 @@ class Robot(TimedRobot):
 
     def robotPeriodic(self) -> None:
         self.subsystems.robotPeriodic()
+        self.timeRunnig = getTime() - self.timeStart
+        NetworkTableInstance.getDefault().getTable("telemetry").putNumber(
+            "TIME RUNNING", self.timeRunnig
+        )
 
     def autonomousInit(self) -> None:
         self.subsystems.init()
