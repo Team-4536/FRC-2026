@@ -771,8 +771,8 @@ class Shooter(Subsystem):
 
         self.dontShoot = robotState.dontShoot
 
-        if not self.dontShoot:
-            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
+        # if not self.dontShoot:
+        self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
 
         return robotState
 
