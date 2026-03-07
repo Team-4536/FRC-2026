@@ -139,10 +139,10 @@ def routineChooser(
                 ),
                 OperateTurret(),
             ]
-            routine["shoot"] = [
+            routine["shoot"] = [  # kai this routine chunk is messing it up idk why
                 OperateTurret(
                     True,
-                    5,
+                    4,
                 )
             ]
             routine["under right trench from start middle"] = [
