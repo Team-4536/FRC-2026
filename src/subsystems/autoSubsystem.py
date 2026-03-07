@@ -118,11 +118,13 @@ def routineChooser(
             routine["intake"] = [
                 OperateIntake(3),
             ]
-            routine["swerve"] = [
+            routine["back"] = [
                 FollowTrajectory(
                     "Backward",
                     isFlipped,
                 ),
+            ]
+            routine["for"] = [
                 FollowTrajectory(
                     "Forward",
                     isFlipped,
