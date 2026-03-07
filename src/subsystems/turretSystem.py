@@ -1,6 +1,7 @@
 from math import atan, cos, pi as PI, sqrt, tan, tau as TAU
 from rev import SparkRelativeEncoder
 from subsystems.motor import RevMotor
+import numpy as np
 from subsystems.robotState import (
     RobotState,
     TurretMode,
@@ -18,7 +19,7 @@ from subsystems.utils import (
     wrapAngle,
 )
 from typing import Any, Tuple
-from wpilib import DriverStation, getTime
+from wpilib import DriverStation, getTime, FieldObject2d
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Translation3d
 from wpimath.units import (
     degreesToRadians,
@@ -166,7 +167,15 @@ class Turret(Subsystem):
             DriverStation.getAlliance() or DriverStation.Alliance.kRed
         )
 
+        self.velocityVar = 0.0
+        self.pitchVar = 0.0
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
+        self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
+            "fieldTargPos"
+        )
+        self.passThrough: FieldObject2d = robotState.odomField.getObject("passThrough")
+
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
@@ -203,6 +212,10 @@ class Turret(Subsystem):
         robotState.dontShoot = False
         self.mode = self.getMode(robotState)
 
+        self.fieldTargPos.setPose(
+            Pose2d(Translation2d(self.targetPos.x, self.targetPos.y), Rotation2d())
+        )
+
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
 
@@ -238,6 +251,10 @@ class Turret(Subsystem):
             self.reset(self.yawMotor._ctrlr.getReverseLimitSwitch().get())
 
         robotState.turretMode = self.mode
+
+        self.velocityVar = self.getFloat("velocity variable", default=0)
+        self.ptchVar = self.getFloat("ptch variable", default=0)
+
         return robotState
 
     def automaticUpdate(self, robotState: RobotState):
@@ -253,6 +270,7 @@ class Turret(Subsystem):
         self.publishFloat("h", h, debug=True)
         self.publishFloat("xPass", self.getXPass(d), debug=True)
         self.publishFloat("ypass", self.getYPass(), debug=True)
+
         try:
             angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
             velocity = _calculateVelocity(angle, d, h)
@@ -282,6 +300,7 @@ class Turret(Subsystem):
         self.compensateSetpoint(
             time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
         )
+        self.passThrough.setPose(self.odom.pose)
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -493,8 +512,11 @@ class Turret(Subsystem):
 
     def targetPoint(
         self, pointPos: Translation3d, turretPose: Pose2d, robotState: RobotState
-    ) -> None:  # make velocity later
+    ) -> None:
+
         xDiff = pointPos.X() - turretPose.X()
+        # super high tech offset
+        xDiff += np.sign(xDiff) * inchesToMeters(36)
         yDiff = pointPos.Y() - turretPose.Y()
 
         quadrant = 1
@@ -610,6 +632,8 @@ class Turret(Subsystem):
         self.publishBoolean(
             "Failed to dynamic after setpoint was compensated", self.compensateFail
         )
+        self.publishFloat("velocity variable", self.velocityVar)
+        self.publishFloat("pitch variable", self.pitchVar)
 
 
 class TurretOdometry:
@@ -639,9 +663,9 @@ class TurretOdometry:
             distance=TURRET_DIST_FROM_CENTER, angle=Rotation2d(wrappedRoboYaw)
         )
 
-        feildPos: Translation2d = roboPose.translation().__add__(self.posFromRobot)
+        feildPos: Translation2d = roboPose.translation() + self.posFromRobot
 
-        self.pose = Pose2d(feildPos, Rotation2d(wrappedRoboYaw - wrappedYaw))
+        self.pose = Pose2d(feildPos, Rotation2d(wrappedRoboYaw + wrappedYaw))
         self.pitch = pitchAngle
 
 
