@@ -171,6 +171,8 @@ class Turret(Subsystem):
         self.pitchVar = 0.0
 
         self.publishFloat("YawTargetOffset", 36)
+        self.publishFloat("add", -4.54025)
+        self.publishFloat("scale", 2.55728)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
@@ -215,10 +217,6 @@ class Turret(Subsystem):
         robotState.impossibleDynamic = False
         robotState.dontShoot = False
         self.mode = self.getMode(robotState)
-
-        self.fieldTargPos.setPose(
-            Pose2d(Translation2d(self.targetPos.x, self.targetPos.y), Rotation2d())
-        )
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.targetLocked = self.getTargetLocked()
@@ -307,6 +305,9 @@ class Turret(Subsystem):
             time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
         )
         self.passThrough.setPose(self.odom.pose)
+        self.fieldTargPos.setPose(
+            Pose2d(Translation2d(self.targetPos.x, self.targetPos.y), Rotation2d())
+        )
         try:
             self.targetPoint(
                 self.targetPos, self.odom.pose, robotState
@@ -490,7 +491,7 @@ class Turret(Subsystem):
         # multiply by time to get the distance the ball would move
 
         compensateVector = scaleTranslation2D(compensateVector, time)
-        # compensateVector.rotateBy(Rotation2d(PI))
+        compensateVector = compensateVector.rotateBy(Rotation2d(PI))
 
         # add in the opposite direction
 
@@ -569,8 +570,11 @@ class Turret(Subsystem):
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
+        add = self.getFloat("add", default=-4.54025)
+        scale = self.getFloat("scale", default=2.55728)
+
         robotState.turretVelocitySetpoint = Translation2d(
-            distance=compensateSpeed(velocity),
+            distance=compensateSpeed(velocity, scale, add),
             angle=Rotation2d(self.pitchSetpoint),
         )
 
@@ -802,10 +806,13 @@ class Shooter(Subsystem):
 
     def getFullyReved(self) -> bool:
 
-        if self.revingSetpoint == 0:
+        if self.mpsSetpoint == 0:
             return True
 
         if 100 - (100 * self.getMPSSpeed() / self.mpsSetpoint) > REV_ALLOWED_ERROR:
+            self.publishFloat(
+                "percent", 100 - (100 * self.getMPSSpeed() / self.mpsSetpoint)
+            )
             return False
 
         return True
@@ -866,7 +873,7 @@ def checkDependencies(depends: Tuple[Any, ...]) -> bool:
     return True
 
 
-def compensateSpeed(speed: MPS) -> MPS:
+def compensateSpeed(speed: MPS, scale: float, add: float) -> MPS:
     # desmos best fit line :D
-    actual: MPS = 2.55728 * (speed) - 4.54025
+    actual: MPS = scale * (speed) + add
     return actual
