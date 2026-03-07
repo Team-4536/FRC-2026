@@ -137,7 +137,13 @@ def routineChooser(
                     "Backward",
                     isFlipped,
                 ),
-                OperateTurret(True),
+                OperateTurret(),
+            ]
+            routine["shoot"] = [  # kai this routine chunk is messing it up idk why
+                OperateTurret(
+                    True,
+                    4,
+                )
             ]
             routine["under right trench from start middle"] = [
                 FollowTrajectory(
