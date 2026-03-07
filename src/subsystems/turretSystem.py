@@ -170,6 +170,8 @@ class Turret(Subsystem):
         self.velocityVar = 0.0
         self.pitchVar = 0.0
 
+        self.publishFloat("YawTargetOffset", 36)
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
             "fieldTargPos"
@@ -516,7 +518,8 @@ class Turret(Subsystem):
 
         xDiff = pointPos.X() - turretPose.X()
         # super high tech offset
-        xDiff += np.sign(xDiff) * inchesToMeters(36)
+        offset = self.getFloat("YawTargetOffset", default=36)
+        xDiff += np.sign(xDiff) * inchesToMeters(offset)
         yDiff = pointPos.Y() - turretPose.Y()
 
         quadrant = 1
