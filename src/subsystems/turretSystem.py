@@ -128,6 +128,7 @@ class Turret(Subsystem):
 
         self.yawEncoder = self.yawMotor.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
+        self.yawEncoder.setPosition(PI / 2 * YAW_GEARING)
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.yawAngle = 0  # yaw angle relative to the field
