@@ -161,12 +161,13 @@ def routineChooser(
                 FollowTrajectory(
                     "under left trench to hub",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    8,
+                    15,
                 )
             ]
 
@@ -193,7 +194,8 @@ def routineChooser(
                 FollowTrajectory(
                     "under left trench to hub",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
@@ -225,7 +227,8 @@ def routineChooser(
                 FollowTrajectory(
                     "under right trench to hub",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
@@ -245,7 +248,7 @@ def routineChooser(
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    15,
+                    19,
                 )
             ]
 
