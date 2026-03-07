@@ -137,19 +137,14 @@ def routineChooser(
                     "Backward",
                     isFlipped,
                 ),
-                OperateTurret(),
-            ]
-            routine["shoot"] = [
-                OperateTurret(
-                    True,
-                    5,
-                )
+                OperateTurret(True),
             ]
             routine["under right trench from start middle"] = [
                 FollowTrajectory(
                     "under right trench from start middle",
                     isFlipped,
-                )
+                ),
+                OperateTurret(True),
             ]
             routine["right to balls"] = [
                 FollowTrajectory(
