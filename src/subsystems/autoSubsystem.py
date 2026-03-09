@@ -120,7 +120,7 @@ def routineChooser(
             ]
             routine["back"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "M Backward",
                     isFlipped,
                 ),
             ]
@@ -134,7 +134,7 @@ def routineChooser(
         case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_MID:
             routine["Back and rev"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "M Backward",
                     isFlipped,
                 ),
                 OperateTurret(),
@@ -173,39 +173,39 @@ def routineChooser(
                 )
             ]
 
-        case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_RIGHT:
-            routine["shoot"] = [
-                OperateTurret(
-                    True,
-                    5,
-                )
-            ]
-            routine["under right trench from start"] = [
-                FollowTrajectory(
-                    "under right trench from start",
-                    isFlipped,
-                )
-            ]
-            routine["right to balls"] = [
-                FollowTrajectory(
-                    "right to balls",
-                    isFlipped,
-                ),
-                OperateIntake(),
-            ]
-            routine["under left trench to hub"] = [
-                FollowTrajectory(
-                    "under left trench to hub",
-                    isFlipped,
-                ),
-                OperateTurret(),
-            ]
-            routine["shoot"] = [
-                OperateTurret(
-                    True,
-                    8,
-                )
-            ]
+        # case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_RIGHT:
+        #     routine["shoot"] = [
+        #         OperateTurret(
+        #             True,
+        #             5,
+        #         )
+        #     ]
+        #     routine["under right trench from start"] = [
+        #         FollowTrajectory(
+        #             "under right trench from start",
+        #             isFlipped,
+        #         )
+        #     ]
+        #     routine["right to balls"] = [
+        #         FollowTrajectory(
+        #             "right to balls",
+        #             isFlipped,
+        #         ),
+        #         OperateIntake(),
+        #     ]
+        #     routine["under left trench to hub"] = [
+        #         FollowTrajectory(
+        #             "under left trench to hub",
+        #             isFlipped,
+        #         ),
+        #         OperateTurret(),
+        #     ]
+        #     routine["shoot"] = [
+        #         OperateTurret(
+        #             True,
+        #             8,
+        #         )
+        #     ]
 
         case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_LEFT:
             routine["shoot"] = [
@@ -244,7 +244,7 @@ def routineChooser(
         case AutoRoutines.A_BACK_UP_AND_SHOOT:
             routine["backward"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "M Backward",
                     isFlipped,
                 ),
                 OperateTurret(),
@@ -259,7 +259,7 @@ def routineChooser(
         case AutoRoutines.A_SHOOT_AND_LEAVE_MID:
             routine["backward"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "M Backward",
                     isFlipped,
                 ),
                 OperateTurret(),
@@ -280,7 +280,7 @@ def routineChooser(
         case AutoRoutines.A_SHOOT_AND_LEAVE_RIGHT:
             routine["backward"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "R Backward",
                     isFlipped,
                 ),
                 OperateTurret(),
@@ -301,7 +301,7 @@ def routineChooser(
         case AutoRoutines.A_SHOOT_AND_LEAVE_LEFT:
             routine["backward"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "L Backward",
                     isFlipped,
                 ),
                 OperateTurret(),
@@ -438,7 +438,7 @@ def routineChooser(
             ]
             routine["Backward"] = [
                 FollowTrajectory(
-                    "Backward",
+                    "M Backward",
                     isFlipped,
                 )
             ]
