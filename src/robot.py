@@ -12,8 +12,10 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.tester import Tester
 from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
+from subsystems.limelights import llCams
 from wpilib import TimedRobot
 from wpimath.units import inchesToMeters, meters
+from ntcore import NetworkTableInstance
 
 
 class Robot(TimedRobot):
@@ -37,6 +39,7 @@ class Robot(TimedRobot):
             cameras=CameraManager(),
             time=timeData,
             tests=Tester(),
+            llCam=llCams(),
             robotState=RobotState.empty(),
         )
 
@@ -69,3 +72,6 @@ class Robot(TimedRobot):
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disabled()
+
+    def testInit(self) -> None:
+        llCams()

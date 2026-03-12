@@ -30,6 +30,7 @@ class RobotState(NetworkTablesMixin):
     intakeEject: bool
     intakePos: bool
     resetGyro: bool
+    limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
     autosInitPose: Pose2d
 
@@ -79,7 +80,9 @@ class RobotState(NetworkTablesMixin):
             self.publishGeneric(name, value)
 
         self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
-
+        if self.limelightPose != None:
+            self.odomField.setRobotPose(self.limelightPose)
+            print("Done")
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )

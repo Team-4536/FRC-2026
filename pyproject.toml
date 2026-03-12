@@ -13,6 +13,8 @@ dependencies = [
     "pre-commit",
     "certifi>=2026.1.4",
     "setuptools<82.0.0",
+    "ntcore",
+    "limelightlib-python"
 ]
 
 
