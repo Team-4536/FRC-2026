@@ -22,6 +22,8 @@ robotpy_components = [
     # "romi",
     # "sim",
     # "xrp",
+    # "limelightlib-python",
+    # "ntcore"
 ]
 
 # Other pip packages to install
@@ -31,4 +33,6 @@ requires = [
     "robotpy-rev",
     "phoenix6",
     "photonlibpy",
+    "mypy",
+    "limelightlib-python",
 ]

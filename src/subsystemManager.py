@@ -10,6 +10,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.turretSystem import Turret, Shooter
 from subsystems.utils import matchData, TimeData
+from subsystems.limelights import llCams
 from typing import Generator, NamedTuple, Union
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Rotation2d
@@ -40,6 +41,7 @@ class Subsystems(NamedTuple):
 class SubsystemManager(NetworkTablesMixin):
     inputs: Inputs
     cameras: CameraManager
+    llCam: llCams
     time: TimeData
     subsystems: Subsystems
     robotState: RobotState
@@ -93,8 +95,8 @@ class SubsystemManager(NetworkTablesMixin):
     def robotPeriodic(self) -> None:
         self._publish()
         self.robotState.publish()
-
         self.cameras.periodic(self.robotState)
+        self.llCam.periodic(self.robotState)
         self.time.periodic(self.robotState)
 
     def autonomousPeriodic(self) -> None:

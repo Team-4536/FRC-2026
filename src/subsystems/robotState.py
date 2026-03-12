@@ -4,7 +4,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Translation2d
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second, meters, radians
 
@@ -31,6 +31,7 @@ class RobotState(NetworkTablesMixin):
     intakePos: int
     intakeMode: bool
     resetGyro: bool
+    limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
 
     revSpeed: float
@@ -68,7 +69,9 @@ class RobotState(NetworkTablesMixin):
             self.publishGeneric(name, value)
 
         self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
-
+        if self.limelightPose != None:
+            self.odomField.setRobotPose(self.limelightPose)
+            print("Done")
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )
