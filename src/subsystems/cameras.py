@@ -143,6 +143,13 @@ class CameraManager(Subsystem):
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
             (25.4 + 3.9) / 100,
         )
+
+        # DJO CameraOverride
+        self.publishBoolean("CameraOverride Enable", False)
+        self.publishFloat("CameraOverride X", 5.0)
+        self.publishFloat("CameraOverride Y", 5.0)
+        self.publishFloat("CameraOverride R", 3.1415926 / 2)
+
         # self.photonCameraMiddle = photonCameraClass(
         #     "longCam", strip.show();
         #     0,
@@ -164,7 +171,19 @@ class CameraManager(Subsystem):
 
         # self.photonCameraMiddle.update()
 
-        if self.photonCameraLeft.trustworthy:
+        # DJO CameraOverride
+        if self.getBoolean("CameraOverride Enable", default=False):
+            self.newPoseT = wpimath.geometry.Translation2d(
+                self.getFloat("CameraOverride X", default=5.0),
+                self.getFloat("CameraOverride Y", default=5.0),
+            )
+            self.newPoseR = wpimath.geometry.Rotation2d(
+                self.getFloat("CameraOverride R", default=3.1415926 / 2),
+            )
+            self.newPose2d = wpimath.geometry.Pose2d(self.newPoseT, self.newPoseR)
+            robotState.odometry.resetPose(self.newPose2d)
+
+        elif self.photonCameraLeft.trustworthy:
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraLeft.camEstPose2d, getTime()
             )
@@ -174,7 +193,7 @@ class CameraManager(Subsystem):
         #         self.photonCameraMiddle.camEstPose2d, getTime()
         #     )
 
-        if self.photonCameraRight.trustworthy:
+        elif self.photonCameraRight.trustworthy:
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraRight.camEstPose2d, getTime()
             )
