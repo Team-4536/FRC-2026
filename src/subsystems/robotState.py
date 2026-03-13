@@ -53,6 +53,8 @@ class RobotState(NetworkTablesMixin):
     turretManualSetpoint: float = 0
     turretSwitchTarget: bool = False
     turretSwitchEnabled: bool = False
+    turretVelocictyRPM: float = 0
+    interpolateTest: bool = False
 
     initialIntake: bool = False
     intakeIndexer: bool = False

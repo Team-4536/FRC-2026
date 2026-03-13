@@ -124,6 +124,8 @@ class Turret(Subsystem):
     def __init__(self, yawMotorID: int, pitchMotorID: int):
         super().__init__()
 
+        self.interpolateToggle = False
+
         self.yawMotor = RevMotor(deviceID=yawMotorID)
 
         self.pitchMotor = RevMotor(deviceID=pitchMotorID)
@@ -172,6 +174,9 @@ class Turret(Subsystem):
             DriverStation.getAlliance() or DriverStation.Alliance.kRed
         )
 
+        self.testVelocity = 0
+        self.testPitch = 0
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
@@ -202,6 +207,13 @@ class Turret(Subsystem):
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
+
+        self.interpolateToggle = self.getBoolean("interpolate toggle", default=True)
+        self.testVelocity = self.getFloat("test velocity", default=0)
+        self.testPitch = self.getFloat("test pitch", default=0)
+
+        robotState.interpolateTest = self.interpolateToggle
+
         self.compensateFail = False
         self.dynamicFail = False
         self.impossibleDynamic = False
@@ -227,7 +239,12 @@ class Turret(Subsystem):
         self.yawAngle = self.odom.pose.rotation().radians()
         self.pitchAngle = self.odom.pitch
 
-        if self.mode == TurretMode.MANUAL:
+        if self.interpolateToggle:
+            self.testUpdate(self.testPitch, self.testVelocity, robotState)
+
+
+
+        elif self.mode == TurretMode.MANUAL:
             self.manualUpdate(robotState)
 
         elif self.mode == TurretMode.DYNAMIC:
@@ -357,6 +374,68 @@ class Turret(Subsystem):
 
         self.yawMotor.setPosition(self.limitedYawSetpoint * YAW_GEARING)
         self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
+
+    def testUpdate(self, pitch: radians, velocity:float, robotState: RobotState):
+
+        self.pitchSetPoint = self.dontOverDoItPitch(pitch)
+        robotState.turretVelocictyRPM = velocity
+
+        h = self.targetPos.z
+        d = self.getTargetDist(self.targetPos, self.odom.pose)
+
+        angle = 0
+        time = 0
+
+        self.publishFloat("d", d, debug=True)
+        self.publishFloat("h", h, debug=True)
+        self.publishFloat("xPass", self.getXPass(d), debug=True)
+        self.publishFloat("ypass", self.getYPass(), debug=True)
+        try:
+            angle = calculateAngle(d, h, self.getXPass(d), self.getYPass())
+            velocity = _calculateVelocity(angle, d, h)
+            self.publishFloat("velocity", velocity)
+            time = calculateTime(velocity, d)
+            self.publishFloat("time", time, debug=True)
+
+        except:
+            self.dynamicFail = True
+            self.impossibleDynamic = True
+            robotState.impossibleDynamic = True
+            robotState.dontShoot = True
+            return
+        # self.publishFloatArray(
+        #     "Robot Linear veloity",
+        #     (
+        #         robotState.robotLinearVelocity.norm(),
+        #         (
+        #             0
+        #             if robotState.robotLinearVelocity.norm() == 0
+        #             else robotState.robotLinearVelocity.angle().radians()
+        #         ),
+        #     ),
+        #     debug=True,
+        # )
+
+        # self.compensateSetpoint(
+        #     time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
+        # )
+        try:
+            self.targetPoint(
+                self.targetPos, self.odom.pose, robotState
+            )  # need robot odom
+        except:
+            self.compensateFail = True
+            self.impossibleDynamic = True
+            robotState.impossibleDynamic = True
+            robotState.dontShoot = True
+            return
+
+        # self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
+
+        # self.yawMotor.setPosition(self.limitedYawSetpoint * YAW_GEARING)
+        self.pitchMotor.setPosition(self.relativePitchSetpoint * PITCH_GEARING)
+        
+
 
     def getTargetDist(self, targetPos: Translation3d, pose: Pose2d) -> meters:
         dist: meters = Translation2d(targetPos.x, targetPos.y).distance(
@@ -613,6 +692,10 @@ class Turret(Subsystem):
             "Failed to dynamic after setpoint was compensated", self.compensateFail
         )
 
+        self.publishBoolean("interpolate toggle", self.interpolateToggle)
+        self.publishFloat("test velocity", self.testVelocity)
+        self.publishFloat("test pitch", self.testPitch)
+
 
 class TurretOdometry:
 
@@ -717,8 +800,16 @@ class Shooter(Subsystem):
         if not checkDependencies(self.dependencies):
             return robotState
 
-        if self.mode == TurretMode.MANUAL:
+        if robotState.interpolateTest:
+
+            self.test2Update(robotState)
+            self.revingMotorBottom.setVelocity(self.revSetPoint)
+            self.revingMotorTop.setVelocity(self.revSetPoint)
+
+        elif self.mode == TurretMode.MANUAL:
             self.manualUpdate()
+            
+
 
         elif self.mode == TurretMode.DYNAMIC:
             self.dynamicUpdate(robotState)
@@ -734,7 +825,10 @@ class Shooter(Subsystem):
         if robotState.intakeIndexer:
             robotState.kickShooter = 1
 
-        self.revShooters(self.mpsSetpoint)
+        # self.revShooters(self.mpsSetpoint)
+
+        
+
 
         self.kickSetPoint = KICK_SPEED * robotState.kickShooter
 
@@ -761,6 +855,9 @@ class Shooter(Subsystem):
             return
 
         self.mpsSetpoint = robotState.turretVelocitySetpoint.norm()
+
+    def test2Update(self, robotState: RobotState):
+        self.revSetPoint = robotState.turretVelocictyRPM
 
     def revShooters(self, speed: MPS):
         top: RPM = MPSToRPM(speed, TOP_FLYWHEEL_CIRCUMFRENCE)
