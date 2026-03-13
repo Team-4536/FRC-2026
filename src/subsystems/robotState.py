@@ -40,7 +40,6 @@ class RobotState(NetworkTablesMixin):
     indexerEject: bool = False
     dontShoot: bool = False  # REMOVE (local var)
     impossibleDynamic: bool = False  # REMOVE (local var)
-    forceDynamicTurret: bool = False  # REMOVE (local var)
     fullyReved: bool = False
     revSpeed: float = 0
     kickShooter: int = 0
@@ -53,6 +52,7 @@ class RobotState(NetworkTablesMixin):
     turretManualSetpoint: float = 0
     turretSwitchTarget: bool = False
     turretSwitchEnabled: bool = False
+    assistedTurret: bool = False  # set to a button evetually
 
     initialIntake: bool = False
     intakeIndexer: bool = False

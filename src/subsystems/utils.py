@@ -1,5 +1,6 @@
 from math import atan2, copysign, cos, hypot, pi, sin, tau
 from numpy import sign
+import math
 from phoenix6.units import volt as voltage
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
@@ -242,17 +243,21 @@ def lerp(x: float, y: float, t: float) -> float:
 
 def getTangentAngle(posFromCenter: Translation2d) -> radians:
     # TODO idk if this works
-    tangentAngle: radians = atan2(posFromCenter.y, posFromCenter.x) + pi / 2
+    tangentAngle: radians = realInverseTan(posFromCenter.y, posFromCenter.x) + pi / 2
 
     return tangentAngle
 
 
 def getContributedRotation(
-    tangentAngle: radians, angle: radians, speed: meters_per_second
+    tangentAngle: radians, vector: Translation2d
 ) -> meters_per_second:
-    contributedVector: float = cos(tangentAngle - angle)
 
-    return speed * contributedVector
+    if vector.norm() == 0:
+        return 0
+
+    contributedVector: float = cos(tangentAngle - vector.angle().radians())
+
+    return vector.norm() * contributedVector
 
 
 def RPMToMPS(speed: revolutions_per_minute, circ: meters) -> meters_per_second:
@@ -264,6 +269,10 @@ def MPSToRPM(speed: meters_per_second, circ: meters) -> revolutions_per_minute:
 
 
 def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
+
+    if translation.norm() == 0:
+        return Translation2d()
+
     angle = translation.angle()
     hyp = translation.norm()
 
@@ -279,3 +288,21 @@ def wrapAngle(angle: radians) -> radians:
 
 def RPMToVolts(rpm: revolutions_per_minute, maxRPM: revolutions_per_minute) -> voltage:
     return rpm / (maxRPM / BATTERY_VOLTS)
+
+
+def realInverseTan(y: float, x: float) -> radians:
+    canOutput: bool = True
+    # inverse tan only returns in quadrant 1 and 4
+    if x < 0:
+        canOutput = False
+
+    # we don't care if its 4
+
+    # gets the yaw angle
+    angle: radians = math.atan(y / x)
+
+    # In case inverse tan won't output correct angle
+    if not canOutput:
+        angle += math.pi
+
+    return angle

@@ -243,6 +243,9 @@ class SwerveDrive(Subsystem):
         for module in self._modules:
             vector += self.getDriveVelocity(module)
 
+        if vector.norm() == 0:
+            return Translation2d()
+
         vector = Translation2d(
             distance=vector.norm() / 4,
             angle=vector.angle(),
@@ -256,8 +259,7 @@ class SwerveDrive(Subsystem):
             tanVel = getTangentAngle(module.position)
             sum += getContributedRotation(
                 tanVel,
-                module.azimuthRotation.radians(),
-                self.getDriveVelocity(module).distance(Translation2d()),
+                self.getDriveVelocity(module),
             )
 
         return sum / 4

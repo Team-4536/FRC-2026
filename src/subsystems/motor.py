@@ -254,7 +254,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(0)
+            .reverseSoftLimit(10 / 360 * (4.86 / (8 / 360)))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
