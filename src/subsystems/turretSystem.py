@@ -49,7 +49,7 @@ LIL_PITCH_GEAR_RADIUS: inches = 3 / 4
 ARC_RATIO = (
     PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
 )  # how many rotations of the smol ladder gear is 1 rotation of the pitch
-PITCH_GEARING: float = 4.86 / (8 / 360)
+PITCH_GEARING: float = 16 * ARC_RATIO  # 4.86 / degreesToRotations(8)
 TURRET_HEIGHT: meters = inchesToMeters(15)
 
 BALL_RADIUS: inches = 5.91 / 2

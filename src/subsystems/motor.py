@@ -16,7 +16,12 @@ from rev import (
     SparkRelativeEncoder,
 )
 from subsystems.utils import matchData
-from wpimath.units import radians, radiansToRotations, revolutions_per_minute
+from wpimath.units import (
+    radians,
+    radiansToRotations,
+    revolutions_per_minute,
+    degreesToRotations,
+)
 
 
 class RevMotor:
@@ -254,7 +259,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(10 / 360 * (4.86 / (8 / 360)))
+            .reverseSoftLimit(degreesToRotations(10) * (16 * 8 / (3 / 4)))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
