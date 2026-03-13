@@ -121,7 +121,7 @@ class RevMotor:
 
     INDEXER_MOTOR_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(15, 15)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .inverted(False)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
@@ -259,7 +259,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(degreesToRotations(10) * (16 * 8 / (3 / 4)))
+            .reverseSoftLimit(degreesToRotations(9) * (16 * 8 / (3 / 4)))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
