@@ -143,6 +143,14 @@ class CameraManager(Subsystem):
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
             (25.4 + 3.9) / 100,
         )
+
+        # DJO CameraOverride
+        self.publishBoolean("CameraOverride Enable", False)
+        self.publishFloat("CameraOverride X", 5.0)
+        self.publishFloat("CameraOverride Y", 5.0)
+        self.publishFloat("CameraOverride R", 3.1415926 / 2)
+        self.test = 0
+
         # self.photonCameraMiddle = photonCameraClass(
         #     "longCam", strip.show();
         #     0,
@@ -164,20 +172,40 @@ class CameraManager(Subsystem):
 
         # self.photonCameraMiddle.update()
 
-        if self.photonCameraLeft.trustworthy:
-            robotState.odometry.addVisionMeasurement(
-                self.photonCameraLeft.camEstPose2d, getTime()
+        # DJO CameraOverride
+        if self.getBoolean("CameraOverride Enable", default=False):
+            newPoseT = wpimath.geometry.Translation2d(
+                self.getFloat("CameraOverride X", default=5.0),
+                self.getFloat("CameraOverride Y", default=5.0),
             )
-        # if self.photonCameraMiddle.trustworthy:
-
-        #     robotState.odometry.addVisionMeasurement(
-        #         self.photonCameraMiddle.camEstPose2d, getTime()
-        #     )
-
-        if self.photonCameraRight.trustworthy:
-            robotState.odometry.addVisionMeasurement(
-                self.photonCameraRight.camEstPose2d, getTime()
+            newPoseR = wpimath.geometry.Rotation2d(
+                self.getFloat("CameraOverride R", default=3.1415926 / 2),
             )
+            newPose2d = wpimath.geometry.Pose2d(newPoseT, newPoseR)
+            robotState.odometry.resetPose(newPose2d)
+        else:
+            if self.photonCameraLeft.trustworthy:
+                robotState.odometry.addVisionMeasurement(
+                    self.photonCameraLeft.camEstPose2d,
+                    getTime(),  ## DJO: I believe this is the wrong time.
+                )
+            # if self.photonCameraMiddle.trustworthy:
+
+            #     robotState.odometry.addVisionMeasurement(
+            #         self.photonCameraMiddle.camEstPose2d, getTime()
+            #     )
+
+            if self.photonCameraRight.trustworthy:
+                robotState.odometry.addVisionMeasurement(
+                    self.photonCameraRight.camEstPose2d,
+                    getTime(),  ## DJO: I believe this is the wrong time.
+                )
+
+        self.test = self.test + 1
+        self.publishFloat(
+            "DJO Test Time", getTime()
+        )  ## DJO: This is the *wrong* time in sim
+        self.publishFloat("DJO Test Time2", self.test)
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
