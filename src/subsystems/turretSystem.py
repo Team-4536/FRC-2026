@@ -302,7 +302,11 @@ class Turret(Subsystem):
             "Robot Linear veloity",
             (
                 robotState.robotLinearVelocity.norm(),
-                robotState.robotLinearVelocity.angle().radians(),
+                (  # TODO: Tust note that this is a temporary addition from Emmett C
+                    0
+                    if robotState.robotLinearVelocity.norm() == 0
+                    else robotState.robotLinearVelocity.angle().radians()
+                ),
             ),
             debug=True,
         )
