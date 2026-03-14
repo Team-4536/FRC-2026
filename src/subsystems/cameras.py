@@ -9,7 +9,7 @@ from photonlibpy import EstimatedRobotPose
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpimath.units import inchesToMeters
+from wpimath.units import inchesToMeters, radiansToDegrees
 from wpilib import getTime
 
 
@@ -132,7 +132,7 @@ class CameraManager(Subsystem):
         self.photonCameraRight = photonCameraClass(
             "Camera1",
             15,
-            -30,
+            -30 - radiansToDegrees(0.1),
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (6.6 / 100)),
             (25.4 + 3.9) / 100 + inchesToMeters(0.5),
@@ -140,7 +140,7 @@ class CameraManager(Subsystem):
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             15,
-            30,
+            30 - radiansToDegrees(0.1),
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
             (25.4 + 3.9) / 100 + inchesToMeters(0.5),

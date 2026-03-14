@@ -155,7 +155,7 @@ class SwerveModules(NamedTuple):
 
 
 class SwerveDrive(Subsystem):
-    MAX_MODULE_SPEED: meters_per_second = 10.5
+    MAX_MODULE_SPEED: meters_per_second = 6
 
     _modules: SwerveModules
     _gyro: AHRS

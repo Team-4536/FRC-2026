@@ -209,7 +209,7 @@ class RevMotor:
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.2)
+                .allowedClosedLoopError(0.1)
             )
         )
         .apply(

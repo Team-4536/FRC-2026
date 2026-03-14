@@ -180,9 +180,9 @@ class Turret(Subsystem):
         self.velocityVar = 0.0
         self.pitchVar = 0.0
 
-        self.publishFloat("YawTargetOffset", 36)
+        self.publishFloat("YawTargetOffset", 0)
         self.publishFloat("add", -4.54025)
-        self.publishFloat("scale", 2.75728)
+        self.publishFloat("scale", 2.70728)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
@@ -265,8 +265,8 @@ class Turret(Subsystem):
 
         robotState.turretMode = self.mode
 
-        self.velocityVar = self.getFloat("velocity variable", default=0)
-        self.ptchVar = self.getFloat("ptch variable", default=0)
+        # self.velocityVar = self.getFloat("velocity variable", default=0)
+        # self.ptchVar = self.getFloat("ptch variable", default=0)
 
         return robotState
 
@@ -290,7 +290,7 @@ class Turret(Subsystem):
                 angle = degreesToRadians(40)
 
             velocity = _calculateVelocity(angle, d, h)
-            self.publishFloat("velocity", velocity)
+            self.publishFloat("velocity", velocity, debug=True)
             time = calculateTime(velocity, d)
             self.publishFloat("time", time, debug=True)
 
@@ -610,7 +610,7 @@ class Turret(Subsystem):
 
         self.publishFloat("Yaw Robot Relative Setpoint", self.relativeYawSetpoint)
         self.publishFloat("Yaw Feild Relative Rotation", self.yawAngle)
-        self.publishFloat("Yaw Motor Pos", self.yawEncoderPos)
+        self.publishFloat("Yaw Motor Pos", self.yawEncoder.getPosition())
         self.publishFloat("Limited Yaw Setpoint", self.limitedYawSetpoint)
         self.publishFloat("Manual Yaw Velocity", self.yawVelocity)
         self.publishFloat("Manual Pitch Velocity", self.pitchVelocity)
