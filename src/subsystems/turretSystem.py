@@ -131,7 +131,7 @@ class Turret(Subsystem):
         self.yawEncoder = self.yawMotor.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
 
-        self.pitchEncoder.setPosition(degreesToRotations(10) * PITCH_GEARING)
+        self.pitchEncoder.setPosition(degreesToRotations(6) * PITCH_GEARING)
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.yawAngle = 0  # yaw angle relative to the field
@@ -176,7 +176,7 @@ class Turret(Subsystem):
 
         self.publishFloat("YawTargetOffset", 36)
         self.publishFloat("add", -4.54025)
-        self.publishFloat("scale", 2.55728)
+        self.publishFloat("scale", 2.75728)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
@@ -560,7 +560,7 @@ class Turret(Subsystem):
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
         add = self.getFloat("add", default=-4.54025)
-        scale = self.getFloat("scale", default=2.55728)
+        scale = self.getFloat("scale", default=2.75728)
 
         robotState.turretVelocitySetpoint = Translation2d(
             distance=compensateSpeed(velocity, scale, add),
