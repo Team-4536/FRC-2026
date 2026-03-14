@@ -21,6 +21,7 @@ from subsystems.utils import (
 )
 from typing import Any, Tuple
 from wpilib import DriverStation, getTime, FieldObject2d
+from rev import SparkLimitSwitch
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Translation3d
 from wpimath.units import (
     degreesToRadians,
@@ -65,9 +66,10 @@ Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
 Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
-SHUTTLE_DIST_X: meters = 3
-TOP_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - 3
-BOTTOM_SHUTTLE_DIST_Y: meters = 3
+SHUTTLE_DIST_X: meters = 2
+SHUTTLE_DIST_Y: meters = 2
+TOP_SHUTTLE_DIST_Y: meters = FIELD_WIDTH - SHUTTLE_DIST_Y
+BOTTOM_SHUTTLE_DIST_Y: meters = SHUTTLE_DIST_Y
 
 # x and y should be the same as what the robot thinks those are, z is height (in meters)
 RED_TOP_SHUTTLE_POS: Translation3d = Translation3d(
@@ -135,27 +137,35 @@ class Turret(Subsystem):
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.yawAngle = 0  # yaw angle relative to the field
-        self.pitchAngle = 0
+        self.pitchAngle = 0  # pitch angle relative to the field
 
-        self.odom = TurretOdometry()
+        self.odom = TurretOdometry()  # for visualizing turret on field
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
 
         self.homeSet: bool = True
+        self.yawLimitSwitch: SparkLimitSwitch = (
+            self.yawMotor._ctrlr.getReverseLimitSwitch()  # pyright: ignore
+        )
+
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
+
         self.pitchSetpoint: radians = PI / 2
         self.relativePitchSetpoint: radians = 0  # cuz zero points up
-        self.targetPos: Translation3d = Translation3d()
 
+        self.targetPos: Translation3d = Translation3d()
         self.targetLocked: bool = False
 
         self.target: TurretTarget = TurretTarget.HUB
         self.mode: TurretMode = TurretMode.DYNAMIC
 
+        self.side: DriverStation.Alliance = (
+            DriverStation.getAlliance() or DriverStation.Alliance.kRed
+        )
+
         self.turretManDependencies: Tuple[Any, ...] = (None,)
-        self.turretGenDepedencies: Tuple[Any, ...] = (None,)
         self.turretGenDepedencies: Tuple[Any, ...] = (None,)
         # these velocity values are only used when in DYNAMIC mode
         self.yawVelocity: RPM = 0
@@ -166,10 +176,6 @@ class Turret(Subsystem):
         self.dynamicFail = False
 
         self.lastTime: seconds = getTime()
-
-        self.side: DriverStation.Alliance = (
-            DriverStation.getAlliance() or DriverStation.Alliance.kRed
-        )
 
         self.velocityVar = 0.0
         self.pitchVar = 0.0
@@ -182,9 +188,11 @@ class Turret(Subsystem):
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
             "fieldTargPos"
         )
-        self.passThrough: FieldObject2d = robotState.odomField.getObject("passThrough")
-        shuttle: FieldObject2d = robotState.odomField.getObject("shuttle")
-        shuttle.setPose(RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d())
+        self.fieldTurret: FieldObject2d = robotState.odomField.getObject("passThrough")
+        redShuttleTop: FieldObject2d = robotState.odomField.getObject("shuttle")
+        redShuttleTop.setPose(
+            RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d()
+        )
 
         self.homeSet: bool = True
         self.yawSetPoint: radians = 0  # in relation to the field
@@ -198,7 +206,6 @@ class Turret(Subsystem):
         self.target: TurretTarget = TurretTarget.HUB
         self.mode: TurretMode = TurretMode.DYNAMIC
 
-        self.turretAutoDepedencies = (None,)
         self.turretManDependencies = (None,)
         self.turretGenDepedencies = (None,)
 
@@ -232,9 +239,7 @@ class Turret(Subsystem):
         self.turretGenDepedencies = (robotState.odometry,)
 
         if not self.homeSet:
-            self.reset(
-                self.yawMotor._ctrlr.getReverseLimitSwitch().get()  # pyright: ignore
-            )
+            self.reset()
             return robotState
 
         if not checkDependencies(self.turretGenDepedencies):
@@ -256,9 +261,7 @@ class Turret(Subsystem):
             self.automaticUpdate(robotState)
 
         elif self.mode == TurretMode.DISABLED:
-            self.reset(
-                self.yawMotor._ctrlr.getReverseLimitSwitch().get()  # pyright: ignore
-            )
+            self.reset()
 
         robotState.turretMode = self.mode
 
@@ -314,7 +317,7 @@ class Turret(Subsystem):
         self.compensateSetpoint(
             time, robotState.robotLinearVelocity, robotState.robotOmegaSpeed
         )
-        self.passThrough.setPose(self.odom.pose)
+        self.fieldTurret.setPose(self.odom.pose)
         self.fieldTargPos.setPose(
             Pose2d(Translation2d(self.targetPos.x, self.targetPos.y), Rotation2d())
         )
@@ -584,7 +587,9 @@ class Turret(Subsystem):
     def getRelativePitchSetpoint(self, angle: radians) -> radians:
         return (PI / 2) - angle
 
-    def reset(self, limit: bool):
+    def reset(self):
+
+        limit: bool = self.yawLimitSwitch.get()
 
         if limit:
             self.homeSet = True
