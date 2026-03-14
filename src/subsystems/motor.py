@@ -156,6 +156,11 @@ class RevMotor:
                 .allowedClosedLoopError(1)
             )
         )
+        .apply(
+            LimitSwitchConfig()
+            .reverseLimitSwitchEnabled(False)
+            .forwardLimitSwitchEnabled(False)
+        )
     )
 
     AZIMUTH_CONFIG: SparkBaseConfig = (

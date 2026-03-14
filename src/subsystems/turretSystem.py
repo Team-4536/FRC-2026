@@ -181,8 +181,8 @@ class Turret(Subsystem):
         self.pitchVar = 0.0
 
         self.publishFloat("YawTargetOffset", 0)
-        self.publishFloat("add", -4.54025)
-        self.publishFloat("scale", 2.70728)
+        self.publishFloat("add", -4.04025)
+        self.publishFloat("scale", 2.40728)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
