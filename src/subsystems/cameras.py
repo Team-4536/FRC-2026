@@ -94,6 +94,8 @@ class photonCameraClass(NetworkTablesMixin):
                     len(self.target) > 1
                     and type(self.camPoseEst.estimateCoprocMultiTagPose(self.result))
                     == EstimatedRobotPose
+                    and self.target[0].getPoseAmbiguity() < 0.16
+                    and self.target[1].getPoseAmbiguity() < 0.16
                 ):
                     self.trustworthy = True
                 self.camEstPose = self.camPoseEst.estimateCoprocMultiTagPose(
@@ -133,7 +135,7 @@ class CameraManager(Subsystem):
             -30,
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (6.6 / 100)),
-            (25.4 + 3.9) / 100,
+            (25.4 + 3.9) / 100 + inchesToMeters(0.5),
         )
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
@@ -141,7 +143,7 @@ class CameraManager(Subsystem):
             30,
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
-            (25.4 + 3.9) / 100,
+            (25.4 + 3.9) / 100 + inchesToMeters(0.5),
         )
 
         # DJO CameraOverride
