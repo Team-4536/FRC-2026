@@ -21,14 +21,12 @@ class Intake(Subsystem):
         self.intakeMotorManual = RevMotor(deviceID=frontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=raiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=backMotorID)
+        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(0)
         self.downLimitSwitch = self.intakeMotorRaise.getLimitSwitch(0)
-        self.upLimitSwitch = self.intakeMotorRaise.getLimitSwitch(
-            1
-        )  # TODO add real IDs
 
-        self.AUTOMATIC_MODE = False
+        self.automaticMode = False
         self.state = IntakeState.OH_NO
-
+        self.lowerIntake = False
         self.publishFloat("intake_speed (0 to 1)", 0.7)
         self.publishFloat("reverse_speed (0 to 1)", 0.7)
         self.publishFloat("indexer_speed (0 to 1)", 0.4)
@@ -67,42 +65,42 @@ class Intake(Subsystem):
         self.indexerSetpoint = -max(
             min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
         )
+        self.lowerIntake = robotState.intakePos
 
-        # if not self.AUTOMATIC_MODE:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
-        # change these values if you need to decrease/increase raise and lowering speed
-        if robotState.intakePosYAxis < -0.1:
-            self.raiseThrottle = robotState.intakePosYAxis * 0.2  # down
-        elif robotState.intakePosYAxis > 0.1:
-            self.raiseThrottle = robotState.intakePosYAxis * 0.2  # up
-        else:
-            self.raiseThrottle = 0  # dead
+        if not self.automaticMode:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
+            # change these values if you need to decrease/increase raise and lowering speed
+            if robotState.intakePosYAxis < -0.1:
+                self.raiseThrottle = robotState.intakePosYAxis * 0.2  # down
+            elif robotState.intakePosYAxis > 0.1:
+                self.raiseThrottle = robotState.intakePosYAxis * 0.2  # up
+            else:
+                self.raiseThrottle = 0  # dead
 
-        # elif self.AUTOMATIC_MODE:  # AUTOMATIC MODE
+        elif self.automaticMode:  # AUTOMATIC MODE
+            if self.state == IntakeState.UP:
+                self.raiseThrottle = self.raiseStayUpSetpoint
+            if robotState.intakePos:
+                self.startTime = wpilib.getTime()
+                self.state = IntakeState.GOING_DOWN
 
-        #     if self.state == IntakeState.UP:
-        #         self.raiseThrottle = self.raiseStayUpSetpoint
-        #         if robotState.intakePos:
-        #             self.startTime = wpilib.getTime()
-        #             self.state = IntakeState.GOING_DOWN
+            if self.state == IntakeState.GOING_DOWN:
+                if getTime() - self.startTime < 0.3:
+                    self.raiseThrottle = self.raiseDownSetpoint
+                else:
+                    self.raiseThrottle = 0
+                    self.state = IntakeState.DOWN
 
-        #     if self.state == IntakeState.GOING_DOWN:
-        #         if getTime() - self.startTime < 0.3:
-        #             self.raiseThrottle = self.raiseDownSetpoint
-        #         else:
-        #             self.raiseThrottle = 0
-        #             self.state = IntakeState.DOWN
+                if self.state == IntakeState.DOWN:
+                    if robotState.intakePos:
+                        self.state = IntakeState.GOING_UP
 
-        #     if self.state == IntakeState.DOWN:
-        #         if robotState.intakePos:
-        #             self.state = IntakeState.GOING_UP
-
-        #     if self.state == IntakeState.GOING_UP:
-        #         self.raiseThrottle = self.raiseUpSetpoint
-        #         if self.upLimitSwitch:
-        #             self.state = IntakeState.UP
+                if self.state == IntakeState.GOING_UP:
+                    self.raiseThrottle = self.raiseUpSetpoint
+                    if self.upLimitSwitch:
+                        self.state = IntakeState.UP
 
         self.intakeMotorRaise.setThrottle(self.raiseThrottle)
-        # self.AUTOMATIC_MODE = not robotState.intakeMode
+        self.automaticMode = not robotState.intakeMode
 
         # initial motor that intakes
         if robotState.initialIntake:
@@ -149,5 +147,8 @@ class Intake(Subsystem):
         self.publishFloat("intakeMThrottle", self.manualThrottle)
         self.publishFloat("intakeAThrottle", self.automaticThrottle)
         self.publishFloat("intakeRThrottle", self.raiseThrottle)
-        self.publishBoolean("intakeAutomaticMode", self.AUTOMATIC_MODE)
-        self.publishString("intakeState", self.state.name)
+        self.publishBoolean("intakeAutomaticMode", self.automaticMode)
+        self.publishString("intakeState", self.state)
+        self.publishBoolean("intakePos", self.lowerIntake)
+        self.publishBoolean("upLimitSwitch", self.upLimitSwitch)
+        self.publishBoolean("downLimitSwitch", self.downLimitSwitch)
