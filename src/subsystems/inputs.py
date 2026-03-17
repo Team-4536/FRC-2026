@@ -25,13 +25,14 @@ class Inputs(Subsystem):
         self,
         drivePort: int = 0,
         mechPort: int = 1,
+        dingPort: int = 2,
     ) -> None:
         super().__init__()
         # self.turretSpeed: float = 0.0
 
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
-
+        self._dingCtrlr = XboxController(dingPort)
         self._linearScalar: Scalar = Scalar(magnitude=tau)
         self._circularScalar: CircularScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
@@ -67,6 +68,7 @@ class Inputs(Subsystem):
 
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
         robotState.flyTest = self._driveCtrlr.getAButton()
+        robotState.flyTest = self._dingCtrlr.getBButton()
     
 
         robotState.motorDesiredState = self._linearScalar(self._mechCtrlr.getRightY())
