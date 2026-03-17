@@ -174,10 +174,10 @@ def routineChooser(
             ]
 
         case AutoRoutines.A_EMPTY_AND_GET_BALLS_AND_SHOOT_FROM_RIGHT:
-            routine["shoot"] = [
+            routine["start shoot"] = [
                 OperateTurret(
                     True,
-                    1,
+                    3,
                 )
             ]
             routine["under right trench from start"] = [
@@ -200,7 +200,7 @@ def routineChooser(
                 ),
                 OperateTurret(),
             ]
-            routine["shoot"] = [
+            routine["end shoot"] = [
                 OperateTurret(
                     True,
                     15,
