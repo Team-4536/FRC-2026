@@ -32,11 +32,17 @@ class Inputs(Subsystem):
 
         self._isTestMode: bool = False
 
+        self.proxyControlMode: bool = False
+
+        self.publishFloat("proxy drive x", 0)
+        self.publishFloat("proxy drive y", 0)
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # Drive Controls
+        self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
@@ -69,13 +75,22 @@ class Inputs(Subsystem):
         pass
 
     def publish(self) -> None:
+        self.publishBoolean("proxy control mode", self.proxyControlMode)
         pass
 
     def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
         self._circularDriveScalar.setMagnitude(maxSpeed)
-        vx, vy = self._circularDriveScalar(
-            x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
-        )
+
+        if not self.proxyControlMode:
+            vx, vy = self._circularDriveScalar(
+                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
+            )
+        else:
+            vx, vy = self._circularDriveScalar(
+                x=self.getFloat("proxy drive x", default=0), y=self.getFloat("proxy drive y", default=0)
+            )
+
+        
 
         omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 
