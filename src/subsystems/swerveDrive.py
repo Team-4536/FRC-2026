@@ -197,6 +197,7 @@ class SwerveDrive(Subsystem):
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
         )
+        # robotState.odometry.resetRotation(self._gyro.getRotation2d())
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
