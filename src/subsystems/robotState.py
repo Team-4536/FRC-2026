@@ -58,6 +58,7 @@ class RobotState(NetworkTablesMixin):
     initialIntake: bool = False
     intakeIndexer: bool = False
     intakeMode: bool = False
+    intakeModeLeftBumperPressed: bool = False
 
     turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL
