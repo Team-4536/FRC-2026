@@ -11,6 +11,7 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpimath.units import inchesToMeters, radiansToDegrees
 from wpilib import getTime
+from wpilib import Timer
 
 
 class photonCameraClass(NetworkTablesMixin):
@@ -49,6 +50,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.camEstPose: EstimatedRobotPose | None = None
         self.hasTargetsRan = False
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.timeStamp = -1
 
     def update(self):
         self.hasTargetsRan = False
@@ -112,7 +114,7 @@ class photonCameraClass(NetworkTablesMixin):
                     self.camEstPose2d = wpimath.geometry.Pose2d(
                         self.camEstTrans, self.camEstRot
                     )
-
+                    self.timeStamp = self.camEstPose.timestampSeconds
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
@@ -189,7 +191,7 @@ class CameraManager(Subsystem):
             if self.photonCameraLeft.trustworthy:
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraLeft.camEstPose2d,
-                    getTime(),  ## DJO: I believe this is the wrong time.
+                    self.photonCameraLeft.timeStamp,
                 )
             # if self.photonCameraMiddle.trustworthy:
 
@@ -200,7 +202,7 @@ class CameraManager(Subsystem):
             if self.photonCameraRight.trustworthy:
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraRight.camEstPose2d,
-                    getTime(),  ## DJO: I believe this is the wrong time.
+                    self.photonCameraRight.timeStamp,
                 )
 
         self.test = self.test + 1
