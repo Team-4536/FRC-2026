@@ -113,7 +113,7 @@ class RevMotor:
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(2000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(25000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(15000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
         )
@@ -206,7 +206,7 @@ class RevMotor:
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.08, 0, 0, 0.02)
+            .pidf(0.045, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(False)
