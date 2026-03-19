@@ -10,7 +10,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpimath.units import inchesToMeters
-from wpilib import getTime
+from wpilib import getTime, Timer
 
 
 class photonCameraClass(NetworkTablesMixin):
@@ -149,7 +149,7 @@ class CameraManager(Subsystem):
         self.publishFloat("CameraOverride X", 5.0)
         self.publishFloat("CameraOverride Y", 5.0)
         self.publishFloat("CameraOverride R", 3.1415926 / 2)
-        self.test = 0
+        self.cycles = 0
 
         # self.photonCameraMiddle = photonCameraClass(
         #     "longCam", strip.show();
@@ -201,11 +201,13 @@ class CameraManager(Subsystem):
                     getTime(),  ## DJO: I believe this is the wrong time.
                 )
 
-        self.test = self.test + 1
-        self.publishFloat(
-            "DJO Test Time", getTime()
-        )  ## DJO: This is the *wrong* time in sim
-        self.publishFloat("DJO Test Time2", self.test)
+        self.cycles = self.cycles + 1
+        self.publishFloat("DJO Test Cycles Since Start", self.cycles)
+
+        ## DJO: This is the *wrong* time in sim
+        self.publishFloat("DJO Test getTime()", getTime())
+        self.publishFloat("DJO Test getFPGATimestamp()", Timer.getFPGATimestamp())
+
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
