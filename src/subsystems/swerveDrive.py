@@ -155,7 +155,7 @@ class SwerveModules(NamedTuple):
 
 
 class SwerveDrive(Subsystem):
-    MAX_MODULE_SPEED: meters_per_second = 10.5
+    MAX_MODULE_SPEED: meters_per_second = 6
 
     _modules: SwerveModules
     _gyro: AHRS
@@ -197,6 +197,7 @@ class SwerveDrive(Subsystem):
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
         )
+        # robotState.odometry.resetRotation(self._gyro.getRotation2d())
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -243,6 +244,9 @@ class SwerveDrive(Subsystem):
         for module in self._modules:
             vector += self.getDriveVelocity(module)
 
+        if vector.norm() == 0:
+            return Translation2d()
+
         vector = Translation2d(
             distance=vector.norm() / 4,
             angle=vector.angle(),
@@ -256,8 +260,7 @@ class SwerveDrive(Subsystem):
             tanVel = getTangentAngle(module.position)
             sum += getContributedRotation(
                 tanVel,
-                module.azimuthRotation.radians(),
-                self.getDriveVelocity(module).distance(Translation2d()),
+                self.getDriveVelocity(module),
             )
 
         return sum / 4

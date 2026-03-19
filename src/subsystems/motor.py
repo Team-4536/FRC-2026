@@ -16,7 +16,12 @@ from rev import (
     SparkRelativeEncoder,
 )
 from subsystems.utils import matchData
-from wpimath.units import radians, radiansToRotations, revolutions_per_minute
+from wpimath.units import (
+    radians,
+    radiansToRotations,
+    revolutions_per_minute,
+    degreesToRotations,
+)
 
 
 class RevMotor:
@@ -108,7 +113,7 @@ class RevMotor:
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(2000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(25000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(15000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
         )
@@ -116,7 +121,7 @@ class RevMotor:
 
     INDEXER_MOTOR_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(15, 15)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .inverted(False)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
@@ -150,6 +155,11 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
+        )
+        .apply(
+            LimitSwitchConfig()
+            .reverseLimitSwitchEnabled(False)
+            .forwardLimitSwitchEnabled(False)
         )
     )
 
@@ -196,7 +206,7 @@ class RevMotor:
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.08, 0, 0, 0.02)
+            .pidf(0.07, 0, 0, 0.00)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(False)
@@ -204,7 +214,7 @@ class RevMotor:
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.2)
+                .allowedClosedLoopError(0.01)
             )
         )
         .apply(
@@ -254,7 +264,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(0)
+            .reverseSoftLimit(degreesToRotations(6) * (16 * 8 / (3 / 4)))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )

@@ -9,8 +9,9 @@ from photonlibpy import EstimatedRobotPose
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpimath.units import inchesToMeters
-from wpilib import getTime, Timer
+from wpimath.units import inchesToMeters, radiansToDegrees
+from wpilib import getTime
+from wpilib import Timer
 
 
 class photonCameraClass(NetworkTablesMixin):
@@ -49,6 +50,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.camEstPose: EstimatedRobotPose | None = None
         self.hasTargetsRan = False
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.timeStamp = -1
 
     def update(self):
         self.hasTargetsRan = False
@@ -94,6 +96,8 @@ class photonCameraClass(NetworkTablesMixin):
                     len(self.target) > 1
                     and type(self.camPoseEst.estimateCoprocMultiTagPose(self.result))
                     == EstimatedRobotPose
+                    and self.target[0].getPoseAmbiguity() < 0.16
+                    and self.target[1].getPoseAmbiguity() < 0.16
                 ):
                     self.trustworthy = True
                 self.camEstPose = self.camPoseEst.estimateCoprocMultiTagPose(
@@ -110,7 +114,7 @@ class photonCameraClass(NetworkTablesMixin):
                     self.camEstPose2d = wpimath.geometry.Pose2d(
                         self.camEstTrans, self.camEstRot
                     )
-
+                    self.timeStamp = self.camEstPose.timestampSeconds
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
@@ -133,15 +137,15 @@ class CameraManager(Subsystem):
             -30,
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (6.6 / 100)),
-            (25.4 + 3.9) / 100,
+            (25.4 + 3.9) / 100 + inchesToMeters(0.5),
         )
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             15,
-            30,
+            30 - radiansToDegrees(0.1),
             inchesToMeters(27 / 2) - (9 / 100),
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
-            (25.4 + 3.9) / 100,
+            (25.4 + 3.9) / 100 + inchesToMeters(0.5),
         )
 
         # DJO CameraOverride
@@ -187,7 +191,7 @@ class CameraManager(Subsystem):
             if self.photonCameraLeft.trustworthy:
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraLeft.camEstPose2d,
-                    getTime(),  ## DJO: I believe this is the wrong time.
+                    self.photonCameraLeft.timeStamp,
                 )
             # if self.photonCameraMiddle.trustworthy:
 
@@ -198,7 +202,7 @@ class CameraManager(Subsystem):
             if self.photonCameraRight.trustworthy:
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraRight.camEstPose2d,
-                    getTime(),  ## DJO: I believe this is the wrong time.
+                    self.photonCameraRight.timeStamp,
                 )
 
         self.cycles = self.cycles + 1
