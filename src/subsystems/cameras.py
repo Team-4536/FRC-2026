@@ -11,7 +11,6 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpimath.units import inchesToMeters, radiansToDegrees
 from wpilib import getTime
-from wpilib import Timer
 
 
 class photonCameraClass(NetworkTablesMixin):
