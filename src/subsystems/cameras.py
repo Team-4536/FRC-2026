@@ -3,13 +3,14 @@ from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from robotpy_apriltag import AprilTagField, AprilTagFieldLayout
 
 import wpimath.geometry
+from wpimath.geometry import Pose2d, Translation2d
 
 from ntcore import NetworkTableInstance
 from photonlibpy import EstimatedRobotPose
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpimath.units import inchesToMeters, radiansToDegrees
+from wpimath.units import inchesToMeters, radiansToDegrees, meters
 from wpilib import getTime
 from wpilib import Timer
 
@@ -213,7 +214,7 @@ class CameraManager(Subsystem):
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
-        robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
+        robotState.odometry.resetPose(Pose2d(meters(robotState.odometry.getEstimatedPosition().X()), meters(robotState.odometry.getEstimatedPosition().Y()), robotState.gyro))
 
         # resetPosition(
         #         self._gyro.getRotation2d(),
