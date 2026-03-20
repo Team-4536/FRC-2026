@@ -1,6 +1,6 @@
-from math import atan, cos, pi as PI, sqrt, tan, tau as TAU
+from math import sqrt, cos, tan, atan, pi as PI, tau as TAU
 from rev import SparkRelativeEncoder
-from subsystems.motor import RevMotor
+from subsystems.motor import RevMotor, INIT_PITCH_ANGLE
 import numpy as np
 from subsystems.robotState import (
     RobotState,
@@ -42,26 +42,31 @@ MAX_PITCH: radians = degreesToRadians(80)  # in relation to feild
 MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
-# TODO offset in radians from the zero of the gyro and zero of the turret
-ZERO_OFFSET: radians = (MAX_ROTATION - PI) / 2 + (PI / 2)
+# if the robot is facing 0 and we want to go to 0, go to the zero offset in robot relative space
+ZERO_OFFSET: radians = MAX_ROTATION / 2
+# small gear rotations to big gear rotations
 YAW_GEARING: float = 100 / 3
-PITCH_RADIUS: inches = 8
-LIL_PITCH_GEAR_RADIUS: inches = 3 / 4
+PITCH_RADIUS: inches = 9.342
+LIL_PITCH_GEAR_RADIUS: inches = 0.552
 ARC_RATIO = (
     PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
 )  # how many rotations of the smol ladder gear is 1 rotation of the pitch
 PITCH_GEARING: float = 16 * ARC_RATIO  # 4.86 / degreesToRotations(8)
-TURRET_HEIGHT: meters = inchesToMeters(15)
+# TODO make a sin func to change hieght of turret (Pitch_radius) * sin(theta) + turret_height
+# if angle is 0 this is the height of the turret
+TURRET_HEIGHT: meters = inchesToMeters(13.841)
 
-BALL_RADIUS: inches = 5.91 / 2
+BALL_DIAM: inches = 5.91
+BALL_RADIUS: inches = BALL_DIAM / 2
 
 MAX_RPM: RPM = 5676
-HUB_RADIUS: inches = 41.7 / 2
-HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(
-    HUB_RADIUS
-)  # + inchesToMeters(10)
+
+HUB_DIAM: inches = 41.7
+HUB_RADIUS: inches = HUB_DIAM / 2
+HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15) - TURRET_HEIGHT
+# TODO TODO TODO continue code review here
 Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
 Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
@@ -81,7 +86,7 @@ RED_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 RED_SCORE_POS: Translation3d = Translation3d(
     FIELD_LEN - HUB_DIST_X,
     HUB_DIST_Y,
-    HUB_HEIGHT_Z - TURRET_HEIGHT,
+    HUB_HEIGHT_Z,
 )
 BLUE_TOP_SHUTTLE_POS: Translation3d = Translation3d(
     SHUTTLE_DIST_X, TOP_SHUTTLE_DIST_Y, 0
@@ -92,7 +97,7 @@ BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_X,
     HUB_DIST_Y,
-    HUB_HEIGHT_Z - TURRET_HEIGHT,
+    HUB_HEIGHT_Z,
 )
 
 BOTTOM_FLYWHEEL_DIAMETER: inches = 3.5
@@ -133,7 +138,9 @@ class Turret(Subsystem):
         self.yawEncoder = self.yawMotor.getEncoder()
         self.pitchEncoder = self.pitchMotor.getEncoder()
 
-        self.pitchEncoder.setPosition(degreesToRotations(6) * PITCH_GEARING)
+        self.pitchEncoder.setPosition(
+            degreesToRotations(INIT_PITCH_ANGLE) * PITCH_GEARING
+        )
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.yawAngle = 0  # yaw angle relative to the field
@@ -281,7 +288,6 @@ class Turret(Subsystem):
 
         self.publishFloat("d", d, debug=True)
         self.publishFloat("h", h, debug=True)
-        self.publishFloat("xPass", self.getXPass(d), debug=True)
         self.publishFloat("ypass", self.getYPass(), debug=True)
 
         try:
@@ -491,11 +497,6 @@ class Turret(Subsystem):
         tanVel: Translation2d = Translation2d(
             distance=turretRotSpeed, angle=Rotation2d(getTangentAngle(offset))
         )
-
-        # self.publishFloatArray(
-        #     "Tangent velocity", (tanVel.norm(), tanVel.angle().radians()), debug=True
-        # )
-        # add the mps values
         compensateVector += tanVel
         compensateVector += roboLinV
 
@@ -554,7 +555,8 @@ class Turret(Subsystem):
 
         d = self.getTargetDist(pointPos, turretPose)
         h = pointPos.z
-
+        self.publishFloat("xPass", self.getXPass(d), debug=True)
+        self.publishFloat("distance", d, debug=True)
         self.pitchSetpoint = calculateAngle(d, h, self.getXPass(d), self.getYPass())
 
         if self.target != TurretTarget.HUB:
@@ -775,7 +777,7 @@ class Shooter(Subsystem):
         self.dontShoot = robotState.dontShoot
 
         if not self.dontShoot or not robotState.assistedTurret:
-            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, KICK_SPEED))
+            self.kickMotor.setVoltage(RPMToVolts(self.kickSetPoint, MAX_RPM))
 
         return robotState
 
