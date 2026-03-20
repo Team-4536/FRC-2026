@@ -10,12 +10,17 @@ class Climber(Subsystem):
         super().__init__()
         self.Motor = RevMotor(deviceID=MotorID)
         self.Button = null  # TODO map button to inputs
+        self.Automatic = False
 
     def periodic(self, robotState: RobotState):
-        if self.Button:
-            self.Motor.setThrottle(5)
-        else:
-            self.Motor.setThrottle(0)
+        if self.Automatic:
+            pass
+        # TODO implement encoder to set the position and have a toggle button instead (talk to bea)
+        elif not self.Automatic:
+            if self.Button:
+                self.Motor.setThrottle(5)
+            else:
+                self.Motor.setThrottle(0)
 
     # values when the robot is disabled
     def disabled(self):
