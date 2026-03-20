@@ -159,12 +159,24 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
+        ).apply(
+        LimitSwitchConfig()
+        .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+        .forwardLimitSwitchEnabled(
+            False
+        )  # TODO when forward limit switch exists again change
+        .reverseLimitSwitchEnabled(True)
+        # .forwardLimitSwitchPosition(16.66)
+        .reverseLimitSwitchPosition(0)
+        .reverseLimitSwitchTriggerBehavior(
+            LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
         )
-        .apply(
-            LimitSwitchConfig()
-            .reverseLimitSwitchEnabled(False)
-            .forwardLimitSwitchEnabled(False)
-        )
+        # .forwardLimitSwitchTriggerBehavior(
+        #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+        # )
+        .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+        .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+    )
     )
 
     AZIMUTH_CONFIG: SparkBaseConfig = (

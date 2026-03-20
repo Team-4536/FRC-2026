@@ -30,6 +30,7 @@ class RobotState(NetworkTablesMixin):
     intakeEject: bool
     intakePos: bool
     resetGyro: bool
+    limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
     autosInitPose: Pose2d
 
@@ -57,6 +58,7 @@ class RobotState(NetworkTablesMixin):
     initialIntake: bool = False
     intakeIndexer: bool = False
     intakeMode: bool = False
+    intakeModeLeftBumperPressed: bool = False
 
     turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL
@@ -65,6 +67,9 @@ class RobotState(NetworkTablesMixin):
 
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
+
+    climbUp: bool = False
+    climbDown: bool = False
 
     def __post_init__(self) -> None:
         super().__init__(table="RobotState", inst=False)
@@ -79,7 +84,9 @@ class RobotState(NetworkTablesMixin):
             self.publishGeneric(name, value)
 
         self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
-
+        if self.limelightPose != None:
+            self.odomField.setRobotPose(self.limelightPose)
+            print("Done")
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )

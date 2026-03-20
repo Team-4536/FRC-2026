@@ -45,6 +45,9 @@ class Inputs(Subsystem):
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
+        robotState.climbUp = self._driveCtrlr.getRightBumperButton()
+        robotState.climbDown = self._driveCtrlr.getLeftBumperButton()
+
         # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
@@ -59,9 +62,9 @@ class Inputs(Subsystem):
         # TODO chagne to not overlap with revspeed
         robotState.indexerEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
-        robotState.intakeMode = not self._mechCtrlr.getLeftBumper()
+        robotState.intakeModeLeftBumperPressed = self._mechCtrlr.getLeftBumperPressed()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
-        robotState.intakePos = self._mechCtrlr.getBackButton()
+        robotState.intakePos = self._mechCtrlr.getBackButtonPressed()
 
         return robotState
 
