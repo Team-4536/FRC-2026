@@ -21,7 +21,11 @@ from wpimath.units import (
     radiansToRotations,
     revolutions_per_minute,
     degreesToRotations,
+    degrees,
 )
+
+# could lowkey be 10 degrees idk
+INIT_PITCH_ANGLE: degrees = 8.813
 
 
 class RevMotor:
@@ -264,7 +268,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(degreesToRotations(10) * (16 * 8 / (3 / 4)))
+            .reverseSoftLimit(degreesToRotations(INIT_PITCH_ANGLE) * (16 * 8 / (3 / 4)))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
