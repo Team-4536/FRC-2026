@@ -61,7 +61,7 @@ class Inputs(Subsystem):
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
         robotState.intakeModeLeftBumperPressed = self._mechCtrlr.getLeftBumperPressed()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
-        robotState.intakePos = self._mechCtrlr.getBackButton()
+        robotState.intakePos = self._mechCtrlr.getBackButtonPressed()
 
         return robotState
 

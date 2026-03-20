@@ -12,6 +12,8 @@ class IntakeState(Enum):
     GOING_DOWN = 2
     DOWN = 3
     GOING_UP = 4
+    # when using states for autos, do IntakeState.[insert state], it will act as a simple check,
+    # if needed I can make a more robust system
 
 
 class Intake(Subsystem):
@@ -38,9 +40,9 @@ class Intake(Subsystem):
         self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
 
         # these set the speed of the intake motors (negative is forward...):
-        self.raiseDownSetpoint = 0.5
+        self.raiseDownSetpoint = 0.2
         self.raiseUpSetpoint = -0.5
-        self.raiseStayUpSetpoint = -0.150
+        self.raiseStayUpSetpoint = -0.02
         self.downSetpoint = 0
 
         # default 0
@@ -48,9 +50,9 @@ class Intake(Subsystem):
         self.manualThrottle = 0
         self.automaticThrottle = 0
 
-        if not self.downLimitSwitch:
+        if self.downLimitSwitch:
             self.state = IntakeState.DOWN
-        elif not self.upLimitSwitch:
+        elif self.upLimitSwitch:
             self.state = IntakeState.UP
         else:
             self.state = IntakeState.OH_NO
@@ -70,10 +72,8 @@ class Intake(Subsystem):
         )
         self.lowerIntake = robotState.intakePos
 
-        if robotState.intakeModeLeftBumperPressed and self.automaticMode:
-            self.automaticMode = False
-        elif robotState.intakeModeLeftBumperPressed and not self.automaticMode:
-            self.automaticMode = True
+        if robotState.intakeModeLeftBumperPressed:
+            self.automaticMode = not self.automaticMode
 
         if not self.automaticMode:  # MANUAL MODE!! ITS THE ONLY MODE FOR ME
             # change these values if you need to decrea se/increase raise and lowering speed
@@ -84,26 +84,28 @@ class Intake(Subsystem):
             else:
                 self.raiseThrottle = 0  # dead
 
+        # TODO make modes 1 and 4 last longer than milliseconds
         elif self.automaticMode:  # AUTOMATIC MODE
             if self.state == IntakeState.UP:
                 self.raiseThrottle = self.raiseStayUpSetpoint
-            if robotState.intakePos:
-                self.startTime = wpilib.getTime()
-                self.state = IntakeState.GOING_DOWN
+                if robotState.intakePos:
+                    self.startTime = wpilib.getTime()
+                    self.state = IntakeState.GOING_DOWN
 
-            if self.state == IntakeState.GOING_DOWN:
-                if getTime() - self.startTime < 0.3:
+            elif self.state == IntakeState.GOING_DOWN:
+                if getTime() - self.startTime < 0.6:
                     self.raiseThrottle = self.raiseDownSetpoint
                 else:
                     self.raiseThrottle = 0
                     self.state = IntakeState.DOWN
 
-            if self.state == IntakeState.DOWN:
+            elif self.state == IntakeState.DOWN:
                 self.raiseThrottle = self.downSetpoint
                 if robotState.intakePos:
+                    self.startTime = wpilib.getTime()
                     self.state = IntakeState.GOING_UP
 
-            if self.state == IntakeState.GOING_UP:
+            elif self.state == IntakeState.GOING_UP:
                 self.raiseThrottle = self.raiseUpSetpoint
                 if not self.upLimitSwitch.get():
                     self.state = IntakeState.UP
