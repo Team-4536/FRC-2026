@@ -189,6 +189,8 @@ class SwerveDrive(Subsystem):
 
         for m in self._modules:
             m.resetAzimuthEncoder()
+        
+        robotState.gyro = self._gyro.getRotation2d()
 
         return robotState
 
@@ -198,6 +200,12 @@ class SwerveDrive(Subsystem):
             self._modules.modulePositions,
         )
         # robotState.odometry.resetRotation(self._gyro.getRotation2d())
+        # robotState.odometry.update(
+        #     self._gyro.getRotation2d(),
+        #     self._modules.modulePositions,
+        # )
+
+        robotState.gyro = self._gyro.getRotation2d()
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -223,12 +231,22 @@ class SwerveDrive(Subsystem):
             )
             robotState.autosGyroResetToggle = False
 
+        robotState.odometry.update(
+            self._gyro.getRotation2d(),
+            self._modules.modulePositions,
+        )
+
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
         robotState.robotOmegaSpeed = self.getOmegaVelocity()
         robotState.robotLinearVelocity = self.getLinearVelocity(
             robotState.odometry.getEstimatedPosition().rotation()
         )
+        self.odomX = robotState.odometry.getEstimatedPosition().X()
+        self.odomY = robotState.odometry.getEstimatedPosition().Y()
+        self.odomZ = robotState.odometry.getEstimatedPosition().rotation().degrees()
+
+        robotState.gyro = self._gyro.getRotation2d()
 
         return robotState
 
@@ -293,6 +311,10 @@ class SwerveDrive(Subsystem):
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)
         self.publishFloat("gyro_angle", self._gyro.getAngle() % 360)
+
+        self.publishFloat("Odom X", self.odomX)
+        self.publishFloat("Odom Y", self.odomY)
+        self.publishFloat("Odom Z", self.odomZ)
 
         for i, state in enumerate(self._swerveStates):
             module, name = self._modules[i], self._modules._fields[i]
