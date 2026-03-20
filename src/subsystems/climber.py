@@ -5,7 +5,7 @@ from subsystems.motor import RevMotor
 class CLimber(Subsystem):
     def __init__(self):
         super().__init__()
-        self.climberMotor: RevMotor = RevMotor(deviceID=12)
+        self.climberMotor: RevMotor = RevMotor(deviceID=15)
         self.climberLimit = self.climberMotor._ctrlr.getForwardLimitSwitch()
         self.climbEncoder = self.climberMotor.getEncoder()
         self.climbEncoder.setPosition(0)
@@ -33,9 +33,9 @@ class CLimber(Subsystem):
             if robotState.climbDown:
                 self.climberMotor.setVoltage(-3)
 
-        if self.climbEncoder.getPosition() <= 7:
-            if robotState.climbUp:
-                self.climberMotor.setVoltage(3)
+        
+        if robotState.climbUp:
+            self.climberMotor.setVoltage(3)
 
 
         return robotState
