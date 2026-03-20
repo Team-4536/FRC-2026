@@ -68,6 +68,9 @@ class RobotState(NetworkTablesMixin):
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
 
+    climbUp: bool = False
+    climbDown: bool = False
+
     def __post_init__(self) -> None:
         super().__init__(table="RobotState", inst=False)
         self.odomField: Field2d = Field2d()

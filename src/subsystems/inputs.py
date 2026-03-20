@@ -45,6 +45,9 @@ class Inputs(Subsystem):
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
+        robotState.climbUp = self._driveCtrlr.getRightBumperButton()
+        robotState.climbDown = self._driveCtrlr.getLeftBumperButton()
+
         # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
