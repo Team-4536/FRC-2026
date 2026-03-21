@@ -15,7 +15,7 @@ class Tester(Subsystem):
     _lastTesing: str = ""
 
     def __init__(self) -> None:
-        super().__init__(table="Testing", inst=False)
+        super().__init__(table="Testing")
 
         self.publishBoolean("drive_tests", self.testDrive)
         self.publishBoolean("intake_tests", self.testIntake)
@@ -23,14 +23,10 @@ class Tester(Subsystem):
         self.publishBoolean("climber_tests", self.testClimb)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-        self.testDrive = self.getBoolean("drive_tests", None, inst=False, default=False)
-        self.testIntake = self.getBoolean(
-            "intake_tests", None, inst=False, default=False
-        )
-        self.testTurret = self.getBoolean(
-            "turret_tests", None, inst=False, default=False
-        )
-        self.testClimb = self.getBoolean("climb_tests", None, inst=False, default=False)
+        self.testDrive = self.getBoolean("drive_tests", None, default=False)
+        self.testIntake = self.getBoolean("intake_tests", None, default=False)
+        self.testTurret = self.getBoolean("turret_tests", None, default=False)
+        self.testClimb = self.getBoolean("climb_tests", None, default=False)
 
         self.currentlyTesting = "Started"
 

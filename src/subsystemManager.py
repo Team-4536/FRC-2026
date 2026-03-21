@@ -23,6 +23,11 @@ from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 
+from ntcore import NetworkTableInstance
+
+table = NetworkTableInstance.getDefault().getTable("profiling")
+table.putNumber("OVERRUN!!!", 20)
+
 
 class Subsystems(NamedTuple):
     intake: Intake
@@ -36,16 +41,28 @@ class Subsystems(NamedTuple):
             s.phaseInit(state)
 
     def periodic(self, state: RobotState) -> None:
+        totalTime = 0
         for s in self:
+            startTime = matchData.timeSinceInit
             s.periodic(state)
+            time = (matchData.timeSinceInit - startTime) * 10000
+            totalTime += time
+            table.putNumber(s.__class__.__name__, time)
+        table.putNumber("total_time", totalTime)
 
     def robotPeriodic(self, state: RobotState) -> None:
         for s in self:
             s.robotPeriodic(state)
 
     def disabled(self) -> None:
+        totalTime = 0
         for s in self:
+            startTime = matchData.timeSinceInit
             s.disabled()
+            time = (matchData.timeSinceInit - startTime) * 10000
+            table.putNumber(s.__class__.__name__, time)
+            totalTime += time
+        table.putNumber("total_time", totalTime)
 
 
 @dataclass
@@ -63,7 +80,7 @@ class SubsystemManager(NetworkTablesMixin):
     DEBUGGING: bool = False
 
     def __post_init__(self) -> None:
-        super().__init__(table="SubsystemManager", inst=False)
+        super().__init__(table="SubsystemManager")
 
         drive = self.subsystems.swerveDrive
         initPos = (
@@ -106,47 +123,40 @@ class SubsystemManager(NetworkTablesMixin):
             s.phaseInit(self.robotState)
 
     def robotPeriodic(self) -> None:
-        self._publish()
         self.subsystems.robotPeriodic(self.robotState)
-        self.robotState.publish()
         self.cameras.periodic(self.robotState)
         self.llCam.periodic(self.robotState)
         self.time.periodic(self.robotState)
 
+        self._publish()
+        self.robotState.publish()
+
     def autonomousPeriodic(self) -> None:
         self.autos.periodic(self.robotState)
-        self._periodic()
+        self.subsystems.periodic(self.robotState)
 
     def teleopPeriodic(self) -> None:
         self.inputs.periodic(self.robotState)
-        self._periodic()
+        self.subsystems.periodic(self.robotState)
 
     def testPeriodic(self) -> None:
         self.tests.periodic(self.robotState)
-        self._periodic
+        self.subsystems.periodic(self.robotState)
 
     def disabled(self) -> None:
         for s in self:
             s.disabled()
 
-    def _periodic(self) -> None:
-        for s in self.subsystems:
-            s.periodic(self.robotState)
-
     # TODO: maybe move some of this back into Subsystems
     def _publish(self, force: bool = False) -> None:
         if not force:
-            nt.debugging = self.getBoolean("debugging", inst=False, default=False)
-            if not self.getBoolean("runPublish", inst=False, default=False):
+            nt.debugging = self.getBoolean("debugging", default=False)
+            if not self.getBoolean("runPublish", default=False):
                 return
         for i in self:
             if not isinstance(i, Subsystems):
                 if self.getBoolean(
-                    f"publish{i.__class__.__name__}?",
-                    None,
-                    "specific",
-                    inst=False,
-                    default=True,
+                    f"publish{i.__class__.__name__}?", None, "specific", default=True
                 ):
                     i.publish()
                 continue
@@ -156,7 +166,6 @@ class SubsystemManager(NetworkTablesMixin):
                     None,
                     "specific",
                     "subsystems",
-                    inst=False,
                     default=True,
                 ):
                     s.publish()

@@ -1,4 +1,4 @@
-from math import tau
+from math import pi, tau
 from navx import AHRS
 from phoenix6.hardware import CANcoder
 from rev import SparkBaseConfig, SparkRelativeEncoder
@@ -19,7 +19,7 @@ from wpimath.units import meters_per_second, meters
 
 
 class SwerveModule(NetworkTablesMixin):
-    WHEEL_CIRCUMFERENCE: meters = 0.1016 * tau
+    WHEEL_CIRCUMFERENCE: meters = 0.1016 * pi
     DRIVE_GEARING: float = RevMotor.DRIVE_GEARiNG
     AZIMUTH_GEARING: float = RevMotor.AZIMUTH_GEARING
 
@@ -238,13 +238,11 @@ class SwerveDrive(Subsystem):
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
+        pos = robotState.odometry.getEstimatedPosition()
+        rot = pos.rotation()
+
         robotState.robotOmegaSpeed = self.getOmegaVelocity()
-        robotState.robotLinearVelocity = self.getLinearVelocity(
-            robotState.odometry.getEstimatedPosition().rotation()
-        )
-        self.odomX = robotState.odometry.getEstimatedPosition().X()
-        self.odomY = robotState.odometry.getEstimatedPosition().Y()
-        self.odomZ = robotState.odometry.getEstimatedPosition().rotation().degrees()
+        robotState.robotLinearVelocity = self.getLinearVelocity(rot)
 
         robotState.gyro = self._gyro.getRotation2d()
 
@@ -311,10 +309,6 @@ class SwerveDrive(Subsystem):
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)
         self.publishFloat("gyro_angle", self._gyro.getAngle() % 360)
-
-        self.publishFloat("Odom X", self.odomX)
-        self.publishFloat("Odom Y", self.odomY)
-        self.publishFloat("Odom Z", self.odomZ)
 
         for i, state in enumerate(self._swerveStates):
             module, name = self._modules[i], self._modules._fields[i]

@@ -23,7 +23,7 @@ class PhysicsEngine(PhysicsEngineBase):
         )
 
     def update_sim(self, now: float, tm_diff: float) -> None:
-        fieldSpeeds = self.robot.subsystems.robotState.fieldSpeeds
+        fieldSpeeds = self.robot.subsystemManager.robotState.fieldSpeeds
         if matchData.isRed():
             fieldSpeeds = ChassisSpeeds(vx=-fieldSpeeds.vx, vy=-fieldSpeeds.vy)
         pose = self.ctrlr.get_pose()

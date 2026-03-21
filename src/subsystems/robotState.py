@@ -34,11 +34,11 @@ class RobotState(NetworkTablesMixin):
     odometry: SwerveDrive4PoseEstimator
     autosInitPose: Pose2d
 
-    robotOmegaSpeed: meters_per_second
+    turretVelocitySetpoint: Translation2d
     robotLinearVelocity: Translation2d
     gyro: Rotation2d
 
-    turretVelocitySetpoint: Translation2d
+    robotOmegaSpeed: meters_per_second = 0
     indexerEject: bool = False
     dontShoot: bool = False  # REMOVE (local var)
     impossibleDynamic: bool = False  # REMOVE (local var)
@@ -73,10 +73,11 @@ class RobotState(NetworkTablesMixin):
     climbDown: bool = False
 
     def __post_init__(self) -> None:
-        super().__init__(table="RobotState", inst=False)
+        super().__init__(table="RobotState")
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("odomField", self.odomField)
         self.turretVelocitySetpoint = Translation2d()
+        self.robotLinearVelocity = Translation2d()
 
     def publish(self) -> None:
         for field in fields(self):

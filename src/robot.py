@@ -17,7 +17,7 @@ from ntcore import NetworkTableInstance
 
 
 class Robot(TimedRobot):
-    subsystems: SubsystemManager
+    subsystemManager: SubsystemManager
 
     def robotInit(self) -> None:
         WHEEL_DISTANCE: meters = inchesToMeters(10.875)
@@ -25,7 +25,7 @@ class Robot(TimedRobot):
         self.timeStart: seconds = getTime()
         self.timeRunnig: seconds = 0
 
-        self.subsystems = SubsystemManager(
+        self.subsystemManager = SubsystemManager(
             subsystems=Subsystems(
                 intake=Intake(10, 17, 9),
                 ledSignals=LEDSignals(deviceID=0),
@@ -45,38 +45,38 @@ class Robot(TimedRobot):
         )
 
     def robotPeriodic(self) -> None:
-        self.subsystems.robotPeriodic()
+        self.subsystemManager.robotPeriodic()
         self.timeRunnig = getTime() - self.timeStart
         NetworkTableInstance.getDefault().getTable("telemetry").putNumber(
             "TIME RUNNING", self.timeRunnig
         )
 
     def autonomousInit(self) -> None:
-        self.subsystems.init()
+        self.subsystemManager.init()
 
     def autonomousPeriodic(self) -> None:
-        self.subsystems.autonomousPeriodic()
+        self.subsystemManager.autonomousPeriodic()
 
     def teleopInit(self) -> None:
-        self.subsystems.init()
+        self.subsystemManager.init()
 
     def teleopPeriodic(self) -> None:
-        self.subsystems.teleopPeriodic()
+        self.subsystemManager.teleopPeriodic()
 
     def teleopExit(self) -> None:
         self.disabledInit()
 
     def testInit(self) -> None:
-        self.subsystems.init()
+        self.subsystemManager.init()
 
     def testPeriodic(self) -> None:
-        self.subsystems.testPeriodic()
+        self.subsystemManager.testPeriodic()
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()
 
     def disabledPeriodic(self) -> None:
-        self.subsystems.disabled()
+        self.subsystemManager.disabled()
 
     def testInit(self) -> None:
         llCams()
