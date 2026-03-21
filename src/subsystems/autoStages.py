@@ -159,9 +159,10 @@ class OperateIntake(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, runTime: float = 0):
+    def __init__(self, runTime: float = 0, togglePos: bool = True):
         self.pathDone = False
         self.runTime = runTime
+        self.togglePos = togglePos
 
     def autoInit(self, robotState: RobotState) -> RobotState:
         self.startTime = getTime()
@@ -172,14 +173,10 @@ class OperateIntake(AutoStages):
         self.robotState = robotState
         self.pathTime = getTime() - self.startTime
 
-        if self.pathTime < 1.2:  # TODO: make this not work like this
-            self.robotState.intakePosYAxis = 0.85
-        else:
-            self.robotState.intakePosYAxis = 0
-            self.robotState.initialIntake = True
+        robotState.intakePos = True
 
-            if self.pathTime > self.pathTime:
-                self.robotState.initialIntake = False
+        if self.pathTime < self.pathTime:  # TODO: make this not work like this
+            self.robotState.initialIntake = True
 
         return self.robotState
 
