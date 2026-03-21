@@ -135,7 +135,9 @@ def routineChooser(
                     "L Backward",
                     isFlipped,
                 ),
+                OperateTurret(),
             ]
+            routine["unload 1"] = [OperateTurret(True, 4)]
 
         case AutoRoutines.M_BACK_N_SHOOT:
             routine["back"] = [
@@ -143,7 +145,9 @@ def routineChooser(
                     "M Backward",
                     isFlipped,
                 ),
+                OperateTurret(),
             ]
+            routine["unload 1"] = [OperateTurret(True, 4)]
 
         case AutoRoutines.R_BACK_SHOOT:
             routine["back"] = [
@@ -151,7 +155,9 @@ def routineChooser(
                     "R Backward",
                     isFlipped,
                 ),
+                OperateTurret(),
             ]
+            routine["unload 1"] = [OperateTurret(True, 4)]
 
         case AutoRoutines.L_BACK_SHOOT_N_LEAVE:
             pass
