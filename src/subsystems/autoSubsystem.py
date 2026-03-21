@@ -201,12 +201,33 @@ def routineChooser(
                 FollowTrajectory(
                     "L Trench In",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
             routine["L collect"] = [
                 FollowTrajectory(
                     "L Collect",
                     isFlipped,
+                ),
+                OperateIntake(),
+            ]
+            routine["L Trench Out"] = [
+                FollowTrajectory(
+                    "L Trench Out",
+                    isFlipped,
+                )
+            ]
+            routine["back"] = [
+                FollowTrajectory(
+                    "L Backward",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["shoot 1"] = [
+                OperateTurret(
+                    True,
+                    4,
                 )
             ]
 
