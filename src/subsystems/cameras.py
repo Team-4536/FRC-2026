@@ -206,12 +206,10 @@ class CameraManager(Subsystem):
                 )
 
         self.cycles = self.cycles + 1
-        self.publishFloat("DJO Test Cycles Since Start", self.cycles)
-
-        ## DJO: This is the *wrong* time in sim
-        self.publishFloat("DJO Test getTime()", getTime())
-        self.publishFloat("DJO Test getFPGATimestamp()", Timer.getFPGATimestamp())
-
+        self.publishFloat(
+            "DJO Test Time", getTime()
+        )  ## DJO: This is the *wrong* time in sim
+        self.publishFloat("DJO Test Time2", self.cycles)
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
