@@ -17,8 +17,9 @@ from rev import (
     SparkRelativeEncoder,
 )
 from subsystems.utils import matchData
-from wpimath.units import radians, radiansToRotations, revolutions_per_minute
+from wpimath.units import radians, radiansToRotations, revolutions_per_minute, degrees
 
+INIT_PITCH_ANGLE: degrees = 8.813
 
 class RevMotor:
     _ctrlr: SparkMax
