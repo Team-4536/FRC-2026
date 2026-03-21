@@ -15,6 +15,7 @@ from typing import NamedTuple
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from typing import NamedTuple
 from subsystems.turretSystem import Turret, Shooter
+from subsystems.climber import Climber
 from subsystems.tester import Tester
 from subsystems.utils import matchData, TimeData
 from subsystems.limelights import llCams
@@ -30,6 +31,7 @@ class Subsystems(NamedTuple):
     shooter: Shooter
     swerveDrive: SwerveDrive
     turret: Turret
+    climb: Climber
 
     def phaseInit(self, state: RobotState) -> None:
         for s in self:

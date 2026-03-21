@@ -171,6 +171,30 @@ class RevMotor:
         .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
     )
 
+    CLIMBER_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(30, 30)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(LimitSwitchConfig()
+            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+            .forwardLimitSwitchEnabled(
+                False
+            ) 
+            .reverseLimitSwitchEnabled(True)
+            # .forwardLimitSwitchPosition(16.66)
+            .reverseLimitSwitchPosition(0)
+            .reverseLimitSwitchTriggerBehavior(
+                LimitSwitchConfig.Behavior.kStopMovingMotor
+            )
+            # .forwardLimitSwitchTriggerBehavior(
+            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+            # )
+            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed))
+
+    )
+
     AZIMUTH_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(40)
