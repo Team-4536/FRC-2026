@@ -160,30 +160,75 @@ def routineChooser(
             routine["unload 1"] = [OperateTurret(True, 4)]
 
         case AutoRoutines.L_BACK_SHOOT_N_LEAVE:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "L Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.M_BACK_SHOOT_N_LEAVE:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "M Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.R_BACK_SHOOT_N_LEAVE:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "R Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.L_COLLECT_N_SHOOT_X1:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "L Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.R_COLLECT_N_SHOOT_X1:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "R Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.L_COLLECT_N_SHOOT_X2:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "L Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.R_COLLECT_N_SHOOT_X2:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "R Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.L_COLLECT_N_SHOOT_X3:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "L Backward",
+                    isFlipped,
+                ),
+            ]
 
         case AutoRoutines.R_COLLECT_N_SHOOT_X3:
-            pass
+            routine["back"] = [
+                FollowTrajectory(
+                    "R Backward",
+                    isFlipped,
+                ),
+            ]
 
     return routine
