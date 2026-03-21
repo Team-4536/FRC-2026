@@ -66,6 +66,7 @@ class photonCameraClass(NetworkTablesMixin):
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
 
+
             if (
                 self.ambiguity < 0.15
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
@@ -87,7 +88,7 @@ class photonCameraClass(NetworkTablesMixin):
                     self.camEstPose2d = wpimath.geometry.Pose2d(
                         self.camEstTrans, self.camEstRot
                     )
-
+                    self.timeStamp = self.camEstPose.timestampSeconds
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
@@ -189,6 +190,7 @@ class CameraManager(Subsystem):
             robotState.odometry.resetPose(newPose2d)
         else:
             if self.photonCameraLeft.trustworthy:
+
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraLeft.camEstPose2d,
                     self.photonCameraLeft.timeStamp,
@@ -213,12 +215,16 @@ class CameraManager(Subsystem):
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
+        # robotState.odometry.resetPose(
+        #     Pose2d(
+        #         meters(robotState.odometry.getEstimatedPosition().X()),
+        #         meters(robotState.odometry.getEstimatedPosition().Y()),
+        #         robotState.gyro,
+        #     )
+        # )
+
         robotState.odometry.resetPose(
-            Pose2d(
-                meters(robotState.odometry.getEstimatedPosition().X()),
-                meters(robotState.odometry.getEstimatedPosition().Y()),
-                robotState.gyro,
-            )
+                robotState.odometry.getEstimatedPosition()
         )
 
         # resetPosition(

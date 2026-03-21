@@ -231,10 +231,10 @@ class SwerveDrive(Subsystem):
             )
             robotState.autosGyroResetToggle = False
 
-        robotState.odometry.update(
-            self._gyro.getRotation2d(),
-            self._modules.modulePositions,
-        )
+        # robotState.odometry.update(
+        #     self._gyro.getRotation2d(),
+        #     self._modules.modulePositions,
+        # )
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
