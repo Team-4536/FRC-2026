@@ -193,7 +193,7 @@ def routineChooser(
                 ),
                 OperateTurret(),
             ]
-            routine["shoot 1"] = [
+            routine["shoot 0"] = [
                 OperateTurret(
                     True,
                     4,
@@ -209,8 +209,17 @@ def routineChooser(
                 FollowTrajectory(
                     "L Collect",
                     isFlipped,
-                )
+                ),
+                OperateIntake(),
             ]
+            routine["L Trench Out"] = [
+                FollowTrajectory(
+                    "L Trench Out",
+                    isFlipped,
+                ),
+                OperateTurret(),
+            ]
+            routine["Shoot 1"] = [OperateTurret(True, 15)]
 
         case AutoRoutines.R_COLLECT_N_SHOOT_X1:
             routine["back"] = [
