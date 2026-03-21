@@ -223,9 +223,9 @@ class CameraManager(Subsystem):
         #     )
         # )
 
-        robotState.odometry.resetPose(
-                robotState.odometry.getEstimatedPosition()
-        )
+        # robotState.odometry.resetPose(
+        #         robotState.odometry.getEstimatedPosition()
+        # )
 
         # resetPosition(
         #         self._gyro.getRotation2d(),
