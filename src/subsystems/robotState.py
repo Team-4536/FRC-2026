@@ -4,7 +4,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import inchesToMeters, meters_per_second, meters, radians
 
@@ -30,17 +30,18 @@ class RobotState(NetworkTablesMixin):
     intakeEject: bool
     intakePos: bool
     resetGyro: bool
+    limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
     autosInitPose: Pose2d
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
+    gyro: Rotation2d
 
     turretVelocitySetpoint: Translation2d
     indexerEject: bool = False
     dontShoot: bool = False  # REMOVE (local var)
     impossibleDynamic: bool = False  # REMOVE (local var)
-    forceDynamicTurret: bool = False  # REMOVE (local var)
     fullyReved: bool = False
     revSpeed: float = 0
     kickShooter: int = 0
@@ -53,10 +54,12 @@ class RobotState(NetworkTablesMixin):
     turretManualSetpoint: float = 0
     turretSwitchTarget: bool = False
     turretSwitchEnabled: bool = False
+    assistedTurret: bool = False  # set to a button evetually
 
     initialIntake: bool = False
     intakeIndexer: bool = False
     intakeMode: bool = False
+    intakeModeLeftBumperPressed: bool = False
 
     turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL
@@ -65,6 +68,9 @@ class RobotState(NetworkTablesMixin):
 
     autosGyroResetToggle: bool = False
     autosGyroReset: float = 0.0
+
+    climbUp: bool = False
+    climbDown: bool = False
 
     def __post_init__(self) -> None:
         super().__init__(table="RobotState", inst=False)
@@ -79,7 +85,9 @@ class RobotState(NetworkTablesMixin):
             self.publishGeneric(name, value)
 
         self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
-
+        if self.limelightPose != None:
+            self.odomField.setRobotPose(self.limelightPose)
+            print("Done")
         self.publishFloat(
             "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
         )

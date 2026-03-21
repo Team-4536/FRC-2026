@@ -127,6 +127,8 @@ def routineChooser(
                     "Forward",
                     isFlipped,
                 ),
+                OperateTurret(True),
+                OperateIntake(),
             ]
 
         case AutoRoutines.L_BACK_N_SHOOT:

@@ -12,6 +12,7 @@ from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
 from wpilib import TimedRobot, getTime
 from wpimath.units import inchesToMeters, meters, seconds
+from subsystems.limelights import llCams
 from ntcore import NetworkTableInstance
 
 
@@ -39,6 +40,7 @@ class Robot(TimedRobot):
             cameras=CameraManager(),
             time=timeData,
             tests=Tester(),
+            llCam=llCams(),
             robotState=RobotState.empty(),
         )
 
@@ -75,3 +77,6 @@ class Robot(TimedRobot):
 
     def disabledPeriodic(self) -> None:
         self.subsystems.disabled()
+
+    def testInit(self) -> None:
+        llCams()
