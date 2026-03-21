@@ -15,6 +15,7 @@ from rev import (
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
+    FeedForwardConfig,
 )
 from subsystems.utils import matchData
 from wpimath.units import radians, radiansToRotations, revolutions_per_minute, degrees
@@ -249,6 +250,7 @@ class RevMotor:
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(0.2)
             )
+            .apply(FeedForwardConfig().kS(0.25, ClosedLoopSlot.kSlot0))
         )
         .apply(
             LimitSwitchConfig()
@@ -305,7 +307,7 @@ class RevMotor:
 
     FLYWHEEL_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
         .inverted(True)
@@ -325,7 +327,7 @@ class RevMotor:
 
     KICK_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .inverted(False)

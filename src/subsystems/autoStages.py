@@ -13,6 +13,7 @@ from wpimath.units import (
     lbsToKilograms,  # pyright: ignore
     meters_per_second,
     radians_per_second,
+    inchesToMeters,
 )
 
 
@@ -30,10 +31,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
 
-    topLeftWheelCords = Translation2d(-0.276225, 0.276225)
-    topRightWheelCords = Translation2d(0.276225, 0.276225)
-    bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
-    bottomRightWheelCords = Translation2d(0.276225, -0.276225)
+    topLeftWheelCords = Translation2d(-inchesToMeters(11), inchesToMeters(11))
+    topRightWheelCords = Translation2d(inchesToMeters(11), inchesToMeters(11))
+    bottomLeftWheelCords = Translation2d(-inchesToMeters(11), -inchesToMeters(11))
+    bottomRightWheelCords = Translation2d(inchesToMeters(11), -inchesToMeters(11))
 
     robotMassKG = lbsToKilograms(100)  # TODO: change later
     robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # TODO: change later
@@ -101,6 +102,7 @@ class FollowTrajectory(AutoStages):
             self.trajectory.getInitialPose().rotation().degrees()
         )
         robotState.autosInitPose = self.trajectory.getInitialPose()
+
         return robotState
 
     def run(self, robotState: RobotState):
@@ -116,7 +118,10 @@ class FollowTrajectory(AutoStages):
         return self.robotState
 
     def end(self, robotState: RobotState) -> RobotState:
-        return robotState
+        self.robotState = robotState
+        self.robotState.fieldSpeeds = self.trajectory.getEndState().fieldSpeeds
+
+        return self.robotState
 
     def isDone(self) -> bool:
         currXPos = self.robotState.odometry.getEstimatedPosition().x
