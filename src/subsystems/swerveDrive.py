@@ -155,7 +155,7 @@ class SwerveModules(NamedTuple):
 
 
 class SwerveDrive(Subsystem):
-    MAX_MODULE_SPEED: meters_per_second = 10.5
+    MAX_MODULE_SPEED: meters_per_second = 6
 
     _modules: SwerveModules
     _gyro: AHRS
@@ -190,6 +190,8 @@ class SwerveDrive(Subsystem):
         for m in self._modules:
             m.resetAzimuthEncoder()
 
+        robotState.gyro = self._gyro.getRotation2d()
+
         return robotState
 
     def robotPeriodic(self, robotState: RobotState) -> RobotState:
@@ -197,6 +199,13 @@ class SwerveDrive(Subsystem):
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
         )
+        # robotState.odometry.resetRotation(self._gyro.getRotation2d())
+        # robotState.odometry.update(
+        #     self._gyro.getRotation2d(),
+        #     self._modules.modulePositions,
+        # )
+
+        robotState.gyro = self._gyro.getRotation2d()
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -222,12 +231,22 @@ class SwerveDrive(Subsystem):
             )
             robotState.autosGyroResetToggle = False
 
+        # robotState.odometry.update(
+        #     self._gyro.getRotation2d(),
+        #     self._modules.modulePositions,
+        # )
+
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
         robotState.robotOmegaSpeed = self.getOmegaVelocity()
         robotState.robotLinearVelocity = self.getLinearVelocity(
             robotState.odometry.getEstimatedPosition().rotation()
         )
+        self.odomX = robotState.odometry.getEstimatedPosition().X()
+        self.odomY = robotState.odometry.getEstimatedPosition().Y()
+        self.odomZ = robotState.odometry.getEstimatedPosition().rotation().degrees()
+
+        robotState.gyro = self._gyro.getRotation2d()
 
         return robotState
 
@@ -243,9 +262,12 @@ class SwerveDrive(Subsystem):
         for module in self._modules:
             vector += self.getDriveVelocity(module)
 
+        if vector.norm() == 0:
+            return Translation2d()
+
         vector = Translation2d(
-            distance=vector.distance(Translation2d()) / 4,
-            angle=Rotation2d() if vector.norm() == 0 else vector.angle(),
+            distance=vector.norm() / 4,
+            angle=vector.angle(),
         )
 
         return vector.rotateBy(roboRotation)
@@ -256,8 +278,7 @@ class SwerveDrive(Subsystem):
             tanVel = getTangentAngle(module.position)
             sum += getContributedRotation(
                 tanVel,
-                module.azimuthRotation.radians(),
-                self.getDriveVelocity(module).distance(Translation2d()),
+                self.getDriveVelocity(module),
             )
 
         return sum / 4
@@ -290,6 +311,10 @@ class SwerveDrive(Subsystem):
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)
         self.publishFloat("gyro_angle", self._gyro.getAngle() % 360)
+
+        self.publishFloat("Odom X", self.odomX)
+        self.publishFloat("Odom Y", self.odomY)
+        self.publishFloat("Odom Z", self.odomZ)
 
         for i, state in enumerate(self._swerveStates):
             module, name = self._modules[i], self._modules._fields[i]

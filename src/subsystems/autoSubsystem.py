@@ -61,7 +61,7 @@ class AutoSubsystem(Subsystem):
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.routine: dict[str, List[AutoStages]] = routineChooser(
-            self.autoRoutineChooser.getSelected(), matchData.isBlue()
+            self.autoRoutineChooser.getSelected(), matchData.isRed()
         )
 
         self.currentPath = 0
@@ -132,17 +132,18 @@ def routineChooser(
                 ),
                 OperateTurret(),
             ]
-            routine["shoot"] = [
+            routine["shoot"] = [  # kai this routine chunk is messing it up idk why
                 OperateTurret(
                     True,
-                    5,
+                    4,
                 )
             ]
             routine["under right trench from start middle"] = [
                 FollowTrajectory(
                     "under right trench from start middle",
                     isFlipped,
-                )
+                ),
+                OperateTurret(True),
             ]
             routine["right to balls"] = [
                 FollowTrajectory(
@@ -155,12 +156,13 @@ def routineChooser(
                 FollowTrajectory(
                     "under left trench to hub",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    8,
+                    15,
                 )
             ]
 
@@ -188,7 +190,8 @@ def routineChooser(
                 FollowTrajectory(
                     "under left trench to hub",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
@@ -221,12 +224,13 @@ def routineChooser(
                 FollowTrajectory(
                     "under right trench to hub",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    8,
+                    15,
                 )
             ]
 
@@ -241,7 +245,7 @@ def routineChooser(
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    19,
+                    15,
                 )
             ]
 
@@ -444,14 +448,15 @@ def routineChooser(
         case AutoRoutines.FORWARD_AND_SHOOT:
             routine["Forward"] = [
                 FollowTrajectory(
-                    "Drive Forward Test",
+                    "Forward",
                     isFlipped,
-                )
+                ),
+                OperateTurret(),
             ]
             routine["shoot"] = [
                 OperateTurret(
                     True,
-                    0.5,
+                    15,
                 )
             ]
 

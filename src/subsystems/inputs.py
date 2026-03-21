@@ -8,8 +8,8 @@ from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
-    LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 4
-    MAX_ABTAINABLE_SPEED: meters_per_second = 10
+    LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 2
+    MAX_ABTAINABLE_SPEED: meters_per_second = 8
 
     _driveCtrlr: XboxController
     _mechCtrlr: XboxController
@@ -24,7 +24,7 @@ class Inputs(Subsystem):
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
-        self._linearDriveScalar = Scalar(magnitude=tau)
+        self._linearDriveScalar = Scalar(magnitude=tau * 1.5)
         self._circularDriveScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
@@ -32,11 +32,17 @@ class Inputs(Subsystem):
 
         self._isTestMode: bool = False
 
+        self.proxyControlMode: bool = False
+
+        self.publishFloat("proxy drive x", 0)
+        self.publishFloat("proxy drive y", 0)
+
     def phaseInit(self, robotState: RobotState) -> RobotState:
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # Drive Controls
+        self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
@@ -45,10 +51,13 @@ class Inputs(Subsystem):
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
 
+        robotState.climbUp = self._driveCtrlr.getRightBumperButton()
+        robotState.climbDown = self._driveCtrlr.getLeftBumperButton()
+
         # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
-        robotState.turretSwitchEnabled = self._mechCtrlr.getXButtonPressed()
+        robotState.turretSwitchTarget = self._mechCtrlr.getXButtonPressed()
         robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
 
@@ -69,13 +78,21 @@ class Inputs(Subsystem):
         pass
 
     def publish(self) -> None:
+        self.publishBoolean("proxy control mode", self.proxyControlMode)
         pass
 
     def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
         self._circularDriveScalar.setMagnitude(maxSpeed)
-        vx, vy = self._circularDriveScalar(
-            x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
-        )
+
+        if not self.proxyControlMode:
+            vx, vy = self._circularDriveScalar(
+                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
+            )
+        else:
+            vx, vy = self._circularDriveScalar(
+                x=self.getFloat("proxy drive x", default=0),
+                y=self.getFloat("proxy drive y", default=0),
+            )
 
         omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 

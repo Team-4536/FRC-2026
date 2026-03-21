@@ -5,7 +5,6 @@ from pathplannerlib.path import (  # pyright: ignore
     PathPlannerTrajectory,
 )
 from subsystems.robotState import RobotState
-from subsystems.utils import matchData
 from wpilib import getTime
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
@@ -215,10 +214,10 @@ class OperateTurret(AutoStages):
         self.robotState = robotState
         self.pathTime = getTime() - self.startTime
 
-        self.robotState.kickShooter = self.unload
         self.robotState.revSpeed = 1
-        if self.robotState.fullyReved:
-            self.robotState.intakeIndexer = True
+        if not robotState.dontShoot:
+            self.robotState.kickShooter = self.unload
+            self.robotState.intakeIndexer = self.unload
 
         return self.robotState
 
