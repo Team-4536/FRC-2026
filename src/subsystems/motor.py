@@ -167,8 +167,8 @@ class RevMotor:
         # .forwardLimitSwitchTriggerBehavior(
         #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
         # )
-        .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
-        .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
+        .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+        .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
     )
 
     AZIMUTH_CONFIG: SparkBaseConfig = (
