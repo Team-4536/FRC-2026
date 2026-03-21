@@ -4,7 +4,7 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
 from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import inchesToMeters, meters_per_second, meters, radians
 
@@ -36,6 +36,7 @@ class RobotState(NetworkTablesMixin):
 
     robotOmegaSpeed: meters_per_second
     robotLinearVelocity: Translation2d
+    gyro: Rotation2d
 
     turretVelocitySetpoint: Translation2d
     indexerEject: bool = False

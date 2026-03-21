@@ -3,13 +3,14 @@ from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from robotpy_apriltag import AprilTagField, AprilTagFieldLayout
 
 import wpimath.geometry
+from wpimath.geometry import Pose2d, Translation2d
 
 from ntcore import NetworkTableInstance
 from photonlibpy import EstimatedRobotPose
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpimath.units import inchesToMeters, radiansToDegrees
+from wpimath.units import inchesToMeters, radiansToDegrees, meters
 from wpilib import getTime
 
 
@@ -49,6 +50,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.camEstPose: EstimatedRobotPose | None = None
         self.hasTargetsRan = False
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
+        self.timeStamp = -1
 
     def update(self):
         self.hasTargetsRan = False
@@ -112,7 +114,7 @@ class photonCameraClass(NetworkTablesMixin):
                     self.camEstPose2d = wpimath.geometry.Pose2d(
                         self.camEstTrans, self.camEstRot
                     )
-
+                    self.timeStamp = self.camEstPose.timestampSeconds
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
@@ -189,7 +191,7 @@ class CameraManager(Subsystem):
             if self.photonCameraLeft.trustworthy:
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraLeft.camEstPose2d,
-                    getTime(),  ## DJO: I believe this is the wrong time.
+                    self.photonCameraLeft.timeStamp,
                 )
             # if self.photonCameraMiddle.trustworthy:
 
@@ -200,7 +202,7 @@ class CameraManager(Subsystem):
             if self.photonCameraRight.trustworthy:
                 robotState.odometry.addVisionMeasurement(
                     self.photonCameraRight.camEstPose2d,
-                    getTime(),  ## DJO: I believe this is the wrong time.
+                    self.photonCameraRight.timeStamp,
                 )
 
         self.test = self.test + 1
@@ -211,7 +213,13 @@ class CameraManager(Subsystem):
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
-        robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
+        robotState.odometry.resetPose(
+            Pose2d(
+                meters(robotState.odometry.getEstimatedPosition().X()),
+                meters(robotState.odometry.getEstimatedPosition().Y()),
+                robotState.gyro,
+            )
+        )
 
         # resetPosition(
         #         self._gyro.getRotation2d(),
