@@ -3,14 +3,13 @@ from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from robotpy_apriltag import AprilTagField, AprilTagFieldLayout
 
 import wpimath.geometry
-from wpimath.geometry import Pose2d, Translation2d
 
 from ntcore import NetworkTableInstance
 from photonlibpy import EstimatedRobotPose
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpimath.units import inchesToMeters, radiansToDegrees, meters
+from wpimath.units import inchesToMeters, radiansToDegrees
 from wpilib import getTime
 
 
@@ -65,7 +64,6 @@ class photonCameraClass(NetworkTablesMixin):
             self.target = self.result.getTargets()
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
-
 
             if (
                 self.ambiguity < 0.15
@@ -223,9 +221,9 @@ class CameraManager(Subsystem):
         #     )
         # )
 
-        robotState.odometry.resetPose(
-                robotState.odometry.getEstimatedPosition()
-        )
+        # robotState.odometry.resetPose(
+        #         robotState.odometry.getEstimatedPosition()
+        # )
 
         # resetPosition(
         #         self._gyro.getRotation2d(),

@@ -4,6 +4,7 @@ from subsystemManager import SubsystemManager, Subsystems
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
+from subsystems.climber import Climber
 
 from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
@@ -34,6 +35,7 @@ class Robot(TimedRobot):
                     xPos=WHEEL_DISTANCE, yPos=WHEEL_DISTANCE
                 ),
                 turret=Turret(yawMotorID=14, pitchMotorID=13),
+                climb=Climber(motorID=15),
             ),
             inputs=Inputs(),
             autos=AutoSubsystem(),

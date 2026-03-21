@@ -206,6 +206,13 @@ class SwerveDrive(Subsystem):
         # )
 
         robotState.gyro = self._gyro.getRotation2d()
+        self.odomX = robotState.odometry.getEstimatedPosition().X()
+        self.odomY = robotState.odometry.getEstimatedPosition().Y()
+        self.odomZ = robotState.odometry.getEstimatedPosition().rotation().degrees()
+        self.publishFloat("BAM: Gyro", self._gyro.getRotation2d().degrees())
+        self.publishFloat("BAM: Odom x", self.odomX)
+        self.publishFloat("BAM: Odom y", self.odomY)
+        self.publishFloat("BAM: Odom r", self.odomZ)
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
@@ -238,8 +245,7 @@ class SwerveDrive(Subsystem):
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
-        pos = robotState.odometry.getEstimatedPosition()
-        rot = pos.rotation()
+        rot = robotState.odometry.getEstimatedPosition().rotation()
 
         robotState.robotOmegaSpeed = self.getOmegaVelocity()
         robotState.robotLinearVelocity = self.getLinearVelocity(rot)

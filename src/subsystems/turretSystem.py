@@ -96,7 +96,7 @@ BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 )
 BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_X,
-    HUB_DIST_Y,
+    HUB_DIST_Y,  # + 0.254, #fudge factor move target to left by 10 inches
     HUB_HEIGHT_Z,
 )
 
@@ -116,7 +116,9 @@ YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
 
-TURRET_DIST_FROM_CENTER: meters = inchesToMeters(27 - (6 + 1 / 2))  # TODO make correct
+TURRET_DIST_FROM_CENTER: meters = inchesToMeters(
+    7.5
+)  # TODO make correct # 27 - (6 + 1 / 2)
 TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
 
 
@@ -188,8 +190,9 @@ class Turret(Subsystem):
         self.pitchVar = 0.0
 
         self.publishFloat("YawTargetOffset", 0)
-        self.publishFloat("add", -4.04025)
-        self.publishFloat("scale", 2.370728)
+        self.publishFloat("add", -3.040249824)
+        self.publishFloat("scale", 1.9)
+        self.publishFloat("AM: Y Pass", 25)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
@@ -582,7 +585,12 @@ class Turret(Subsystem):
         return xPass
 
     def getYPass(self) -> meters:
-        yPass = Y_PASS_HUB
+        # yPass = Y_PASS_HUB
+        yPass = (
+            inchesToMeters(73 - 15)
+            - inchesToMeters(13.841)
+            + inchesToMeters(self.getFloat("BAM: Y Pass", default=25) + (5.91 / 2))
+        )
 
         return yPass
 
@@ -648,6 +656,7 @@ class Turret(Subsystem):
         )
         self.publishFloat("velocity variable", self.velocityVar)
         self.publishFloat("pitch variable", self.pitchVar)
+        self.getFloat("BAM: Y Pass", default=25)
 
 
 class TurretOdometry:

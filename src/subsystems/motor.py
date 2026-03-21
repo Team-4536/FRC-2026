@@ -4,6 +4,7 @@ from rev import (
     ClosedLoopConfig,
     ClosedLoopSlot,
     FeedbackSensor,
+    FeedForwardConfig,
     LimitSwitchConfig,
     MAXMotionConfig,
     PersistMode,
@@ -16,15 +17,8 @@ from rev import (
     SparkRelativeEncoder,
 )
 from subsystems.utils import matchData
-from wpimath.units import (
-    radians,
-    radiansToRotations,
-    revolutions_per_minute,
-    degreesToRotations,
-    degrees,
-)
+from wpimath.units import radians, radiansToRotations, revolutions_per_minute, degrees
 
-# could lowkey be 10 degrees idk
 INIT_PITCH_ANGLE: degrees = 8.813
 
 
@@ -117,7 +111,7 @@ class RevMotor:
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(2000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(15000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(25000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
         )
@@ -125,7 +119,7 @@ class RevMotor:
 
     INDEXER_MOTOR_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40, 40)
+        .smartCurrentLimit(15, 15)
         .disableFollowerMode()
         .inverted(False)
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
@@ -159,7 +153,8 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
-        ).apply(
+        )
+    ).apply(
         LimitSwitchConfig()
         .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
         .forwardLimitSwitchEnabled(
@@ -177,6 +172,28 @@ class RevMotor:
         .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
         .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
     )
+
+    CLIMBER_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(30, 30)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            LimitSwitchConfig()
+            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+            .forwardLimitSwitchEnabled(False)
+            .reverseLimitSwitchEnabled(True)
+            # .forwardLimitSwitchPosition(16.66)
+            .reverseLimitSwitchPosition(0)
+            .reverseLimitSwitchTriggerBehavior(
+                LimitSwitchConfig.Behavior.kStopMovingMotor
+            )
+            # .forwardLimitSwitchTriggerBehavior(
+            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+            # )
+            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+        )
     )
 
     AZIMUTH_CONFIG: SparkBaseConfig = (
@@ -222,7 +239,7 @@ class RevMotor:
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.07, 0, 0, 0.00)
+            .pidf(0.08, 0, 0, 0.02)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(False)
@@ -230,8 +247,9 @@ class RevMotor:
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.01)
+                .allowedClosedLoopError(0.2)
             )
+            .apply(FeedForwardConfig().kS(0.25, ClosedLoopSlot.kSlot0))
         )
         .apply(
             LimitSwitchConfig()
@@ -280,7 +298,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(degreesToRotations(INIT_PITCH_ANGLE) * (16 * 8 / (3 / 4)))
+            .reverseSoftLimit(0)
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
@@ -288,7 +306,7 @@ class RevMotor:
 
     FLYWHEEL_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
         .inverted(True)
@@ -308,7 +326,7 @@ class RevMotor:
 
     KICK_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .inverted(False)

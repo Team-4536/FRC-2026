@@ -2,41 +2,36 @@ from subsystems.subsystem import Subsystem
 from subsystems.robotState import RobotState
 from subsystems.motor import RevMotor
 
-class CLimber(Subsystem):
-    def __init__(self):
+
+class Climber(Subsystem):
+    def __init__(self, motorID: int):
         super().__init__()
-        self.climberMotor: RevMotor = RevMotor(deviceID=15)
-        self.climberLimit = self.climberMotor._ctrlr.getForwardLimitSwitch()
-        self.climbEncoder = self.climberMotor.getEncoder()
-        self.climbEncoder.setPosition(0)
+        self.climberMotor: RevMotor = RevMotor(deviceID=motorID)
+        self.climberMotor.configure(config=RevMotor.CLIMBER_CONFIG)
+        # self.climberLimit = self.climberMotor._ctrlr.getForwardLimitSwitch()
+        # self.climbEncoder = self.climberMotor.getEncoder()
+        # self.climbEncoder.setPosition(0)
         pass
 
-    def phaseInit(
-        self, robotState: RobotState
-    ) -> RobotState:
-        
+    def phaseInit(self, robotState: RobotState) -> RobotState:
+
         self.climberMotor.setVoltage(0)
 
-        if self.climberLimit:
-            self.climbEncoder.setPosition(0)
-        
+        # if self.climberLimit:
+        #     self.climbEncoder.setPosition(0)
+
         return robotState
 
-    def periodic(
-        self, robotState: RobotState
-    ) -> RobotState:
+    def periodic(self, robotState: RobotState) -> RobotState:
 
-        if self.climberLimit:
-            self.climbEncoder.setPosition(0)
-        
-        if self.climbEncoder.getPosition() >= 0:
-            if robotState.climbDown:
-                self.climberMotor.setVoltage(-3)
+        if robotState.climbDown:
+            self.climberMotor.setThrottle(-0.4)
 
-        
-        if robotState.climbUp:
-            self.climberMotor.setVoltage(3)
+        elif robotState.climbUp:
+            self.climberMotor.setThrottle(0.2)
 
+        else:
+            self.climberMotor.setThrottle(0)
 
         return robotState
 
@@ -48,5 +43,3 @@ class CLimber(Subsystem):
 
     def publish(self) -> None:
         pass
-
-
