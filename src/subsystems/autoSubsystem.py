@@ -183,6 +183,13 @@ def routineChooser(
                     "L Backward",
                     isFlipped,
                 ),
+                OperateTurret(),
+            ]
+            routine["shoot 1"] = [
+                OperateTurret(
+                    True,
+                    4,
+                )
             ]
 
         case AutoRoutines.R_COLLECT_N_SHOOT_X1:
@@ -191,6 +198,13 @@ def routineChooser(
                     "R Backward",
                     isFlipped,
                 ),
+                OperateTurret(),
+            ]
+            routine["shoot 1"] = [
+                OperateTurret(
+                    True,
+                    4,
+                )
             ]
 
         case AutoRoutines.L_COLLECT_N_SHOOT_X2:
