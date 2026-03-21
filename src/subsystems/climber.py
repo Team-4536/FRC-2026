@@ -30,14 +30,14 @@ class Climber(Subsystem):
     
    
         if robotState.climbDown:
-                self.climberMotor.setVoltage(-3)
+                self.climberMotor.setThrottle(-0.4)
 
         
         elif robotState.climbUp:
-            self.climberMotor.setVoltage(3)
+            self.climberMotor.setThrottle(0.2)
 
         else:
-            self.climberMotor.setVoltage(0)
+            self.climberMotor.setThrottle(0)
 
 
         return robotState
