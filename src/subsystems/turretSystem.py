@@ -67,7 +67,7 @@ HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15) - TURRET_HEIGHT
 # TODO TODO TODO continue code review here
-Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
+Y_PASS_DIFF_HUB: meters = inchesToMeters(25 + BALL_RADIUS)
 Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
