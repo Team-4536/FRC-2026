@@ -679,7 +679,9 @@ class TurretOdometry:
 
         feildPos: Translation2d = roboPose.translation() + self.posFromRobot
 
-        self.pose = Pose2d(feildPos, Rotation2d(wrappedRoboYaw + wrappedYaw))
+        self.pose = Pose2d(
+            feildPos, Rotation2d(wrappedRoboYaw + wrappedYaw - ZERO_OFFSET)
+        )
         self.pitch = pitchAngle
 
 
