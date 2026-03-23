@@ -22,6 +22,7 @@ from wpimath.units import radians, radiansToRotations, revolutions_per_minute, d
 
 INIT_PITCH_ANGLE: degrees = 8.813
 
+
 class RevMotor:
     _ctrlr: SparkMax
     _encoder: SparkRelativeEncoder
@@ -178,11 +179,10 @@ class RevMotor:
         .smartCurrentLimit(30, 30)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-        .apply(LimitSwitchConfig()
+        .apply(
+            LimitSwitchConfig()
             .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
-            .forwardLimitSwitchEnabled(
-                False
-            ) 
+            .forwardLimitSwitchEnabled(False)
             .reverseLimitSwitchEnabled(True)
             # .forwardLimitSwitchPosition(16.66)
             .reverseLimitSwitchPosition(0)
@@ -193,8 +193,8 @@ class RevMotor:
             #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
             # )
             # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed))
-
+            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+        )
     )
 
     AZIMUTH_CONFIG: SparkBaseConfig = (

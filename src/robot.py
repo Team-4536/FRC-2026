@@ -35,7 +35,7 @@ class Robot(TimedRobot):
                     xPos=WHEEL_DISTANCE, yPos=WHEEL_DISTANCE
                 ),
                 turret=Turret(yawMotorID=14, pitchMotorID=13),
-                climb=Climber(motorID=15)
+                climb=Climber(motorID=15),
             ),
             inputs=Inputs(),
             autos=AutoSubsystem(),

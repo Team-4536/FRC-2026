@@ -9,7 +9,7 @@ from wpimath.units import meters_per_second
 
 class Inputs(Subsystem):
     LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 2
-    MAX_ABTAINABLE_SPEED: meters_per_second = 8
+    MAX_ABTAINABLE_SPEED: meters_per_second = 5
 
     _driveCtrlr: XboxController
     _mechCtrlr: XboxController

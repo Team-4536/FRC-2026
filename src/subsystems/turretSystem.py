@@ -43,7 +43,9 @@ MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # if the robot is facing 0 and we want to go to 0, go to the zero offset in robot relative space
-ZERO_OFFSET: radians = MAX_ROTATION / 2
+ZERO_OFFSET: radians = (
+    MAX_ROTATION / 2 + 0.139626
+)  # offset to comp for shooting too far right
 # small gear rotations to big gear rotations
 YAW_GEARING: float = 100 / 3
 PITCH_RADIUS: inches = 9.342
@@ -96,7 +98,7 @@ BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 )
 BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_X,
-    HUB_DIST_Y, #+ 0.254, #fudge factor move target to left by 10 inches
+    HUB_DIST_Y,  # + 0.254, #fudge factor move target to left by 10 inches
     HUB_HEIGHT_Z,
 )
 
@@ -116,7 +118,9 @@ YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
 
-TURRET_DIST_FROM_CENTER: meters = inchesToMeters(7.5)  # TODO make correct # 27 - (6 + 1 / 2)
+TURRET_DIST_FROM_CENTER: meters = inchesToMeters(
+    7.5
+)  # TODO make correct # 27 - (6 + 1 / 2)
 TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
 
 
@@ -584,7 +588,11 @@ class Turret(Subsystem):
 
     def getYPass(self) -> meters:
         # yPass = Y_PASS_HUB
-        yPass = inchesToMeters(73 - 15) - inchesToMeters(13.841) + inchesToMeters(self.getFloat("BAM: Y Pass", default=25)+(5.91/2))
+        yPass = (
+            inchesToMeters(73 - 15)
+            - inchesToMeters(13.841)
+            + inchesToMeters(self.getFloat("BAM: Y Pass", default=25) + (5.91 / 2))
+        )
 
         return yPass
 

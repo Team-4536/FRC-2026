@@ -65,7 +65,6 @@ class photonCameraClass(NetworkTablesMixin):
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
 
-
             if (
                 self.ambiguity < 0.15
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
