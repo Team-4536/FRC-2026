@@ -1,6 +1,6 @@
 from math import sqrt, cos, tan, atan, pi as PI, tau as TAU
 from rev import SparkRelativeEncoder
-from subsystems.motor import RevMotor, INIT_PITCH_ANGLE
+from subsystems.motor import RevMotor, INIT_PITCH_ANGLE, PITCH_GEARING
 import numpy as np
 from subsystems.robotState import (
     RobotState,
@@ -34,6 +34,7 @@ from wpimath.units import (
     revolutions_per_minute as RPM,
     rotationsToRadians,
     seconds,
+    percent,
 )
 
 ROBOT_RADIUS = inchesToMeters(Translation2d(11, 11).norm())
@@ -46,12 +47,7 @@ TURRET_GAP: radians = TAU - MAX_ROTATION
 ZERO_OFFSET: radians = MAX_ROTATION / 2
 # small gear rotations to big gear rotations
 YAW_GEARING: float = 100 / 3
-PITCH_RADIUS: inches = 9.342
-LIL_PITCH_GEAR_RADIUS: inches = 0.552
-ARC_RATIO = (
-    PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
-)  # how many rotations of the smol ladder gear is 1 rotation of the pitch
-PITCH_GEARING: float = 16 * ARC_RATIO  # 4.86 / degreesToRotations(8)
+
 # TODO make a sin func to change hieght of turret (Pitch_radius) * sin(theta) + turret_height
 # if angle is 0 this is the height of the turret
 TURRET_HEIGHT: meters = inchesToMeters(13.841)
@@ -66,7 +62,6 @@ HUB_RADIUS: inches = HUB_DIAM / 2
 HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15) - TURRET_HEIGHT
-# TODO TODO TODO continue code review here
 Y_PASS_DIFF_HUB: meters = inchesToMeters(25 + BALL_RADIUS)
 Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
@@ -106,11 +101,11 @@ BOTTOM_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(BOTTOM_FLYWHEEL_DIAMETER) 
 TOP_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(TOP_FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 MANUAL_REV_SPEED: MPS = 13.96
-MANUAL_SPEED: RPM = 50
+MANUAL_AIM_SPEED: RPM = 50
 KICK_SPEED: RPM = 3500
 
 # in percent
-REV_ALLOWED_ERROR: float = 3
+REV_ALLOWED_ERROR: percent = 3
 # in radians
 YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
@@ -229,11 +224,13 @@ class Turret(Subsystem):
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
+
         self.compensateFail = False
         self.dynamicFail = False
         self.impossibleDynamic = False
         robotState.impossibleDynamic = False
         robotState.dontShoot = False
+
         self.mode = self.getMode(robotState)
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
@@ -374,8 +371,8 @@ class Turret(Subsystem):
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
-        self.yawVelocity *= MANUAL_SPEED
-        self.pitchVelocity *= MANUAL_SPEED
+        self.yawVelocity *= MANUAL_AIM_SPEED
+        self.pitchVelocity *= MANUAL_AIM_SPEED
 
         time = getTime()
         timeDiff = time - self.lastTime  # time since last update

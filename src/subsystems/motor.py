@@ -23,10 +23,18 @@ from wpimath.units import (
     revolutions_per_minute,
     degreesToRotations,
     degrees,
+    inches,
 )
+
 
 # could lowkey be 10 degrees idk
 INIT_PITCH_ANGLE: degrees = 8.813
+PITCH_RADIUS: inches = 9.342
+LIL_PITCH_GEAR_RADIUS: inches = 0.552
+ARC_RATIO = (
+    PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
+)  # how many rotations of the smol ladder gear is 1 rotation of the pitch
+PITCH_GEARING: float = 16 * ARC_RATIO  # 4.86 / degreesToRotations(8)
 
 
 class RevMotor:
@@ -241,17 +249,12 @@ class RevMotor:
             .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
             .forwardLimitSwitchEnabled(
                 False
-            )  # TODO when forward limit switch exists again change
+            )  # TODO when forward limit switch exists again change, it wont
             .reverseLimitSwitchEnabled(True)
-            # .forwardLimitSwitchPosition(16.66)
             .reverseLimitSwitchPosition(0)
             .reverseLimitSwitchTriggerBehavior(
                 LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
             )
-            # .forwardLimitSwitchTriggerBehavior(
-            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
-            # )
-            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
             .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
         )
         .apply(SoftLimitConfig().forwardSoftLimit(16.66).forwardSoftLimitEnabled(True))
@@ -283,7 +286,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(degreesToRotations(INIT_PITCH_ANGLE) * (16 * 8 / (3 / 4)))
+            .reverseSoftLimit(degreesToRotations(INIT_PITCH_ANGLE) * (16 * ARC_RATIO))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
