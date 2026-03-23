@@ -15,12 +15,26 @@ from rev import (
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
-    FeedForwardConfig,
 )
 from subsystems.utils import matchData
-from wpimath.units import radians, radiansToRotations, revolutions_per_minute, degrees
+from wpimath.units import (
+    radians,
+    radiansToRotations,
+    revolutions_per_minute,
+    degreesToRotations,
+    degrees,
+    inches,
+)
 
+
+# could lowkey be 10 degrees idk
 INIT_PITCH_ANGLE: degrees = 8.813
+PITCH_RADIUS: inches = 9.342
+LIL_PITCH_GEAR_RADIUS: inches = 0.552
+ARC_RATIO = (
+    PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
+)  # how many rotations of the smol ladder gear is 1 rotation of the pitch
+PITCH_GEARING: float = 16 * ARC_RATIO  # 4.86 / degreesToRotations(8)
 
 
 class RevMotor:
@@ -240,7 +254,7 @@ class RevMotor:
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.08, 0, 0, 0.02)
+            .pidf(0.1, 0, 0, 0)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(False)
@@ -257,17 +271,12 @@ class RevMotor:
             .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
             .forwardLimitSwitchEnabled(
                 False
-            )  # TODO when forward limit switch exists again change
+            )  # TODO when forward limit switch exists again change, it wont
             .reverseLimitSwitchEnabled(True)
-            # .forwardLimitSwitchPosition(16.66)
             .reverseLimitSwitchPosition(0)
             .reverseLimitSwitchTriggerBehavior(
                 LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
             )
-            # .forwardLimitSwitchTriggerBehavior(
-            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
-            # )
-            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
             .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
         )
         .apply(SoftLimitConfig().forwardSoftLimit(16.66).forwardSoftLimitEnabled(True))
@@ -299,7 +308,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(0)
+            .reverseSoftLimit(degreesToRotations(INIT_PITCH_ANGLE) * (16 * ARC_RATIO))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
