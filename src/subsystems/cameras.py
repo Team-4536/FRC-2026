@@ -190,7 +190,11 @@ class CameraManager(Subsystem):
             if self.photonCameraLeft.trustworthy:
 
                 robotState.odometry.addVisionMeasurement(
-                    self.photonCameraLeft.camEstPose2d,
+                    self.photonCameraLeft.camEstPose2d
+                    + wpimath.geometry.Transform2d(
+                        wpimath.geometry.Translation2d(-13 / 100, 0),
+                        wpimath.geometry.Rotation2d(),
+                    ),  # left cams is 25 cm off for some reason 😭,
                     self.photonCameraLeft.timeStamp,
                 )
             # if self.photonCameraMiddle.trustworthy:
@@ -201,7 +205,11 @@ class CameraManager(Subsystem):
 
             if self.photonCameraRight.trustworthy:
                 robotState.odometry.addVisionMeasurement(
-                    self.photonCameraRight.camEstPose2d,
+                    self.photonCameraRight.camEstPose2d
+                    + wpimath.geometry.Transform2d(
+                        wpimath.geometry.Translation2d(-25 / 100, 0),
+                        wpimath.geometry.Rotation2d(),
+                    ),
                     self.photonCameraRight.timeStamp,
                 )
 
@@ -221,9 +229,7 @@ class CameraManager(Subsystem):
         #     )
         # )
 
-        # robotState.odometry.resetPose(
-        #         robotState.odometry.getEstimatedPosition()
-        # )
+        # robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
         # resetPosition(
         #         self._gyro.getRotation2d(),
