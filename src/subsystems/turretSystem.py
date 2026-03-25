@@ -145,7 +145,7 @@ class Turret(Subsystem):
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
 
-        self.homeSet: bool = True
+        self.homeSet: bool = False
         self.yawLimitSwitch: SparkLimitSwitch = (
             self.yawMotor._ctrlr.getReverseLimitSwitch()  # pyright: ignore
         )
@@ -197,7 +197,7 @@ class Turret(Subsystem):
             RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d()
         )
 
-        self.homeSet: bool = True
+        self.homeSet: bool = False
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
@@ -600,7 +600,7 @@ class Turret(Subsystem):
             self.homeSet = True
 
         else:
-            self.yawMotor.setVoltage(-2)  # changed to -2 from -1
+            self.yawMotor.setVoltage(-1)  # changed to -2 from -1
 
     def disabled(self):
         self.yawMotor.stopMotor()
