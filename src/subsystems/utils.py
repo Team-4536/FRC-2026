@@ -269,7 +269,7 @@ def MPSToRPM(speed: meters_per_second, circ: meters) -> revolutions_per_minute:
 
 def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
 
-    if translation.norm() == 0:
+    if translation.norm() < 1e-4:
         return Translation2d()
 
     angle = translation.angle()

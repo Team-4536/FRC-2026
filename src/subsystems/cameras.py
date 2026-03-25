@@ -10,7 +10,6 @@ from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpimath.units import inchesToMeters, radiansToDegrees
-from wpilib import getTime
 
 
 class photonCameraClass(NetworkTablesMixin):
@@ -205,35 +204,8 @@ class CameraManager(Subsystem):
                     self.photonCameraRight.timeStamp,
                 )
 
-        self.test = self.test + 1
-        self.publishFloat(
-            "DJO Test Time", getTime()
-        )  ## DJO: This is the *wrong* time in sim
-        self.publishFloat("DJO Test Time2", self.test)
-        # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
-        # robotState.odometry.addVisionMeasurement(self.a, getTime())
+        robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
-        # robotState.odometry.resetPose(
-        #     Pose2d(
-        #         meters(robotState.odometry.getEstimatedPosition().X()),
-        #         meters(robotState.odometry.getEstimatedPosition().Y()),
-        #         robotState.gyro,
-        #     )
-        # )
-
-        # robotState.odometry.resetPose(
-        #         robotState.odometry.getEstimatedPosition()
-        # )
-
-        # resetPosition(
-        #         self._gyro.getRotation2d(),
-        #         self._modules.modulePositions,
-        #         Pose2d(
-        #             robotState.odometry.getEstimatedPosition().translation(),
-        #             Rotation2d(),
-        #         ),
-        #     )
-        # robotState.odometry.resetPosition
         return robotState
 
     def disabled(self):
