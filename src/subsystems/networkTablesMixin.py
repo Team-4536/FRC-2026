@@ -12,8 +12,8 @@ class NetworkTablesMixin:
     _table: NetworkTable
     _ntPersist: Dict[str, object]
 
-    def __init__(self, *, table: str = "telemetry"):
-        self._table = self._getTable(table)
+    def __init__(self, *, table: str = "telemetry", inst: bool = False):
+        self._table = self._getTable(table, inst)
         self._ntPersist = {}
 
     def __publish(
@@ -169,13 +169,16 @@ class NetworkTablesMixin:
             return
 
     def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
+        return d
         if s:
             n = "/".join((*s, n))
         return t(n).getEntry(d).get()
 
-    def _getTable(self, table: Optional[str]):
+    def _getTable(self, table: Optional[str], inst: bool = False):
         if table is None:
             table = self._table.getPath()
+        if inst:
+            table = f"{table}/{self.__class__.__name__}"
         return NetworkTableInstance.getDefault().getTable(table)
 
     def getString(

@@ -3,7 +3,6 @@ from subsystems import networkTablesMixin as nt
 from subsystems.cameras import CameraManager
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
-from subsystems.LEDSignals import LEDSignals
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
@@ -32,7 +31,6 @@ table.putNumber("OVERRUN!!!", 20)
 
 class Subsystems(NamedTuple):
     intake: Intake
-    ledSignals: LEDSignals
     shooter: Shooter
     swerveDrive: SwerveDrive
     turret: Turret
@@ -47,7 +45,7 @@ class Subsystems(NamedTuple):
         for s in self:
             startTime = matchData.timeSinceInit
             s.periodic(state)
-            time = (matchData.timeSinceInit - startTime) * 10000
+            time = (matchData.timeSinceInit - startTime) * 1000
             totalTime += time
             table.putNumber(s.__class__.__name__, time)
         table.putNumber("total_time", totalTime)
@@ -61,7 +59,7 @@ class Subsystems(NamedTuple):
         for s in self:
             startTime = matchData.timeSinceInit
             s.disabled()
-            time = (matchData.timeSinceInit - startTime) * 10000
+            time = (matchData.timeSinceInit - startTime) * 1000
             table.putNumber(s.__class__.__name__, time)
             totalTime += time
         table.putNumber("total_time", totalTime)
@@ -126,7 +124,12 @@ class SubsystemManager(NetworkTablesMixin):
 
     def robotPeriodic(self) -> None:
         self.subsystems.robotPeriodic(self.robotState)
+
+        startTime = matchData.timeSinceInit
         self.cameras.periodic(self.robotState)
+        time = (matchData.timeSinceInit - startTime) * 1000
+        self.publishFloat("cameras", time)
+
         self.llCam.periodic(self.robotState)
         self.time.periodic(self.robotState)
 

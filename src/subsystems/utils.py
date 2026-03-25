@@ -251,8 +251,7 @@ def getTangentAngle(posFromCenter: Translation2d) -> radians:
 def getContributedRotation(
     tangentAngle: radians, vector: Translation2d
 ) -> meters_per_second:
-
-    if vector.norm() == 0:
+    if vector.norm() < 1e-4:
         return 0
 
     contributedVector: float = cos(tangentAngle - vector.angle().radians())

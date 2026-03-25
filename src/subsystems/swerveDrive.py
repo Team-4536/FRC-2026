@@ -266,7 +266,7 @@ class SwerveDrive(Subsystem):
         for module in self._modules:
             vector += self.getDriveVelocity(module)
 
-        if vector.norm() == 0:
+        if vector.norm() < 1e-4:
             return Translation2d()
 
         vector = Translation2d(
@@ -290,6 +290,8 @@ class SwerveDrive(Subsystem):
     def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
         speed = module.driveVelocity
         angle = module.azimuthRotation
+        if speed < 1e-4:
+            return Translation2d()
         vector = Translation2d(distance=speed, angle=angle)
         return vector
 

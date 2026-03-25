@@ -1,11 +1,11 @@
-from subsystems.LEDSignals import LEDSignals
-from subsystems.autoSubsystem import AutoSubsystem
+from ntcore import NetworkTableInstance
 from subsystemManager import SubsystemManager, Subsystems
+from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.cameras import CameraManager
+from subsystems.climber import Climber
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
-from subsystems.climber import Climber
-
+from subsystems.limelights import llCams
 from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
 from subsystems.tester import Tester
@@ -13,8 +13,6 @@ from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
 from wpilib import TimedRobot, getTime
 from wpimath.units import inchesToMeters, meters, seconds
-from subsystems.limelights import llCams
-from ntcore import NetworkTableInstance
 
 
 class Robot(TimedRobot):
@@ -29,7 +27,6 @@ class Robot(TimedRobot):
         self.subsystemManager = SubsystemManager(
             subsystems=Subsystems(
                 intake=Intake(10, 17, 9),
-                ledSignals=LEDSignals(deviceID=0),
                 shooter=Shooter(kickerID=18, revTopID=12, revBottomID=11),
                 swerveDrive=SwerveDrive.symmetricDrive(
                     xPos=WHEEL_DISTANCE, yPos=WHEEL_DISTANCE
@@ -48,10 +45,6 @@ class Robot(TimedRobot):
 
     def robotPeriodic(self) -> None:
         self.subsystemManager.robotPeriodic()
-        self.timeRunnig = getTime() - self.timeStart
-        NetworkTableInstance.getDefault().getTable("telemetry").putNumber(
-            "TIME RUNNING", self.timeRunnig
-        )
 
     def autonomousInit(self) -> None:
         self.subsystemManager.init()
@@ -79,6 +72,3 @@ class Robot(TimedRobot):
 
     def disabledPeriodic(self) -> None:
         self.subsystemManager.disabled()
-
-    def testInit(self) -> None:
-        llCams()

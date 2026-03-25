@@ -86,7 +86,7 @@ class Inputs(Subsystem):
 
         if not self.proxyControlMode:
             vx, vy = self._circularDriveScalar(
-                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
+                x=self._driveCtrlr.getLeftY(), y=self._driveCtrlr.getLeftX()
             )
         else:
             vx, vy = self._circularDriveScalar(
