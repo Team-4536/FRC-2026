@@ -7,6 +7,7 @@ from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import inchesToMeters, meters_per_second, meters, radians
+from subsystems.intakestate import IntakeState
 
 ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 BATTERY_VOLTS: float = 12
@@ -60,6 +61,7 @@ class RobotState(NetworkTablesMixin):
     intakeIndexer: bool = False
     intakeMode: bool = False
     intakeModeLeftBumperPressed: bool = False
+    intakeState: Enum = IntakeState.UP
 
     turretTarget: TurretTarget = TurretTarget.HUB
     turretMode: TurretMode = TurretMode.MANUAL

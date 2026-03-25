@@ -15,6 +15,8 @@ from wpimath.units import (
     radians_per_second,
     inchesToMeters,
 )
+from subsystems.intake import IntakeState
+from subsystems.intake import Intake
 
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
@@ -173,7 +175,7 @@ class OperateIntake(AutoStages):
         self.pathTime = getTime() - self.startTime
 
         if self.pathTime < 1.2:  # TODO: make this not work like this
-            self.robotState.intakePosYAxis = 0.85
+            pass
         else:
             self.robotState.intakePosYAxis = 0
             self.robotState.initialIntake = True
