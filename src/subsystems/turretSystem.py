@@ -44,9 +44,7 @@ MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # if the robot is facing 0 and we want to go to 0, go to the zero offset in robot relative space
-ZERO_OFFSET: radians = (
-    MAX_ROTATION / 2 + 0.139626
-)  # offset to comp for shooting too far right
+ZERO_OFFSET: radians = MAX_ROTATION / 2  # offset to comp for shooting too far right
 # small gear rotations to big gear rotations
 YAW_GEARING: float = 100 / 3
 
@@ -113,9 +111,7 @@ YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
 
-TURRET_DIST_FROM_CENTER: meters = inchesToMeters(
-    7.5
-)  # TODO make correct # 27 - (6 + 1 / 2)
+TURRET_DIST_FROM_CENTER: meters = inchesToMeters(7.5)
 TURRET_PATH_CIRCUMFRENCE: meters = TURRET_DIST_FROM_CENTER * TAU
 
 
@@ -149,7 +145,7 @@ class Turret(Subsystem):
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
 
-        self.homeSet: bool = True
+        self.homeSet: bool = False
         self.yawLimitSwitch: SparkLimitSwitch = (
             self.yawMotor._ctrlr.getReverseLimitSwitch()  # pyright: ignore
         )
@@ -187,7 +183,7 @@ class Turret(Subsystem):
         self.pitchVar = 0.0
 
         self.publishFloat("YawTargetOffset", 0)
-        self.publishFloat("add", -3.040249824)
+        self.publishFloat("add", -2.040249824)
         self.publishFloat("scale", 1.9)
         self.publishFloat("AM: Y Pass", 25)
 
@@ -201,7 +197,7 @@ class Turret(Subsystem):
             RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d()
         )
 
-        self.homeSet: bool = True
+        self.homeSet: bool = False
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
@@ -315,7 +311,7 @@ class Turret(Subsystem):
                 robotState.robotLinearVelocity.norm(),
                 (  # TODO: Tust note that this is a temporary addition from Emmett C
                     0
-                    if robotState.robotLinearVelocity.norm() == 0
+                    if robotState.robotLinearVelocity.norm() < 1e-4
                     else robotState.robotLinearVelocity.angle().radians()
                 ),
             ),
@@ -604,7 +600,7 @@ class Turret(Subsystem):
             self.homeSet = True
 
         else:
-            self.yawMotor.setVoltage(-2)  # changed to -2 from -1
+            self.yawMotor.setVoltage(-1)  # changed to -2 from -1
 
     def disabled(self):
         self.yawMotor.stopMotor()

@@ -252,7 +252,7 @@ def getContributedRotation(
     tangentAngle: radians, vector: Translation2d
 ) -> meters_per_second:
 
-    if vector.norm() == 0:
+    if vector.norm() < 1e-4:
         return 0
 
     contributedVector: float = cos(tangentAngle - vector.angle().radians())
@@ -270,7 +270,7 @@ def MPSToRPM(speed: meters_per_second, circ: meters) -> revolutions_per_minute:
 
 def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
 
-    if translation.norm() == 0:
+    if translation.norm() < 1e-4:
         return Translation2d()
 
     angle = translation.angle()
