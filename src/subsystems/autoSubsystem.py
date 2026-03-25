@@ -149,7 +149,7 @@ def routineChooser(
                 ),
                 OperateTurret(),
             ]
-            routine["unload 1"] = [OperateTurret(True, 4)]
+            routine["unload 1"] = [OperateTurret(True, 8)]
 
         case AutoRoutines.R_BACK_SHOOT:
             routine["back"] = [
