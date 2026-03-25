@@ -169,7 +169,7 @@ class NetworkTablesMixin:
             return
 
     def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
-        return d
+        # return d
         if s:
             n = "/".join((*s, n))
         return t(n).getEntry(d).get()
