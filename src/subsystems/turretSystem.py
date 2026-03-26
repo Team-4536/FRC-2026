@@ -367,8 +367,11 @@ class Turret(Subsystem):
             elif setPoint > 90 and setPoint < 270:
                 self.pitchVelocity = 0.5
 
-        if not (self.yawVelocity == 0) and not (
-            self.relativeYawSetpoint == self.dontOverdoItYaw(self.relativeYawSetpoint)
+        if (not (self.yawVelocity == 0)) and (
+            not (
+                self.relativeYawSetpoint
+                == self.dontOverdoItYaw(self.relativeYawSetpoint)
+            )
         ):  # if we are manually moving interupt maintaining rotation in the turret gap
 
             self.yawSetPoint -= self.relativeYawSetpoint - self.dontOverdoItYaw(
@@ -395,6 +398,8 @@ class Turret(Subsystem):
             - wrapAngle(robotState.odometry.getEstimatedPosition().rotation().radians())
             + ZERO_OFFSET
         )
+
+        self.relativeYawSetpoint = wrapAngle(self.relativeYawSetpoint)
 
         self.limitedYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
         self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
