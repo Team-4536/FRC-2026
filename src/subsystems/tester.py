@@ -23,10 +23,10 @@ class Tester(Subsystem):
         self.publishBoolean("climber_tests", self.testClimb)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
-        self.testDrive = self.getBoolean("drive_tests", None, default=False)
-        self.testIntake = self.getBoolean("intake_tests", None, default=False)
-        self.testTurret = self.getBoolean("turret_tests", None, default=False)
-        self.testClimb = self.getBoolean("climb_tests", None, default=False)
+        # self.testDrive = self.getBoolean("drive_tests", None, default=False)
+        # self.testIntake = self.getBoolean("intake_tests", None, default=False)
+        # self.testTurret = self.getBoolean("turret_tests", None, default=False)
+        # self.testClimb = self.getBoolean("climb_tests", None, default=False)
 
         self.currentlyTesting = "Started"
 

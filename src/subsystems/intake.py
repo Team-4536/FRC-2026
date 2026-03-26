@@ -59,15 +59,18 @@ class Intake(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:
         self.robotState = RobotState
-        self.motorForwardSetpoint = -max(
-            min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0
-        )
-        self.motorReverseSetpoint = max(
-            min(self.getFloat("reverse_speed (0 to 1)", default=0.0), 1.0), 0
-        )
-        self.indexerSetpoint = -max(
-            min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
-        )
+        self.motorForwardSetpoint = 0.7
+        # -max(
+        #     min(self.getFloat("intake_speed (0 to 1)", default=0.0), 1.0), 0
+        # )
+        self.motorReverseSetpoint = 0.7
+        # max(
+        #     min(self.getFloat("reverse_speed (0 to 1)", default=0.0), 1.0), 0
+        # )
+        self.indexerSetpoint = 0.5
+        # -max(
+        #     min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
+        # )
         self.lowerIntake = robotState.intakePos
 
         if robotState.intakeModeLeftBumperPressed:

@@ -538,7 +538,8 @@ class Turret(Subsystem):
 
         xDiff = pointPos.X() - turretPose.X()
         # super high tech offset
-        offset = self.getFloat("YawTargetOffset", default=36)
+        offset = 36
+        # self.getFloat("YawTargetOffset", default=36)
         xDiff += np.sign(xDiff) * inchesToMeters(offset)
         yDiff = pointPos.Y() - turretPose.Y()
 
@@ -571,8 +572,10 @@ class Turret(Subsystem):
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
-        add = self.getFloat("add", default=-4.54025)
-        scale = self.getFloat("scale", default=2.75728)
+        # add = self.getFloat("add", default=-4.54025)
+        # scale = self.getFloat("scale", default=2.75728)
+        add = -2.040249824
+        scale = 1.9
 
         robotState.turretVelocitySetpoint = Translation2d(
             distance=compensateSpeed(velocity, scale, add),
@@ -589,7 +592,11 @@ class Turret(Subsystem):
         yPass = (
             inchesToMeters(73 - 15)
             - inchesToMeters(13.841)
-            + inchesToMeters(self.getFloat("BAM: Y Pass", default=25) + (5.91 / 2))
+            + inchesToMeters(
+                # self.getFloat("BAM: Y Pass", default=25)
+                25
+                + (5.91 / 2)
+            )
         )
 
         return yPass
@@ -656,7 +663,6 @@ class Turret(Subsystem):
         )
         self.publishFloat("velocity variable", self.velocityVar)
         self.publishFloat("pitch variable", self.pitchVar)
-        self.getFloat("BAM: Y Pass", default=25)
 
 
 class TurretOdometry:

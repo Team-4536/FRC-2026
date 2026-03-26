@@ -42,7 +42,7 @@ class Inputs(Subsystem):
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # Drive Controls
-        self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
+        # self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
@@ -86,14 +86,14 @@ class Inputs(Subsystem):
 
         if not self.proxyControlMode:
             vx, vy = self._circularDriveScalar(
-                x=self._driveCtrlr.getLeftY(),
-                y=self._driveCtrlr.getLeftX(),  # TEMPORARILY positive to fix inversion (UNKNOWN ISSUE...)
+                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
             )
         else:
-            vx, vy = self._circularDriveScalar(
-                x=self.getFloat("proxy drive x", default=0),
-                y=self.getFloat("proxy drive y", default=0),
-            )
+            # vx, vy = self._circularDriveScalar(
+            #     x=self.getFloat("proxy drive x", default=0),
+            #     y=self.getFloat("proxy drive y", default=0),
+            # )
+            vx, vy = 0, 0
 
         omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 

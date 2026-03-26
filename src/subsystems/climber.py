@@ -28,14 +28,14 @@ class Climber(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
 
         if robotState.climbDown:
-            self.climberMotor.setThrottle(
-                self.getFloat("BAM: climber down throttle", default=-0.7)
-            )
+            self.climberMotor.setThrottle(-0.7)
+            #     self.getFloat("BAM: climber down throttle", default=-0.7)
+            # )
 
         elif robotState.climbUp:
-            self.climberMotor.setThrottle(
-                self.getFloat("BAM: climber up throttle", default=0.7)
-            )
+            self.climberMotor.setThrottle(0.7)
+            #     self.getFloat("BAM: climber up throttle", default=0.7)
+            # )
 
         else:
             self.climberMotor.setThrottle(0)

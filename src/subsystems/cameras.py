@@ -176,34 +176,34 @@ class CameraManager(Subsystem):
         # self.photonCameraMiddle.update()
 
         # DJO CameraOverride
-        if self.getBoolean("CameraOverride Enable", default=False):
-            newPoseT = Translation2d(
-                self.getFloat("CameraOverride X", default=5.0),
-                self.getFloat("CameraOverride Y", default=5.0),
+        # if self.getBoolean("CameraOverride Enable", default=False):
+        # newPoseT = Translation2d(
+        #     self.getFloat("CameraOverride X", default=5.0),
+        #     self.getFloat("CameraOverride Y", default=5.0),
+        # )
+        # newPoseR = Rotation2d(
+        #     self.getFloat("CameraOverride R", default=3.1415926 / 2),
+        # )
+        # newPose2d = Pose2d(newPoseT, newPoseR)
+        # robotState.odometry.resetPose(newPose2d)
+        # else:
+        if self.photonCameraLeft.trustworthy:
+
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraLeft.camEstPose2d,
+                self.photonCameraLeft.timeStamp,
             )
-            newPoseR = Rotation2d(
-                self.getFloat("CameraOverride R", default=3.1415926 / 2),
+        # if self.photonCameraMiddle.trustworthy:
+
+        #     robotState.odometry.addVisionMeasurement(
+        #         self.photonCameraMiddle.camEstPose2d, getTime()
+        #     )
+
+        if self.photonCameraRight.trustworthy:
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraRight.camEstPose2d,
+                self.photonCameraRight.timeStamp,
             )
-            newPose2d = Pose2d(newPoseT, newPoseR)
-            robotState.odometry.resetPose(newPose2d)
-        else:
-            if self.photonCameraLeft.trustworthy:
-
-                robotState.odometry.addVisionMeasurement(
-                    self.photonCameraLeft.camEstPose2d,
-                    self.photonCameraLeft.timeStamp,
-                )
-            # if self.photonCameraMiddle.trustworthy:
-
-            #     robotState.odometry.addVisionMeasurement(
-            #         self.photonCameraMiddle.camEstPose2d, getTime()
-            #     )
-
-            if self.photonCameraRight.trustworthy:
-                robotState.odometry.addVisionMeasurement(
-                    self.photonCameraRight.camEstPose2d,
-                    self.photonCameraRight.timeStamp,
-                )
 
         robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
