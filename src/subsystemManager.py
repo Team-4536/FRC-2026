@@ -1,29 +1,23 @@
 from dataclasses import dataclass, fields
+from ntcore import NetworkTableInstance
 from subsystems import networkTablesMixin as nt
+from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.cameras import CameraManager
+from subsystems.climber import Climber
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
+from subsystems.limelights import llCams
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.swerveDrive import SwerveDrive
-from subsystems.utils import TimeData
-from subsystems.autoSubsystem import AutoSubsystem
-from subsystems.intake import Intake
-from typing import NamedTuple
-from wpimath.estimator import SwerveDrive4PoseEstimator
-from typing import NamedTuple
-from subsystems.turretSystem import Turret, Shooter
-from subsystems.climber import Climber
 from subsystems.tester import Tester
+from subsystems.turretSystem import Turret, Shooter
 from subsystems.utils import matchData, TimeData
-from subsystems.limelights import llCams
 from typing import Generator, NamedTuple, Union
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
-
-from ntcore import NetworkTableInstance
 
 table = NetworkTableInstance.getDefault().getTable("profiling")
 table.putNumber("OVERRUN!!!", 20)

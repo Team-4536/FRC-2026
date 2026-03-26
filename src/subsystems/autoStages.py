@@ -10,15 +10,14 @@ from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import (
     feetToMeters,
+    inchesToMeters,
     lbsToKilograms,  # pyright: ignore
     meters_per_second,
     radians_per_second,
-    inchesToMeters,
 )
 
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
-
     nominalVoltage = 12.0
     stallTorque = 2.6
     stallCurrent = 105.0

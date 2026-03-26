@@ -18,14 +18,13 @@ from rev import (
 )
 from subsystems.utils import matchData
 from wpimath.units import (
+    degrees,
+    degreesToRotations,
+    inches,
     radians,
     radiansToRotations,
     revolutions_per_minute,
-    degreesToRotations,
-    degrees,
-    inches,
 )
-
 
 # could lowkey be 10 degrees idk
 INIT_PITCH_ANGLE: degrees = 8.813
@@ -60,11 +59,11 @@ class RevMotor:
     def setThrottle(self, throttle: voltage) -> None:
         self._ctrlr.setVoltage(throttle * 12.0)
 
-    def getLimitSwitch(self, switch: int) -> SparkLimitSwitch | None:
-        if switch == 0:
-            return self._ctrlr.getReverseLimitSwitch()
-        elif switch == 1:
-            return self._ctrlr.getForwardLimitSwitch()
+    def getForwardLimitSwitch(self) -> SparkLimitSwitch:
+        return self._ctrlr.getForwardLimitSwitch()
+
+    def getReverseLimitSwitch(self) -> SparkLimitSwitch:
+        return self._ctrlr.getReverseLimitSwitch()
 
     def setVelocity(self, rpm: revolutions_per_minute) -> None:
         self._ctrlr.getClosedLoopController().setReference(

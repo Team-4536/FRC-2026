@@ -1,6 +1,5 @@
-from math import atan2, copysign, cos, hypot, pi, sin, tau
+from math import atan, atan2, copysign, cos, hypot, pi, sin, tau
 from numpy import sign
-import math
 from phoenix6.units import volt as voltage
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
@@ -298,10 +297,10 @@ def realInverseTan(y: float, x: float) -> radians:
     # we don't care if its 4
 
     # gets the yaw angle
-    angle: radians = math.atan(y / x)
+    angle: radians = atan(y / x)
 
     # In case inverse tan won't output correct angle
     if not canOutput:
-        angle += math.pi
+        angle += pi
 
     return angle

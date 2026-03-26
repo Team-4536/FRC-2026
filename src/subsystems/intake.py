@@ -3,7 +3,6 @@ from subsystems.motor import RevMotor
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpilib import getTime
-import wpilib
 
 
 class IntakeState(Enum):
@@ -24,8 +23,8 @@ class Intake(Subsystem):
         self.intakeMotorManual = RevMotor(deviceID=frontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=raiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=backMotorID)
-        self.downLimitSwitch = self.intakeMotorRaise._ctrlr.getForwardLimitSwitch()
-        self.upLimitSwitch = self.intakeMotorRaise._ctrlr.getReverseLimitSwitch()
+        self.downLimitSwitch = self.intakeMotorRaise.getForwardLimitSwitch()
+        self.upLimitSwitch = self.intakeMotorRaise.getReverseLimitSwitch()
         # currently limit switches are true by default, false when pressed
 
         self.automaticMode = False
@@ -87,7 +86,7 @@ class Intake(Subsystem):
             if self.state == IntakeState.UP:
                 self.raiseThrottle = self.raiseStayUpSetpoint
                 if robotState.intakePos:
-                    self.startTime = wpilib.getTime()
+                    self.startTime = getTime()
                     self.state = IntakeState.GOING_DOWN
 
             elif self.state == IntakeState.GOING_DOWN:

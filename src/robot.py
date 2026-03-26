@@ -1,4 +1,3 @@
-from ntcore import NetworkTableInstance
 from subsystemManager import SubsystemManager, Subsystems
 from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.cameras import CameraManager

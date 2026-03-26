@@ -1,10 +1,9 @@
-import wpilib
 from ntcore import NetworkTableInstance, NetworkTable
-from wpilib import DriverStation  # Talk to cremmet about robotState implementation
-from wpimath.units import degreesToRadians
-from wpimath.geometry import Pose2d, Rotation2d
-from subsystems.subsystem import Subsystem
 from subsystems.robotState import RobotState
+from subsystems.subsystem import Subsystem
+from wpilib import DriverStation, getTime
+from wpimath.geometry import Pose2d
+from wpimath.units import degreesToRadians
 
 
 class llCams(Subsystem):
@@ -60,7 +59,7 @@ class llCams(Subsystem):
         if llx > 0 and lly > 0:
             robotState.limelightPose = self.limelight2dPose
             robotState.odometry.addVisionMeasurement(
-                robotState.limelightPose, wpilib.getTime()
+                robotState.limelightPose, getTime()
             )
             robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
         else:

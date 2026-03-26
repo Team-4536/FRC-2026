@@ -1,6 +1,6 @@
-from subsystems.subsystem import Subsystem
-from subsystems.robotState import RobotState
 from subsystems.motor import RevMotor
+from subsystems.robotState import RobotState
+from subsystems.subsystem import Subsystem
 
 
 class Climber(Subsystem):

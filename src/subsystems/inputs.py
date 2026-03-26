@@ -8,7 +8,7 @@ from wpimath.units import meters_per_second
 
 
 class Inputs(Subsystem):
-    LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 2
+    LOW_MAX_ABTAINABLE_SPEED: meters_per_second = 1.5
     MAX_ABTAINABLE_SPEED: meters_per_second = 5
 
     _driveCtrlr: XboxController
@@ -24,7 +24,7 @@ class Inputs(Subsystem):
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
-        self._linearDriveScalar = Scalar(magnitude=tau * 1.5)
+        self._linearDriveScalar = Scalar(magnitude=tau)
         self._circularDriveScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )

@@ -101,7 +101,7 @@ BOTTOM_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(BOTTOM_FLYWHEEL_DIAMETER) 
 TOP_FLYWHEEL_CIRCUMFRENCE: meters = inchesToMeters(TOP_FLYWHEEL_DIAMETER) * PI
 GRAVITY: MPS = 9.80665  # don't worry that it's positive
 MANUAL_REV_SPEED: MPS = 13.96
-MANUAL_AIM_SPEED: RPM = 50
+MANUAL_AIM_SPEED: RPM = 30
 KICK_SPEED: RPM = 3500
 
 # in percent
@@ -147,7 +147,7 @@ class Turret(Subsystem):
 
         self.turretAngle: radians = rotationsToRadians(self.pitchEncoder.getPosition())
 
-        self.homeSet: bool = True
+        self.homeSet: bool = False
         self.yawLimitSwitch: SparkLimitSwitch = (
             self.yawMotor._ctrlr.getReverseLimitSwitch()  # pyright: ignore
         )
@@ -199,7 +199,7 @@ class Turret(Subsystem):
             RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d()
         )
 
-        self.homeSet: bool = True
+        self.homeSet: bool = False
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
@@ -359,10 +359,10 @@ class Turret(Subsystem):
                 self.yawVelocity = 1
 
             if setPoint > 270 or setPoint < 90:
-                self.pitchVelocity = -0.8
+                self.pitchVelocity = -1
 
             elif setPoint > 90 and setPoint < 270:
-                self.pitchVelocity = 0.8
+                self.pitchVelocity = 1
 
         if not (self.yawVelocity == 0) and not (
             self.relativeYawSetpoint == self.dontOverdoItYaw(self.relativeYawSetpoint)
