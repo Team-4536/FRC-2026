@@ -35,28 +35,28 @@ class Subsystems(NamedTuple):
             s.phaseInit(state)
 
     def periodic(self, state: RobotState) -> None:
-        totalTime = 0
+        # totalTime = 0
         for s in self:
-            startTime = matchData.timeSinceInit
+            # startTime = matchData.timeSinceInit
             s.periodic(state)
-            time = (matchData.timeSinceInit - startTime) * 1000
-            totalTime += time
-            table.putNumber(s.__class__.__name__, time)
-        table.putNumber("total_time", totalTime)
+            # time = (matchData.timeSinceInit - startTime) * 1000
+            # totalTime += time
+            # table.putNumber(s.__class__.__name__, time)
+        # table.putNumber("total_time", totalTime)
 
     def robotPeriodic(self, state: RobotState) -> None:
         for s in self:
             s.robotPeriodic(state)
 
     def disabled(self) -> None:
-        totalTime = 0
+        # totalTime = 0
         for s in self:
-            startTime = matchData.timeSinceInit
+            # startTime = matchData.timeSinceInit
             s.disabled()
-            time = (matchData.timeSinceInit - startTime) * 1000
-            table.putNumber(s.__class__.__name__, time)
-            totalTime += time
-        table.putNumber("total_time", totalTime)
+            # time = (matchData.timeSinceInit - startTime) * 1000
+            # table.putNumber(s.__class__.__name__, time)
+            # totalTime += time
+        # table.putNumber("total_time", totalTime)
 
 
 @dataclass
