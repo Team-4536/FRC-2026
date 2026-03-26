@@ -6,15 +6,19 @@ from wpimath.kinematics import SwerveModuleState
 
 Struct: TypeAlias = object
 debugging: bool = True
+from wpilib import getTime
 
 
 class NetworkTablesMixin:
     _table: NetworkTable
     _ntPersist: Dict[str, object]
+    _tablePersist: Dict[str, NetworkTable]
 
     def __init__(self, *, table: str = "telemetry", inst: bool = False):
-        self._table = self._getTable(table, inst)
         self._ntPersist = {}
+        self._tablePersist = {}
+
+        self._table = self._getTable(table, inst)
 
     def __publish(
         self,
@@ -169,17 +173,22 @@ class NetworkTablesMixin:
             return
 
     def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
-        # return d
         if s:
             n = "/".join((*s, n))
         return t(n).getEntry(d).get()
 
-    def _getTable(self, table: Optional[str], inst: bool = False):
-        if table is None:
-            table = self._table.getPath()
+    def _getTable(self, tableStr: Optional[str], inst: bool = False):
+        if tableStr is None:
+            tableStr = self._table.getPath()
         if inst:
-            table = f"{table}/{self.__class__.__name__}"
-        return NetworkTableInstance.getDefault().getTable(table)
+            tableStr = f"{tableStr}/{self.__class__.__name__}"
+
+        table = self._tablePersist.get(tableStr)
+        if table is None:
+            table = NetworkTableInstance.getDefault().getTable(tableStr)
+            self._ntPersist[tableStr] = table
+
+        return table
 
     def getString(
         self, name: str, table: Optional[str] = None, *subtables: str, default: str

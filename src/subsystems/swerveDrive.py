@@ -290,7 +290,7 @@ class SwerveDrive(Subsystem):
     def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
         speed = module.driveVelocity
         angle = module.azimuthRotation
-        if speed < 1e-4:
+        if abs(speed) < 1e-4:
             return Translation2d()
         vector = Translation2d(distance=speed, angle=angle)
         return vector
@@ -316,7 +316,7 @@ class SwerveDrive(Subsystem):
 
     def publish(self) -> None:
         self.publishSwerve("swerve_states", self._swerveStates)
-        self.publishFloat("gyro_angle", self._gyro.getAngle() % 360)
+        self.publishFloat("gyro_angle", self._gyro.getRotation2d().degrees() % 360)
 
         for i, state in enumerate(self._swerveStates):
             module, name = self._modules[i], self._modules._fields[i]

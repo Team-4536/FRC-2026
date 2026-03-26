@@ -17,6 +17,7 @@ from subsystems.utils import (
     RPMToVolts,
     scaleTranslation2D,
     wrapAngle,
+    matchData,
     realInverseTan,
 )
 from typing import Any, Tuple
@@ -201,7 +202,7 @@ class Turret(Subsystem):
             RED_TOP_SHUTTLE_POS.x, RED_TOP_SHUTTLE_POS.y, Rotation2d()
         )
 
-        self.homeSet: bool = False
+        self.homeSet: bool = matchData.isSimulation()
         self.yawSetPoint: radians = 0  # in relation to the field
         self.limitedYawSetpoint: radians = 0
         self.relativeYawSetpoint: radians = 0  # in relation to the robot
