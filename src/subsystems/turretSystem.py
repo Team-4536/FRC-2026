@@ -110,6 +110,8 @@ REV_ALLOWED_ERROR: percent = 3
 YAW_ALLOWED_ERROR: radians = 0.05
 PITCH_ALLOWED_ERROR: radians = 0.05
 
+# compenate for how long it takes in real world
+TIME_SCALE: float = 2
 
 TURRET_DIST_FROM_CENTER: meters = inchesToMeters(
     7.5
@@ -870,7 +872,7 @@ def _calculateVelocity(turretAngle: radians, distance: meters, height: meters) -
 
 
 def calculateTime(velocity: MPS, distance: meters):
-    return distance / velocity
+    return distance / velocity * TIME_SCALE
 
 
 def checkDependencies(depends: Tuple[Any, ...]) -> bool:
