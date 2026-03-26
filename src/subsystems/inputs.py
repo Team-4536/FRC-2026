@@ -1,7 +1,7 @@
 from math import tau
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from subsystems.utils import CircularScalar, lerp, Scalar
+from subsystems.utils import CircularScalar, lerp, matchData, Scalar
 from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second
@@ -86,7 +86,8 @@ class Inputs(Subsystem):
 
         if not self.proxyControlMode:
             vx, vy = self._circularDriveScalar(
-                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
+                x=self._driveCtrlr.getLeftY(),
+                y=self._driveCtrlr.getLeftX(),  # TEMPORARILY positive to fix inversion (UNKNOWN ISSUE...)
             )
         else:
             vx, vy = self._circularDriveScalar(

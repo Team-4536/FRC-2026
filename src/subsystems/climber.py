@@ -31,13 +31,11 @@ class Climber(Subsystem):
             self.climberMotor.setThrottle(
                 self.getFloat("BAM: climber down throttle", default=-0.7)
             )
-            print("climbing up")
 
         elif robotState.climbUp:
             self.climberMotor.setThrottle(
                 self.getFloat("BAM: climber up throttle", default=0.7)
             )
-            print("climbing down")
 
         else:
             self.climberMotor.setThrottle(0)
