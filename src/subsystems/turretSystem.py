@@ -359,10 +359,10 @@ class Turret(Subsystem):
                 self.yawVelocity = 1
 
             if setPoint > 270 or setPoint < 90:
-                self.pitchVelocity = -1
+                self.pitchVelocity = -0.5
 
             elif setPoint > 90 and setPoint < 270:
-                self.pitchVelocity = 1
+                self.pitchVelocity = 0.5
 
         if not (self.yawVelocity == 0) and not (
             self.relativeYawSetpoint == self.dontOverdoItYaw(self.relativeYawSetpoint)
