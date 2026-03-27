@@ -314,7 +314,7 @@ class Turret(Subsystem):
             "Robot Linear veloity",
             (
                 robotState.robotLinearVelocity.norm(),
-                (  # TODO: Tust note that this is a temporary addition from Emmett C
+                (
                     0
                     if robotState.robotLinearVelocity.norm() < 1e-4
                     else robotState.robotLinearVelocity.angle().radians()

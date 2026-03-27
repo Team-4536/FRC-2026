@@ -176,9 +176,6 @@ class SwerveDrive(Subsystem):
         self._swerveStates = self._kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
-        self.odomX = 0.0
-        self.odomY = 0.0
-        self.odomZ = 0.0
 
         self._disableModules()
 
@@ -190,8 +187,6 @@ class SwerveDrive(Subsystem):
         for m in self._modules:
             m.resetAzimuthEncoder()
 
-        robotState.gyro = self._gyro.getRotation2d()
-
         return robotState
 
     def robotPeriodic(self, robotState: RobotState) -> RobotState:
@@ -199,25 +194,14 @@ class SwerveDrive(Subsystem):
             self._gyro.getRotation2d(),
             self._modules.modulePositions,
         )
-        # robotState.odometry.resetRotation(self._gyro.getRotation2d())
-        # robotState.odometry.update(
-        #     self._gyro.getRotation2d(),
-        #     self._modules.modulePositions,
-        # )
-
         robotState.gyro = self._gyro.getRotation2d()
-        self.odomX = robotState.odometry.getEstimatedPosition().X()
-        self.odomY = robotState.odometry.getEstimatedPosition().Y()
-        self.odomZ = robotState.odometry.getEstimatedPosition().rotation().degrees()
-        self.publishFloat("BAM: Gyro", self._gyro.getRotation2d().degrees())
-        self.publishFloat("BAM: Odom x", self.odomX)
-        self.publishFloat("BAM: Odom y", self.odomY)
-        self.publishFloat("BAM: Odom r", self.odomZ)
+
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         if robotState.resetGyro:
             self._gyro.reset()
+            self._gyro.setAngleAdjustment(0)
             robotState.odometry.resetPosition(
                 self._gyro.getRotation2d(),
                 self._modules.modulePositions,
@@ -226,7 +210,7 @@ class SwerveDrive(Subsystem):
                     Rotation2d(),
                 ),
             )
-            robotState.autosGyroResetToggle = False
+            robotState.resetGyro = False
 
         if robotState.autosGyroResetToggle:
             self._gyro.reset()
@@ -238,19 +222,12 @@ class SwerveDrive(Subsystem):
             )
             robotState.autosGyroResetToggle = False
 
-        # robotState.odometry.update(
-        #     self._gyro.getRotation2d(),
-        #     self._modules.modulePositions,
-        # )
-
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
-        rot = robotState.odometry.getEstimatedPosition().rotation()
-
         robotState.robotOmegaSpeed = self.getOmegaVelocity()
-        robotState.robotLinearVelocity = self.getLinearVelocity(rot)
-
-        robotState.gyro = self._gyro.getRotation2d()
+        robotState.robotLinearVelocity = self.getLinearVelocity(
+            robotState.odometry.getEstimatedPosition().rotation()
+        )
 
         return robotState
 
@@ -258,7 +235,6 @@ class SwerveDrive(Subsystem):
         self._modules.stopModules()
         if not self._disabledModules and matchData.timeSincePhaseInit > 3:
             self._disableModules()
-            self._disabledModules = True
 
     def getLinearVelocity(self, roboRotation: Rotation2d) -> Translation2d:
         vector = Translation2d()
@@ -344,6 +320,7 @@ class SwerveDrive(Subsystem):
     def _disableModules(self) -> None:
         self._modules.configureDriveMotors(config=RevMotor.DISABLED_DRIVE_CONFIG)
         self._modules.configureAzimuthMotors(config=RevMotor.DISABLED_AZIMUTH_CONFIG)
+        self._disabledModules = True
 
     @property
     def kinematics(self) -> SwerveDrive4Kinematics:
@@ -357,10 +334,6 @@ class SwerveDrive(Subsystem):
         SwerveModulePosition,
     ]:
         return self._modules.modulePositions
-
-    @property
-    def roboAngle(self) -> Rotation2d:
-        return self._gyro.getRotation2d()
 
     @classmethod
     def symmetricDrive(  # TODO: remove defaults and set IDs in robot.py

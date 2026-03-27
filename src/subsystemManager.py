@@ -86,7 +86,7 @@ class SubsystemManager(NetworkTablesMixin):
         self.robotState.fieldSpeeds = ChassisSpeeds()
         self.robotState.odometry = SwerveDrive4PoseEstimator(
             drive.kinematics,
-            drive.roboAngle,
+            self.robotState.gyro,
             drive.modulePoses,
             initPos,
         )
@@ -119,10 +119,7 @@ class SubsystemManager(NetworkTablesMixin):
     def robotPeriodic(self) -> None:
         self.subsystems.robotPeriodic(self.robotState)
 
-        startTime = matchData.timeSinceInit
         self.cameras.periodic(self.robotState)
-        time = (matchData.timeSinceInit - startTime) * 1000
-        self.publishFloat("cameras", time)
 
         self.llCam.periodic(self.robotState)
         self.time.periodic(self.robotState)
