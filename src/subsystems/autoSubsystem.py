@@ -137,7 +137,7 @@ def routineChooser(
                     "L Backward",
                     isFlipped,
                 ),
-                #OperateTurret(),
+                # OperateTurret(),
             ]
             routine["unload 1"] = [OperateTurret(True, 10)]
 
@@ -147,7 +147,7 @@ def routineChooser(
                     "M Backward",
                     isFlipped,
                 ),
-                #OperateTurret(),
+                # OperateTurret(),
             ]
             routine["unload 1"] = [OperateTurret(True, 10)]
 
@@ -157,7 +157,7 @@ def routineChooser(
                     "R Backward",
                     isFlipped,
                 ),
-                #OperateTurret(),
+                # OperateTurret(),
             ]
             routine["unload 1"] = [OperateTurret(True, 10)]
 
@@ -271,5 +271,8 @@ def routineChooser(
                     isFlipped,
                 ),
             ]
+
+        case _:
+            pass
 
     return routine

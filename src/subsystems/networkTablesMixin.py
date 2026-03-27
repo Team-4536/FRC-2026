@@ -6,19 +6,24 @@ from wpimath.kinematics import SwerveModuleState
 
 Struct: TypeAlias = object
 debugging: bool = True
-from wpilib import getTime
 
 
 class NetworkTablesMixin:
     _table: NetworkTable
-    _ntPersist: Dict[str, object]
-    _tablePersist: Dict[str, NetworkTable]
+    _tablePath: str
+
+    _publishers: Dict[str, object] = {}
+    _tables: Dict[str, NetworkTable] = {}
+    _entries: Dict[str, object] = {}
+
+    _subIndex: int = 0
 
     def __init__(self, *, table: str = "telemetry", inst: bool = False):
-        self._ntPersist = {}
-        self._tablePersist = {}
-
-        self._table = self._getTable(table, inst)
+        if inst:
+            table = f"{table}/{self.__class__.__name__}"
+        self._table = self._getTable(table)
+        self._tablePath = table
+        self._tables[table] = self._table
 
     def __publish(
         self,
@@ -28,17 +33,17 @@ class NetworkTablesMixin:
         *subtables: str,
         debug: bool,
     ) -> None:
-        if debug and not debugging:
+        if not debugging and debug:
             return
 
         if subtables:
             name = "/".join((*subtables, name))
 
-        pub = self._ntPersist.get(name)
+        pub = self._publishers.get(name)
         if pub is None:
             topic = topicFn(name)
             pub = topic.publish()
-            self._ntPersist[name] = pub
+            self._publishers[name] = pub
 
         try:
             pub.set(value)  # type: ignore[attr-defined]
@@ -118,7 +123,7 @@ class NetworkTablesMixin:
     ) -> None:
         self.publishStructArray(name, value, *subtables, debug=debug)
 
-    def publishGeneric(
+    def publishAny(
         self,
         name: str,
         value: Optional[
@@ -161,32 +166,38 @@ class NetworkTablesMixin:
             name = "/".join((*subtables, name))
 
         typeStr = type(value).__name__  # pyright: ignore
-        pub = self._ntPersist.get(name)
+        pub = self._publishers.get(name)
         if pub is None:
             topic = self._table.getTopic(name)
             pub = topic.genericPublish(typeStr)
-            self._ntPersist[name] = pub
+            self._publishers[name] = pub
 
         try:
             pub.set(Value.makeValue(value))  # type: ignore
         except TypeError:
             return
 
-    def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
-        if s:
-            n = "/".join((*s, n))
-        return t(n).getEntry(d).get()
+    def __get(
+        self, name: str, topic: Callable[[str], Any], *subtables: str, default: Any
+    ) -> Any:
+        if subtables:
+            name = "/".join((*subtables, name))
 
-    def _getTable(self, tableStr: Optional[str], inst: bool = False):
+        entry = self._entries.get(name)
+        if entry is None:
+            entry = topic(name).getEntry(default)
+            self._entries[name] = entry
+
+        return entry.get()  # type: ignore
+
+    def _getTable(self, tableStr: Optional[str]) -> NetworkTable:
         if tableStr is None:
-            tableStr = self._table.getPath()
-        if inst:
-            tableStr = f"{tableStr}/{self.__class__.__name__}"
+            tableStr = self._tablePath
 
-        table = self._tablePersist.get(tableStr)
+        table = self._tables.get(tableStr)
         if table is None:
             table = NetworkTableInstance.getDefault().getTable(tableStr)
-            self._ntPersist[tableStr] = table
+            self._tables[tableStr] = table
 
         return table
 
@@ -194,7 +205,7 @@ class NetworkTablesMixin:
         self, name: str, table: Optional[str] = None, *subtables: str, default: str
     ) -> str:
         return self.__get(
-            name, self._getTable(table).getStringTopic, *subtables, d=default
+            name, self._getTable(table).getStringTopic, *subtables, default=default
         )
 
     def getStringArray(
@@ -205,14 +216,14 @@ class NetworkTablesMixin:
         default: Sequence[str],
     ) -> Sequence[str]:
         return self.__get(
-            name, self._getTable(table).getStringArrayTopic, *subtables, d=default
+            name, self._getTable(table).getStringArrayTopic, *subtables, default=default
         )
 
     def getInteger(
         self, name: str, table: Optional[str] = None, *subtables: str, default: int
     ) -> int:
         return self.__get(
-            name, self._getTable(table).getIntegerTopic, *subtables, d=default
+            name, self._getTable(table).getIntegerTopic, *subtables, default=default
         )
 
     def getIntegerArray(
@@ -223,14 +234,17 @@ class NetworkTablesMixin:
         default: Sequence[int],
     ) -> Sequence[int]:
         return self.__get(
-            name, self._getTable(table).getIntegerArrayTopic, *subtables, d=default
+            name,
+            self._getTable(table).getIntegerArrayTopic,
+            *subtables,
+            default=default,
         )
 
     def getFloat(
         self, name: str, table: Optional[str] = None, *subtables: str, default: float
     ) -> float:
         return self.__get(
-            name, self._getTable(table).getFloatTopic, *subtables, d=default
+            name, self._getTable(table).getFloatTopic, *subtables, default=default
         )
 
     def getFloatArray(
@@ -241,14 +255,14 @@ class NetworkTablesMixin:
         default: Sequence[float],
     ) -> Sequence[float]:
         return self.__get(
-            name, self._getTable(table).getFloatArrayTopic, *subtables, d=default
+            name, self._getTable(table).getFloatArrayTopic, *subtables, default=default
         )
 
     def getBoolean(
         self, name: str, table: Optional[str] = None, *subtables: str, default: bool
     ) -> bool:
         return self.__get(
-            name, self._getTable(table).getBooleanTopic, *subtables, d=default
+            name, self._getTable(table).getBooleanTopic, *subtables, default=default
         )
 
     def getBooleanArray(
@@ -259,5 +273,8 @@ class NetworkTablesMixin:
         default: Sequence[bool],
     ) -> Sequence[bool]:
         return self.__get(
-            name, self._getTable(table).getBooleanArrayTopic, *subtables, d=default
+            name,
+            self._getTable(table).getBooleanArrayTopic,
+            *subtables,
+            default=default,
         )

@@ -1,7 +1,7 @@
 from math import tau
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from subsystems.utils import CircularScalar, lerp, matchData, Scalar
+from subsystems.utils import CircularScalar, lerp, Scalar
 from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import meters_per_second
@@ -32,7 +32,7 @@ class Inputs(Subsystem):
         )
         self._linearScalar = Scalar()
 
-        self._isTestMode: bool = False
+        self.polarity: bool = True
 
         self.proxyControlMode: bool = False
 
@@ -40,12 +40,13 @@ class Inputs(Subsystem):
         self.publishFloat("proxy drive y", 0)
 
     def phaseInit(self, robotState: RobotState) -> RobotState:
+        robotState.resetGyro = True
+
         return robotState
 
     def periodic(self, robotState: RobotState) -> RobotState:
         # Drive Controls
         # self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
-        
 
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
@@ -54,10 +55,13 @@ class Inputs(Subsystem):
         )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+        self.polarity = (
+            not self.polarity if self._driveCtrlr.getXButtonPressed() else self.polarity
+        )
 
+        # Climb Controls
         robotState.climbUp = self._driveCtrlr.getYButton()
         robotState.climbDown = self._driveCtrlr.getAButton()
-        robotState.drivePolarityToggle = self._driveCtrlr.getXButtonPressed()
 
         # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
@@ -65,21 +69,16 @@ class Inputs(Subsystem):
         robotState.turretSwitchTarget = self._mechCtrlr.getXButtonPressed()
         robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
-        
 
         # Intake Controls
         robotState.initialIntake = self._mechCtrlr.getAButton()
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
         robotState.intakeEject = self._mechCtrlr.getBButton()
-        # TODO chagne to not overlap with revspeed
         robotState.indexerEject = self._mechCtrlr.getBButton()
         robotState.intakePosYAxis = self._mechCtrlr.getRightY()
         robotState.intakeModeLeftBumperPressed = self._mechCtrlr.getLeftBumperPressed()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
         robotState.intakePos = self._mechCtrlr.getBackButtonPressed()
-
-        if robotState.drivePolarityToggle:
-            self.polarity = not self.polarity
 
         return robotState
 
@@ -94,15 +93,11 @@ class Inputs(Subsystem):
         self._circularDriveScalar.setMagnitude(maxSpeed)
 
         if not self.proxyControlMode:
-
-            if self.polarity:
-                vx, vy = self._circularDriveScalar(
-                    x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
-                )
-            else:
-                vx, vy = self._circularDriveScalar(
-                    x=self._driveCtrlr.getLeftY(), y=self._driveCtrlr.getLeftX()
-                )
+            vx, vy = self._circularDriveScalar(
+                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
+            )
+            if not self.polarity:
+                vx, vy = -vx, -vy
         else:
             # vx, vy = self._circularDriveScalar(
             #     x=self.getFloat("proxy drive x", default=0),
@@ -113,4 +108,3 @@ class Inputs(Subsystem):
         omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)
-    

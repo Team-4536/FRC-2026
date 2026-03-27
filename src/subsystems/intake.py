@@ -67,7 +67,7 @@ class Intake(Subsystem):
         # max(
         #     min(self.getFloat("reverse_speed (0 to 1)", default=0.0), 1.0), 0
         # )
-        self.indexerSetpoint = -0.5
+        self.indexerSetpoint = -0.7
         # -max(
         #     min(self.getFloat("indexer_speed (0 to 1)", default=0.0), 1.0), 0
         # )
