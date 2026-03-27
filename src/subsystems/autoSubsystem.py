@@ -137,9 +137,9 @@ def routineChooser(
                     "L Backward",
                     isFlipped,
                 ),
-                OperateTurret(),
+                #OperateTurret(),
             ]
-            routine["unload 1"] = [OperateTurret(True, 4)]
+            routine["unload 1"] = [OperateTurret(True, 10)]
 
         case AutoRoutines.M_BACK_N_SHOOT:
             routine["back"] = [
@@ -147,9 +147,9 @@ def routineChooser(
                     "M Backward",
                     isFlipped,
                 ),
-                OperateTurret(),
+                #OperateTurret(),
             ]
-            routine["unload 1"] = [OperateTurret(True, 4)]
+            routine["unload 1"] = [OperateTurret(True, 10)]
 
         case AutoRoutines.R_BACK_SHOOT:
             routine["back"] = [
@@ -157,9 +157,9 @@ def routineChooser(
                     "R Backward",
                     isFlipped,
                 ),
-                OperateTurret(),
+                #OperateTurret(),
             ]
-            routine["unload 1"] = [OperateTurret(True, 4)]
+            routine["unload 1"] = [OperateTurret(True, 10)]
 
         # case AutoRoutines.L_BACK_SHOOT_N_LEAVE:
         #     routine["back"] = [
