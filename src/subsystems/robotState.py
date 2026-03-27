@@ -8,7 +8,6 @@ from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import inchesToMeters, meters_per_second, meters, radians
 
-
 ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
 BATTERY_VOLTS: float = 12
 
@@ -39,25 +38,23 @@ class RobotState(NetworkTablesMixin):
     robotLinearVelocity: Translation2d
     gyro: Rotation2d
 
-    robotOmegaSpeed: meters_per_second = 0
+    robotOmegaSpeed: meters_per_second = 0.0
     indexerEject: bool = False
     dontShoot: bool = False  # REMOVE (local var)
     impossibleDynamic: bool = False  # REMOVE (local var)
     fullyReved: bool = False
-    revSpeed: float = 0
+    revSpeed: float = 0.0
     kickShooter: int = 0
-    optimalTurretAngle: radians = 0  # REMOVE (local var)
-    targetDistance: meters = 0  # REMOVE (local var)
-    targetHeight: meters = 0  # REMOVE (local var)
+    optimalTurretAngle: radians = 0.0  # REMOVE (local var)
+    targetDistance: meters = 0.0  # REMOVE (local var)
+    targetHeight: meters = 0.0  # REMOVE (local var)
     turretSwitchMode: bool = False
-    turretShuttle: float = -1
-    turretShuttleOff: float = -1
-    turretManualSetpoint: float = 0
+    turretShuttle: float = -1.0
+    turretShuttleOff: float = -1.0
+    turretManualSetpoint: float = 0.0
     turretSwitchTarget: bool = False
     turretSwitchEnabled: bool = False
     assistedTurret: bool = False  # set to a button evetually
-
-    drivePolarityToggle: bool = False
 
     initialIntake: bool = False
     intakeIndexer: bool = False
