@@ -24,6 +24,8 @@ class Inputs(Subsystem):
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
+        self.polarity = True
+
         self._linearDriveScalar = Scalar(magnitude=tau)
         self._circularDriveScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
@@ -43,6 +45,8 @@ class Inputs(Subsystem):
     def periodic(self, robotState: RobotState) -> RobotState:
         # Drive Controls
         # self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
+        
+
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
@@ -53,6 +57,7 @@ class Inputs(Subsystem):
 
         robotState.climbUp = self._driveCtrlr.getYButton()
         robotState.climbDown = self._driveCtrlr.getAButton()
+        robotState.drivePolarityToggle = self._driveCtrlr.getXButtonPressed()
 
         # Turret Controls
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
@@ -60,6 +65,7 @@ class Inputs(Subsystem):
         robotState.turretSwitchTarget = self._mechCtrlr.getXButtonPressed()
         robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
+        
 
         # Intake Controls
         robotState.initialIntake = self._mechCtrlr.getAButton()
@@ -71,6 +77,9 @@ class Inputs(Subsystem):
         robotState.intakeModeLeftBumperPressed = self._mechCtrlr.getLeftBumperPressed()
         robotState.ejectAll = self._mechCtrlr.getLeftTriggerAxis()
         robotState.intakePos = self._mechCtrlr.getBackButtonPressed()
+
+        if robotState.drivePolarityToggle:
+            self.polarity = not self.polarity
 
         return robotState
 
@@ -85,9 +94,15 @@ class Inputs(Subsystem):
         self._circularDriveScalar.setMagnitude(maxSpeed)
 
         if not self.proxyControlMode:
-            vx, vy = self._circularDriveScalar(
-                x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
-            )
+
+            if self.polarity:
+                vx, vy = self._circularDriveScalar(
+                    x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
+                )
+            else:
+                vx, vy = self._circularDriveScalar(
+                    x=self._driveCtrlr.getLeftY(), y=self._driveCtrlr.getLeftX()
+                )
         else:
             # vx, vy = self._circularDriveScalar(
             #     x=self.getFloat("proxy drive x", default=0),
@@ -98,3 +113,4 @@ class Inputs(Subsystem):
         omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)
+    
