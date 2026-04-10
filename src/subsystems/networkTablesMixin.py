@@ -1,11 +1,10 @@
 from enum import Enum
 from functools import partial
 from ntcore import NetworkTable, NetworkTableInstance, Value
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
-from wpimath.kinematics import SwerveModuleState
+from typing import Any, Callable, Dict, Optional, Sequence, TypeAlias, Union
 
 Struct: TypeAlias = object
-debugging: bool = True
+ntDebugging: bool = False
 
 
 class NetworkTablesMixin:
@@ -15,8 +14,6 @@ class NetworkTablesMixin:
     _publishers: Dict[str, object] = {}
     _tables: Dict[str, NetworkTable] = {}
     _entries: Dict[str, object] = {}
-
-    _subIndex: int = 0
 
     def __init__(self, *, table: str = "telemetry", inst: bool = False):
         if inst:
@@ -33,7 +30,7 @@ class NetworkTablesMixin:
         *subtables: str,
         debug: bool,
     ) -> None:
-        if not debugging and debug:
+        if not ntDebugging and debug:
             return
 
         if subtables:
@@ -113,15 +110,6 @@ class NetworkTablesMixin:
     ) -> None:
         topicFn = partial(self._table.getStructArrayTopic, type=value[0].__class__)
         self.__publish(name, value, topicFn, *subtables, debug=debug)
-
-    def publishSwerve(
-        self,
-        name: str,
-        value: Tuple[SwerveModuleState, ...],
-        *subtables: str,
-        debug: bool = False,
-    ) -> None:
-        self.publishStructArray(name, value, *subtables, debug=debug)
 
     def publishAny(
         self,

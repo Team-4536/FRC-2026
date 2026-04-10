@@ -291,7 +291,7 @@ class SwerveDrive(Subsystem):
             module.setAzimuth(state.angle)
 
     def publish(self) -> None:
-        self.publishSwerve("swerve_states", self._swerveStates)
+        self.publishStructArray("swerve_states", self._swerveStates)
         self.publishFloat("gyro_angle", self._gyro.getRotation2d().degrees() % 360)
 
         for i, state in enumerate(self._swerveStates):
@@ -336,21 +336,21 @@ class SwerveDrive(Subsystem):
         return self._modules.modulePositions
 
     @classmethod
-    def symmetricDrive(  # TODO: remove defaults and set IDs in robot.py
+    def symmetricDrive(
         cls,
         *,
-        FL_DriveID: int = 2,
-        FR_DriveID: int = 4,
-        BL_DriveID: int = 6,
-        BR_DriveID: int = 8,
-        FL_AzimuthID: int = 1,
-        FR_AzimuthID: int = 3,
-        BL_AzimuthID: int = 5,
-        BR_AzimuthID: int = 7,
-        FL_EncoderID: int = 21,
-        FR_EncoderID: int = 22,
-        BL_EncoderID: int = 23,
-        BR_EncoderID: int = 24,
+        FL_DriveID: int,
+        FR_DriveID: int,
+        BL_DriveID: int,
+        BR_DriveID: int,
+        FL_AzimuthID: int,
+        FR_AzimuthID: int,
+        BL_AzimuthID: int,
+        BR_AzimuthID: int,
+        FL_EncoderID: int,
+        FR_EncoderID: int,
+        BL_EncoderID: int,
+        BR_EncoderID: int,
         xPos: meters,
         yPos: meters,
     ) -> Self:

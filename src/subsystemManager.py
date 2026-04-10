@@ -103,7 +103,7 @@ class SubsystemManager(NetworkTablesMixin):
         self.disabled()  # TODO: have subsystems make sure that their class attributes are initialized on class initialization
         for s in self:
             self._publish(True)
-        nt.debugging = self.DEBUGGING
+        nt.ntDebugging = self.DEBUGGING
         self.publishBoolean("debugging", self.DEBUGGING)
 
     def __iter__(self) -> Generator[Union[Subsystem, Subsystems]]:
@@ -146,7 +146,7 @@ class SubsystemManager(NetworkTablesMixin):
     # TODO: maybe move some of this back into Subsystems
     def _publish(self, force: bool = False) -> None:
         if not force:
-            nt.debugging = self.getBoolean("debugging", default=False)
+            nt.ntDebugging = self.getBoolean("debugging", default=False)
             if not self.getBoolean("runPublish", default=False):
                 return
         for i in self:
