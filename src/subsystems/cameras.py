@@ -11,7 +11,6 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from wpimath.units import inchesToMeters, radiansToDegrees
 from wpilib import getTime
-from wpilib import Timer
 
 
 class photonCameraClass(NetworkTablesMixin):
@@ -53,7 +52,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.timeStamp = -1
 
     def update(self):
-        self.hasTargetsRan = False
+
         self.trustworthy = False
         self.camEstPose = None
         self.result = self.camera.getLatestResult()
@@ -61,7 +60,7 @@ class photonCameraClass(NetworkTablesMixin):
 
         if self.hasTargets:
             self.running = True
-            self.hasTargetsRan = True
+
             self.target = self.result.getTargets()
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
@@ -213,7 +212,7 @@ class CameraManager(Subsystem):
         # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
         # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
-        robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
+        #   robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
         # resetPosition(
         #         self._gyro.getRotation2d(),
