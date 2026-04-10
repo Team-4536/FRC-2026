@@ -21,7 +21,11 @@ from wpimath.units import (
     radiansToRotations,
     revolutions_per_minute,
     degreesToRotations,
+    degrees,
 )
+
+# could lowkey be 10 degrees idk
+INIT_PITCH_ANGLE: degrees = 8.813
 
 
 class RevMotor:
@@ -113,7 +117,7 @@ class RevMotor:
             .apply(
                 MAXMotionConfig()
                 .maxVelocity(2000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(25000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(15000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
         )
@@ -206,7 +210,7 @@ class RevMotor:
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .apply(
             ClosedLoopConfig()
-            .pidf(0.08, 0, 0, 0.02)
+            .pidf(0.07, 0, 0, 0.00)
             .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
             .positionWrappingEnabled(False)
@@ -214,7 +218,7 @@ class RevMotor:
                 MAXMotionConfig()
                 .maxVelocity(1000, ClosedLoopSlot.kSlot0)
                 .maxAcceleration(500, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.1)
+                .allowedClosedLoopError(0.01)
             )
         )
         .apply(
@@ -264,7 +268,7 @@ class RevMotor:
         .apply(
             SoftLimitConfig()
             .forwardSoftLimit(19.5)
-            .reverseSoftLimit(degreesToRotations(6) * (16 * 8 / (3 / 4)))
+            .reverseSoftLimit(degreesToRotations(INIT_PITCH_ANGLE) * (16 * 8 / (3 / 4)))
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
