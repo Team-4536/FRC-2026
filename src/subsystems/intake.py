@@ -34,7 +34,7 @@ class Intake(Subsystem):
         self.publishFloat("reverse_speed (0 to 1)", 0.7)
         self.publishFloat("indexer_speed (0 to 1)", 0.5)
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
+    def phaseInit(self, robotState: RobotState) -> None:
         self.intakeMotorAutomatic.configure(config=RevMotor.INDEXER_MOTOR_CONFIG)
         self.intakeMotorManual.configure(config=RevMotor.INTAKE_MOTOR_CONFIG)
         self.intakeMotorRaise.configure(config=RevMotor.INTAKE_RAISE_CONFIG)
@@ -55,9 +55,7 @@ class Intake(Subsystem):
         elif self.upLimitSwitch:
             self.state = IntakeState.UP
 
-        return robotState
-
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(self, robotState: RobotState) -> None:
         self.robotState = RobotState
         self.motorForwardSetpoint = -0.7
         # -max(
@@ -138,8 +136,6 @@ class Intake(Subsystem):
 
         self.intakeMotorAutomatic.setThrottle(self.indexerThrottle * 7 / 4)
         self.intakeMotorManual.setThrottle(self.manualThrottle * 1.5)
-
-        return robotState
 
     # values when the robot is disabled
     def disabled(self):

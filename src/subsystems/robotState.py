@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields, MISSING
+from dataclasses import dataclass, field, fields, MISSING
 from enum import Enum
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from typing import Any, Self
@@ -6,16 +6,12 @@ from wpilib import Field2d, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import inchesToMeters, meters_per_second, meters, radians
-
-ROBOT_RADIUS = inchesToMeters(11)  # TODO idk the actual thing
-BATTERY_VOLTS: float = 12
 
 
 class TurretTarget(Enum):
-    HUB = 1
-    SHUTTLE_TOP = 2
-    SHUTTLE_BOTTOM = 3
+    HUB = 0
+    SHUTTLE_TOP = 1
+    SHUTTLE_BOTTOM = 2
 
 
 class TurretMode(Enum):
@@ -24,74 +20,77 @@ class TurretMode(Enum):
     DYNAMIC = 2
 
 
+class ClimberState(Enum):
+    DISABLED = 0
+    CLIMB_UP = 1
+    CLIMB_DOWN = 2
+
+
+def default(default: Any) -> Any:
+    return field(default_factory=lambda: default)
+
+
 @dataclass
 class RobotState(NetworkTablesMixin):
-    fieldSpeeds: ChassisSpeeds
-    intakeEject: bool
-    intakePos: bool
-    resetGyro: bool
     limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
-    autosInitPose: Pose2d
 
-    turretVelocitySetpoint: Translation2d
-    robotLinearVelocity: Translation2d
-    gyro: Rotation2d
+    # Drive
+    gyro: Rotation2d = default(Rotation2d())
+    fieldSpeeds: ChassisSpeeds = default(ChassisSpeeds())
+    robotVelocity: ChassisSpeeds = default(ChassisSpeeds())
+    resetGyro: bool = False
 
-    robotOmegaSpeed: meters_per_second = 0.0
-    indexerEject: bool = False
-    dontShoot: bool = False  # REMOVE (local var)
-    impossibleDynamic: bool = False  # REMOVE (local var)
-    fullyReved: bool = False
-    revSpeed: float = 0.0
-    kickShooter: int = 0
-    optimalTurretAngle: radians = 0.0  # REMOVE (local var)
-    targetDistance: meters = 0.0  # REMOVE (local var)
-    targetHeight: meters = 0.0  # REMOVE (local var)
-    turretSwitchMode: bool = False
-    turretShuttle: float = -1.0
-    turretShuttleOff: float = -1.0
-    turretManualSetpoint: float = 0.0
-    turretSwitchTarget: bool = False
-    turretSwitchEnabled: bool = False
+    # Climb
+    climbState: ClimberState = ClimberState.DISABLED
+
+    # Turret
     assistedTurret: bool = False  # set to a button evetually
-
-    initialIntake: bool = False
-    intakeIndexer: bool = False
-    intakeMode: bool = False
-    intakeModeLeftBumperPressed: bool = False
-
-    turretTarget: TurretTarget = TurretTarget.HUB
+    dontShoot: bool = False
+    kickShooter: int = 0
+    revSpeed: float = 0.0
+    kickerEject: bool = False
+    turretVelocitySetpoint: Translation2d = default(Translation2d())
+    turretManualSetpoint: float = 0.0
     turretMode: TurretMode = TurretMode.MANUAL
-    ejectAll: float = 0.0
+    turretSwitchMode: bool = False
+    turretSwitchTarget: bool = False
+
+    # Intake
+    indexerEject: bool = False
+    initialIntake: bool = False
+    intakeEject: bool = False
+    intakeIndexer: bool = False
+    intakeModeLeftBumperPressed: bool = False
+    intakePos: bool = False
     intakePosYAxis: float = 0.0
 
-    autosGyroResetToggle: bool = False
+    # Autonomous
     autosGyroReset: float = 0.0
+    autosGyroResetToggle: bool = False
+    autosInitPose: Pose2d = default(Pose2d())
 
-    climbUp: bool = False
-    climbDown: bool = False
+    # Other
+    ejectAll: bool = False
 
     def __post_init__(self) -> None:
         super().__init__(table="RobotState")
+
         self.odomField: Field2d = Field2d()
-        SmartDashboard.putData("odomField", self.odomField)
-        self.turretVelocitySetpoint = Translation2d()
-        self.robotLinearVelocity = Translation2d()
-        self.gyro = Rotation2d()
+        SmartDashboard.putData("Field", self.odomField)
 
     def publish(self) -> None:
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
-            self.publishAny(name, value)
+            if value is not None:
+                self.publishAny(name, value)
 
-        self.odomField.setRobotPose(self.odometry.getEstimatedPosition())
+        robotPose = self.odometry.getEstimatedPosition()
+        self.odomField.setRobotPose(robotPose)
         if self.limelightPose != None:
             self.odomField.setRobotPose(self.limelightPose)
-        self.publishFloat(
-            "Robot Angle DJO", self.odometry.getEstimatedPosition().rotation().radians()
-        )
+        self.publishStruct("robotPosition", robotPose)
 
     @classmethod
     def empty(cls, **kwargs: Any) -> Self:

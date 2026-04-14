@@ -1,4 +1,3 @@
-from math import tau
 from phoenix6.units import rotation, volt as voltage
 from rev import (
     ClosedLoopConfig,
@@ -11,20 +10,15 @@ from rev import (
     ResetMode,
     SoftLimitConfig,
     SparkBaseConfig,
+    SparkClosedLoopController,
     SparkLimitSwitch,
     SparkMax,
     SparkMaxConfig,
     SparkRelativeEncoder,
+    SparkSoftLimit,
 )
 from subsystems.utils import matchData
-from wpimath.units import (
-    degrees,
-    degreesToRotations,
-    inches,
-    radians,
-    radiansToRotations,
-    revolutions_per_minute,
-)
+from wpimath.units import degrees, degreesToRotations, inches, revolutions_per_minute
 
 # could lowkey be 10 degrees idk
 INIT_PITCH_ANGLE: degrees = 8.813
@@ -38,13 +32,17 @@ PITCH_GEARING: float = 16 * ARC_RATIO  # 4.86 / degreesToRotations(8)
 
 class RevMotor:
     _ctrlr: SparkMax
+    _pid: SparkClosedLoopController
     _encoder: SparkRelativeEncoder
     _simPosition: rotation
+    _simVelocity: revolutions_per_minute
 
     def __init__(self, *, deviceID: int) -> None:
         self._ctrlr = SparkMax(deviceID, SparkMax.MotorType.kBrushless)
+        self._pid = self._ctrlr.getClosedLoopController()
         self._encoder = self._ctrlr.getEncoder()
         self._simPosition = 0
+        self._simVelocity = 0
 
     def configure(self, *, config: SparkBaseConfig) -> None:
         self._ctrlr.configure(
@@ -56,45 +54,59 @@ class RevMotor:
     def stopMotor(self) -> None:
         self._ctrlr.set(0)
 
-    def setThrottle(self, throttle: voltage) -> None:
-        self._ctrlr.setVoltage(throttle * 12.0)
-
     def getForwardLimitSwitch(self) -> SparkLimitSwitch:
         return self._ctrlr.getForwardLimitSwitch()
 
     def getReverseLimitSwitch(self) -> SparkLimitSwitch:
         return self._ctrlr.getReverseLimitSwitch()
 
+    def getForwardSoftLimit(self) -> SparkSoftLimit:
+        return self._ctrlr.getForwardSoftLimit()
+
+    def getReverseSoftLimit(self) -> SparkSoftLimit:
+        return self._ctrlr.getReverseSoftLimit()
+
     def setVelocity(self, rpm: revolutions_per_minute) -> None:
-        self._ctrlr.getClosedLoopController().setReference(
-            setpoint=rpm,
-            ctrl=SparkMax.ControlType.kMAXMotionVelocityControl,
+        self._pid.setReference(
+            setpoint=rpm, ctrl=SparkMax.ControlType.kMAXMotionVelocityControl
         )
         if matchData.isSimulation():
+            self._simVelocity = rpm
             self._simPosition += rpm * matchData.dt / 60
             self._encoder.setPosition(self._simPosition)
+
+    def getVelocity(self) -> revolutions_per_minute:
+        if matchData.isSimulation():
+            return self._simVelocity
+        return self._encoder.getVelocity()
+
+    def setPosition(self, rotation: rotation) -> None:
+        self._pid.setReference(setpoint=rotation, ctrl=SparkMax.ControlType.kPosition)
+        if matchData.isSimulation():
+            self._simVelocity = 0
+            self._simPosition = rotation
+            self._encoder.setPosition(rotation)
+
+    def getPosition(self) -> rotation:
+        if matchData.isSimulation():
+            return self._simPosition
+        return self._encoder.getPosition()
 
     def setVoltage(self, volts: float) -> None:
         self._ctrlr.setVoltage(volts)
 
-    def setPosition(self, rot: radians) -> None:
-        self._ctrlr.getClosedLoopController().setReference(
-            setpoint=radiansToRotations(rot),
-            ctrl=SparkMax.ControlType.kPosition,
-        )
-        if matchData.isSimulation():
-            self._encoder.setPosition(rot / tau)
+    def setThrottle(self, throttle: voltage) -> None:
+        self.setVoltage(throttle * 12.0)
 
     def getEncoder(self) -> SparkRelativeEncoder:
         return self._encoder
 
-    DRIVE_GEARiNG: float = 6.12
-
+    DRIVE_GEARING: float = 6.12
     AZIMUTH_GEARING: float = 21.4
 
     DRIVE_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(40, 40)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
         .voltageCompensation(12)
@@ -109,6 +121,65 @@ class RevMotor:
                 .maxAcceleration(50000, ClosedLoopSlot.kSlot0)
                 .allowedClosedLoopError(1)
             )
+        )
+    )
+
+    AZIMUTH_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40, 40)
+        .inverted(True)
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            ClosedLoopConfig()
+            .pidf(0.15, 0, 0, 0)
+            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .positionWrappingEnabled(True)
+            .positionWrappingMinInput(-AZIMUTH_GEARING / 2)
+            .positionWrappingMaxInput(AZIMUTH_GEARING / 2)
+            .apply(
+                MAXMotionConfig()
+                .maxVelocity(5000, ClosedLoopSlot.kSlot0)
+                .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
+                .allowedClosedLoopError(0.2)
+            )
+        )
+    )
+
+    DISABLED_DRIVE_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40, 40)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
+    )
+
+    DISABLED_AZIMUTH_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(40, 40)
+        .inverted(True)
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
+    )
+
+    CLIMBER_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(30, 30)
+        .disableFollowerMode()
+        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
+        .apply(
+            LimitSwitchConfig()
+            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+            .forwardLimitSwitchEnabled(False)
+            .reverseLimitSwitchEnabled(True)
+            # .forwardLimitSwitchPosition(16.66)
+            .reverseLimitSwitchPosition(0)
+            .reverseLimitSwitchTriggerBehavior(
+                LimitSwitchConfig.Behavior.kStopMovingMotor
+            )
+            # .forwardLimitSwitchTriggerBehavior(
+            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+            # )
+            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
         )
     )
 
@@ -187,65 +258,6 @@ class RevMotor:
         .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
     )
 
-    CLIMBER_CONFIG: SparkBaseConfig = (
-        SparkMaxConfig()
-        .smartCurrentLimit(30, 30)
-        .disableFollowerMode()
-        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-        .apply(
-            LimitSwitchConfig()
-            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
-            .forwardLimitSwitchEnabled(False)
-            .reverseLimitSwitchEnabled(True)
-            # .forwardLimitSwitchPosition(16.66)
-            .reverseLimitSwitchPosition(0)
-            .reverseLimitSwitchTriggerBehavior(
-                LimitSwitchConfig.Behavior.kStopMovingMotor
-            )
-            # .forwardLimitSwitchTriggerBehavior(
-            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
-            # )
-            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-        )
-    )
-
-    AZIMUTH_CONFIG: SparkBaseConfig = (
-        SparkMaxConfig()
-        .smartCurrentLimit(40)
-        .inverted(True)
-        .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-        .apply(
-            ClosedLoopConfig()
-            .pidf(0.15, 0, 0, 0)
-            .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
-            .positionWrappingEnabled(True)
-            .positionWrappingMinInput(-AZIMUTH_GEARING / 2)
-            .positionWrappingMaxInput(AZIMUTH_GEARING / 2)
-            .apply(
-                MAXMotionConfig()
-                .maxVelocity(5000, ClosedLoopSlot.kSlot0)
-                .maxAcceleration(10000, ClosedLoopSlot.kSlot0)
-                .allowedClosedLoopError(0.2)
-            )
-        )
-    )
-
-    DISABLED_DRIVE_CONFIG: SparkBaseConfig = (
-        SparkMaxConfig()
-        .smartCurrentLimit(40)
-        .disableFollowerMode()
-        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
-    )
-
-    DISABLED_AZIMUTH_CONFIG: SparkBaseConfig = (
-        SparkMaxConfig()
-        .smartCurrentLimit(40)
-        .inverted(True)
-        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
-    )
-
     TURRET_YAW_CONFIG: SparkBaseConfig = (
         SparkMaxConfig()
         .smartCurrentLimit(20, 20)
@@ -312,6 +324,13 @@ class RevMotor:
             .forwardSoftLimitEnabled(True)
             .reverseSoftLimitEnabled(True)
         )
+    )
+
+    TURRET_PITCH_DISABLED_CONFIG: SparkBaseConfig = (
+        SparkMaxConfig()
+        .smartCurrentLimit(20, 20)
+        .inverted(False)
+        .setIdleMode(SparkMaxConfig.IdleMode.kCoast)
     )
 
     FLYWHEEL_CONFIG: SparkBaseConfig = (

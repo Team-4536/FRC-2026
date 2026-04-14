@@ -55,7 +55,7 @@ class AutoSubsystem(Subsystem):
 
         SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
+    def phaseInit(self, robotState: RobotState) -> None:
         self.routine: dict[str, List[AutoStages]] = routineChooser(
             self.autoRoutineChooser.getSelected(), matchData.isRed()
         )
@@ -70,9 +70,7 @@ class AutoSubsystem(Subsystem):
             for path in self.routine[self.routineKeys[self.currentPath]]:
                 robotState = path.autoInit(robotState)
 
-        return robotState
-
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(self, robotState: RobotState) -> None:
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
@@ -86,8 +84,6 @@ class AutoSubsystem(Subsystem):
                 if not self.routineFinished:
                     for path in self.routine[self.routineKeys[self.currentPath]]:
                         robotState = path.autoInit(robotState)
-
-        return robotState
 
     def disabled(self) -> None:
         pass

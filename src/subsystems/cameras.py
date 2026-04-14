@@ -162,11 +162,10 @@ class CameraManager(Subsystem):
         #     (10.5 + 26.5) * 0.0254,
         # )
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def phaseInit(self, robotState: RobotState) -> None:
+        pass
 
-    def periodic(self, robotState: RobotState) -> RobotState:
-
+    def periodic(self, robotState: RobotState) -> None:
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
         # self.publishBoolean("cam1 running", self.photonCameraRight.running)
@@ -206,8 +205,6 @@ class CameraManager(Subsystem):
             )
 
         robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
-
-        return robotState
 
     def disabled(self):
         pass

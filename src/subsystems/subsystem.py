@@ -11,20 +11,14 @@ class Subsystem(NetworkTablesMixin):
     def __init__(self, *, table: str = "telemetry", inst: bool = True):
         super().__init__(table=table, inst=inst)
 
-    def phaseInit(
-        self, robotState: RobotState
-    ) -> RobotState:  # TODO: stop returning RobotState as it is now unused
+    def phaseInit(self, robotState: RobotState) -> None:
         self._warn(self.phaseInit)
-        return robotState
 
-    def periodic(
-        self, robotState: RobotState
-    ) -> RobotState:  # TODO: stop returning RobotState for the same reason ^^^
+    def periodic(self, robotState: RobotState) -> None:
         self._warn(self.periodic)
-        return robotState
 
-    def robotPeriodic(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def robotPeriodic(self, robotState: RobotState) -> None:
+        pass
 
     def disabled(self) -> None:
         self._warn(self.disabled)

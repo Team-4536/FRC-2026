@@ -22,7 +22,7 @@ class Tester(Subsystem):
         self.publishBoolean("turret_tests", self.testTurret)
         self.publishBoolean("climber_tests", self.testClimb)
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
+    def phaseInit(self, robotState: RobotState) -> None:
         # self.testDrive = self.getBoolean("drive_tests", None, default=False)
         # self.testIntake = self.getBoolean("intake_tests", None, default=False)
         # self.testTurret = self.getBoolean("turret_tests", None, default=False)
@@ -30,9 +30,7 @@ class Tester(Subsystem):
 
         self.currentlyTesting = "Started"
 
-        return robotState
-
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(self, robotState: RobotState) -> None:
         time: seconds = matchData.timeSincePhaseInit
         offset: seconds = -1
 
@@ -50,8 +48,6 @@ class Tester(Subsystem):
 
         if time - offset > 0:
             self.currentlyTesting = "Done"
-
-        return robotState
 
     def _testDrive(self, state: RobotState, time: seconds) -> int:
         if 0 < time and time < 3:

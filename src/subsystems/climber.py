@@ -1,52 +1,34 @@
+from phoenix6.units import volt as voltage
 from subsystems.motor import RevMotor
-from subsystems.robotState import RobotState
+from subsystems.robotState import ClimberState, RobotState
 from subsystems.subsystem import Subsystem
 
 
 class Climber(Subsystem):
-    def __init__(self, motorID: int):
+    climberMotor: RevMotor
+
+    CLIMB_SPEED: voltage = 8.5
+
+    def __init__(self, motorID: int) -> None:
         super().__init__()
-        self.climberMotor: RevMotor = RevMotor(deviceID=motorID)
+
+        self.climberMotor = RevMotor(deviceID=motorID)
         self.climberMotor.configure(config=RevMotor.CLIMBER_CONFIG)
-        # self.climbLimit =
-        # self.climberLimit = self.climberMotor._ctrlr.getForwardLimitSwitch()
-        # self.climbEncoder = self.climberMotor.getEncoder()
-        # self.climbEncoder.setPosition(0)
-        self.publishFloat("BAM: climber down throttle", -0.7)
-        self.publishFloat("BAM: climber up throttle", 0.7)
-        pass
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
+    def phaseInit(self, robotState: RobotState) -> None:
+        self.climberMotor.stopMotor()
 
-        self.climberMotor.setVoltage(0)
-
-        # if self.climberLimit:
-        #     self.climbEncoder.setPosition(0)
-
-        return robotState
-
-    def periodic(self, robotState: RobotState) -> RobotState:
-
-        if robotState.climbDown:
-            self.climberMotor.setThrottle(-0.7)
-            #     self.getFloat("BAM: climber down throttle", default=-0.7)
-            # )
-
-        elif robotState.climbUp:
-            self.climberMotor.setThrottle(0.7)
-            #     self.getFloat("BAM: climber up throttle", default=0.7)
-            # )
-
-        else:
-            self.climberMotor.setThrottle(0)
-
-        return robotState
-
-    def robotPeriodic(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def periodic(self, robotState: RobotState) -> None:
+        match robotState.climbState:
+            case ClimberState.CLIMB_UP:
+                self.climberMotor.setVoltage(self.CLIMB_SPEED)
+            case ClimberState.CLIMB_DOWN:
+                self.climberMotor.setVoltage(-self.CLIMB_SPEED)
+            case ClimberState.DISABLED:
+                self.climberMotor.stopMotor()
 
     def disabled(self) -> None:
-        pass
+        self.climberMotor.stopMotor()
 
     def publish(self) -> None:
         pass

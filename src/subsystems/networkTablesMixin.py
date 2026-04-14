@@ -1,10 +1,11 @@
 from enum import Enum
 from functools import partial
 from ntcore import NetworkTable, NetworkTableInstance, Value
-from typing import Any, Callable, Dict, Optional, Sequence, TypeAlias, Union
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
+from wpimath.kinematics import SwerveModuleState
 
 Struct: TypeAlias = object
-ntDebugging: bool = False
+debugging: bool = True
 
 
 class NetworkTablesMixin:
@@ -14,6 +15,8 @@ class NetworkTablesMixin:
     _publishers: Dict[str, object] = {}
     _tables: Dict[str, NetworkTable] = {}
     _entries: Dict[str, object] = {}
+
+    _subIndex: int = 0
 
     def __init__(self, *, table: str = "telemetry", inst: bool = False):
         if inst:
@@ -30,7 +33,7 @@ class NetworkTablesMixin:
         *subtables: str,
         debug: bool,
     ) -> None:
-        if not ntDebugging and debug:
+        if not debugging and debug:
             return
 
         if subtables:
@@ -43,7 +46,7 @@ class NetworkTablesMixin:
             self._publishers[name] = pub
 
         try:
-            pub.set(value)  # type: ignore[attr-defined]
+            pub.set(value)  # type: ignore
         except TypeError:
             pass
 
@@ -111,34 +114,38 @@ class NetworkTablesMixin:
         topicFn = partial(self._table.getStructArrayTopic, type=value[0].__class__)
         self.__publish(name, value, topicFn, *subtables, debug=debug)
 
+    def publishSwerve(
+        self,
+        name: str,
+        value: Tuple[SwerveModuleState, ...],
+        *subtables: str,
+        debug: bool = False,
+    ) -> None:
+        self.publishStructArray(name, value, *subtables, debug=debug)
+
     def publishAny(
         self,
         name: str,
-        value: Optional[
-            Union[
-                int,
-                Sequence[int],
-                bool,
-                Sequence[bool],
-                str,
-                Sequence[str],
-                float,
-                Sequence[float],
-                Struct,
-                Sequence[Struct],
-            ]
+        value: Union[
+            int,
+            Sequence[int],
+            bool,
+            Sequence[bool],
+            str,
+            Sequence[str],
+            float,
+            Sequence[float],
+            Struct,
+            Sequence[Struct],
         ],
         *subtables: str,
         debug: bool = False,
     ) -> None:
-        if value is None:
-            return
-
-        if hasattr(value, "WPIStruct") and value is not None:
+        if hasattr(value, "WPIStruct"):
             self.publishStruct(name, value, *subtables, debug=debug)
             return
         elif isinstance(value, Sequence) and all(
-            v is not None and hasattr(v, "WPIStruct") for v in value  # pyright: ignore
+            hasattr(v, "WPIStruct") for v in value  # pyright: ignore
         ):
             self.publishStructArray(
                 name, value, *subtables, debug=debug  # pyright: ignore
@@ -162,7 +169,7 @@ class NetworkTablesMixin:
 
         try:
             pub.set(Value.makeValue(value))  # type: ignore
-        except TypeError:
+        except:
             return
 
     def __get(

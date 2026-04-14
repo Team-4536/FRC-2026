@@ -36,10 +36,10 @@ class llCams(Subsystem):
             ).getDoubleArray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         # picks pose based on side
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def phaseInit(self, robotState: RobotState) -> None:
+        pass
 
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(self, robotState: RobotState) -> None:
         # # botpose_wpiblue uses a 11 value array (index 0 = x, 2 = z, 5 = yaw)
         if self.Team == DriverStation.Alliance.kRed:
             self.botposeWPI = self.limelightTbl.getEntry(
@@ -64,8 +64,6 @@ class llCams(Subsystem):
             robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
         else:
             robotState.limelightPose = None
-
-        return robotState
 
     def disabled(self) -> None:
         pass
