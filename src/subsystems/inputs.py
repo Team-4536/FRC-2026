@@ -48,11 +48,10 @@ class Inputs(Subsystem):
             self.MAX_ABTAINABLE_SPEED,
             min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
         )
-        self.polarity = (
-            not self.polarity if self._driveCtrlr.getXButtonPressed() else self.polarity
-        )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
-        robotState.resetGyro = self._driveCtrlr.getStartButtonPressed()
+        robotState.resetGyro = (
+            self._driveCtrlr.getStartButtonPressed() or self._driveCtrlr.getXButton()
+        )
 
         # Climb Controls
         if self._driveCtrlr.getYButton():
@@ -97,8 +96,6 @@ class Inputs(Subsystem):
         vx, vy = self._circularDriveScalar(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
-        if not self.polarity:
-            vx, vy = -vx, -vy
         # else:
         #     vx, vy = self._circularDriveScalar(
         #         x=self.getFloat("proxy_drive_x", default=0),

@@ -8,7 +8,7 @@ from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import getTangentAngle, getContributedRotation, matchData
 from typing import NamedTuple, Self, SupportsFloat, SupportsIndex, Tuple, Union
-from wpimath.geometry import Pose2d, Rotation2d, Translation2d
+from wpimath.geometry import Rotation2d, Translation2d
 from wpimath.kinematics import (
     ChassisSpeeds,
     SwerveDrive4Kinematics,
@@ -195,6 +195,7 @@ class SwerveDrive(Subsystem):
     _kinematics: SwerveDrive4Kinematics
     _swerveStates: Tuple[SwerveModuleState, ...]
 
+    _angleAdjustment: Rotation2d = Rotation2d()
     _disabledModules: bool = True
 
     def __init__(self, swerveModules: SwerveModules) -> None:
@@ -229,26 +230,11 @@ class SwerveDrive(Subsystem):
 
     def periodic(self, robotState: RobotState) -> None:
         if robotState.resetGyro:
-            self._gyro.reset()
-            self._gyro.setAngleAdjustment(0)
-            robotState.odometry.resetPosition(
-                self._gyro.getRotation2d(),
-                self._modules.modulePositions,
-                Pose2d(
-                    robotState.odometry.getEstimatedPosition().translation(),
-                    self._gyro.getRotation2d(),
-                ),
-            )
+            self._angleAdjustment = self._gyro.getRotation2d()
             robotState.resetGyro = False
 
-        if robotState.autosGyroResetToggle and matchData.isAutonomous():
-            self._gyro.reset()
+        if robotState.autosGyroResetToggle:
             self._gyro.setAngleAdjustment(robotState.autosGyroReset)
-            robotState.odometry.resetPosition(
-                self._gyro.getRotation2d(),
-                self._modules.modulePositions,
-                robotState.autosInitPose,
-            )
             robotState.autosGyroResetToggle = False
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
@@ -303,7 +289,7 @@ class SwerveDrive(Subsystem):
             fieldSpeeds.vx,
             fieldSpeeds.vy,
             fieldSpeeds.omega,
-            Rotation2d.fromDegrees(self._gyro.getYaw()),
+            self._gyro.getRotation2d() - self._angleAdjustment,
         )
         moduleStates = self._kinematics.toSwerveModuleStates(chassisSpeeds)
 
@@ -312,14 +298,14 @@ class SwerveDrive(Subsystem):
             attainableMaxSpeed=self.MAX_MODULE_SPEED,
         )
 
-        for module, state in zip(self._modules._asdict().values(), self._swerveStates):
+        for module, state in zip(self._modules, self._swerveStates):
             state.optimize(module.modulePosition.angle)
             module.setDrive(state.speed)
             module.setAzimuth(state.angle)
 
     def publish(self) -> None:
         self.publishStructArray("swerve_states", self._swerveStates)
-        self.publishFloat("gyro_angle", self._gyro.getRotation2d().degrees() % 360)
+        self.publishFloat("gyro_angle", self._gyro.getAngle() % 360)
 
         for i, state in enumerate(self._swerveStates):
             module, name = self._modules[i], self._modules._fields[i]
