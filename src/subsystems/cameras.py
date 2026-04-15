@@ -18,7 +18,6 @@ from wpimath.units import inchesToMeters, radiansToDegrees
 
 
 class photonCameraClass(NetworkTablesMixin):
-
     def __init__(
         self,
         cameraName: str,
@@ -27,8 +26,9 @@ class photonCameraClass(NetworkTablesMixin):
         intCamX: float,
         intCamY: float,
         intCamZ: float,
-    ):
+    ) -> None:
         super().__init__()
+
         self.cameraNameReal = cameraName
 
         self.camera = PhotonCamera(cameraName)
@@ -55,7 +55,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.timeStamp = -1
 
-    def update(self):
+    def update(self) -> None:
         self.hasTargetsRan = False
         self.trustworthy = False
         self.camEstPose = None
@@ -127,9 +127,9 @@ class photonCameraClass(NetworkTablesMixin):
 
 
 class CameraManager(Subsystem):
-    def __init__(self):
-
+    def __init__(self) -> None:
         super().__init__()
+
         self.photonCameraRight = photonCameraClass(
             "Camera1",
             15,
@@ -206,17 +206,15 @@ class CameraManager(Subsystem):
 
         robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
-    def disabled(self):
+    def disabled(self) -> None:
         pass
 
-    def publish(self):
-
+    def publish(self) -> None:
         self.publishBoolean("rightCam trustworthy", self.photonCameraRight.trustworthy)
         # self.publishBoolean("midCam trustworthy", self.photonCameraMiddle.trustworthy)
         self.publishBoolean("leftCam trustworthy", self.photonCameraLeft.trustworthy)
         self.publishFloat("leftCamAmbiguity", self.photonCameraLeft.ambiguity)
         self.publishFloat("rightCamAmbiguity", self.photonCameraRight.ambiguity)
-
         # self.publishFloat("midCamX", self.photonCameraMiddle.robotX)
         # self.publishFloat("midCamY", self.photonCameraMiddle.robotY)
         # self.publishFloat("midCamRot", self.photonCameraMiddle.robotAngle)

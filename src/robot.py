@@ -10,8 +10,8 @@ from subsystems.swerveDrive import SwerveDrive
 from subsystems.tester import Tester
 from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
-from wpilib import TimedRobot, getTime
-from wpimath.units import inchesToMeters, meters, seconds
+from wpilib import TimedRobot
+from wpimath.units import inchesToMeters, meters
 
 
 class Robot(TimedRobot):
@@ -19,9 +19,6 @@ class Robot(TimedRobot):
 
     def robotInit(self) -> None:
         WHEEL_DISTANCE: meters = inchesToMeters(10.875)
-
-        self.timeStart: seconds = getTime()
-        self.timeRunnig: seconds = 0
 
         self.subsystemManager = SubsystemManager(
             subsystems=Subsystems(

@@ -13,7 +13,6 @@ from wpilib import SendableChooser, SmartDashboard
 
 
 class AutoRoutines(Enum):
-
     DO_NOTHING = "Do Nothing"
 
     L_BACK_N_SHOOT = "L Back And Shoot"
@@ -53,7 +52,7 @@ class AutoSubsystem(Subsystem):
         for routine in AutoRoutines:
             self.autoRoutineChooser.addOption(routine.value, routine)
 
-        SmartDashboard.putData("auto routine chooser", self.autoRoutineChooser)
+        SmartDashboard.putData("auto_routine_chooser", self.autoRoutineChooser)
 
     def phaseInit(self, robotState: RobotState) -> None:
         self.routine: dict[str, List[AutoStages]] = routineChooser(
@@ -68,22 +67,22 @@ class AutoSubsystem(Subsystem):
 
         if self.routine:
             for path in self.routine[self.routineKeys[self.currentPath]]:
-                robotState = path.autoInit(robotState)
+                path.autoInit(robotState)
 
     def periodic(self, robotState: RobotState) -> None:
         self.routineFinished = self.currentPath >= len(self.routineKeys)
 
         if not self.routineFinished:
             for path in self.routine[self.routineKeys[self.currentPath]]:
-                robotState = path.run(robotState)
+                path.run(robotState)
             if self.routine[self.routineKeys[self.currentPath]][0].isDone():
                 for path in self.routine[self.routineKeys[self.currentPath]]:
-                    robotState = path.end(robotState)
+                    path.end(robotState)
                 self.currentPath += 1
                 self.routineFinished = self.currentPath >= len(self.routineKeys)
                 if not self.routineFinished:
                     for path in self.routine[self.routineKeys[self.currentPath]]:
-                        robotState = path.autoInit(robotState)
+                        path.autoInit(robotState)
 
     def disabled(self) -> None:
         pass
@@ -98,7 +97,6 @@ def routineChooser(
     routine: dict[str, List[AutoStages]] = dict()
 
     match selectedRoutine:
-
         case AutoRoutines.DO_NOTHING:
             pass
 

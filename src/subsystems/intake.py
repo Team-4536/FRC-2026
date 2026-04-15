@@ -18,8 +18,8 @@ class IntakeState(Enum):
 class Intake(Subsystem):
     # defines all motors that are used in the subsystem
     def __init__(self, frontMotorID: int, backMotorID: int, raiseMotorID: int):
-
         super().__init__()
+
         self.intakeMotorManual = RevMotor(deviceID=frontMotorID)
         self.intakeMotorRaise = RevMotor(deviceID=raiseMotorID)
         self.intakeMotorAutomatic = RevMotor(deviceID=backMotorID)
@@ -138,7 +138,7 @@ class Intake(Subsystem):
         self.intakeMotorManual.setThrottle(self.manualThrottle * 1.5)
 
     # values when the robot is disabled
-    def disabled(self):
+    def disabled(self) -> None:
         self.intakeMotorManual.setThrottle(0)
         self.intakeMotorAutomatic.setThrottle(0)
         self.intakeMotorRaise.setThrottle(0)
@@ -146,7 +146,7 @@ class Intake(Subsystem):
         self.indexerThrottle = 0
         self.raiseThrottle = 0
 
-    def publish(self):
+    def publish(self) -> None:
         self.publishFloat("intakeMThrottle", self.manualThrottle)
         self.publishFloat("intakeAThrottle", self.indexerThrottle)
         self.publishFloat("intakeRThrottle", self.raiseThrottle)
