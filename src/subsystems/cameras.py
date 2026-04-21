@@ -1,21 +1,23 @@
+from ntcore import NetworkTableInstance
+from photonlibpy import EstimatedRobotPose
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from robotpy_apriltag import AprilTagField, AprilTagFieldLayout
-
-import wpimath.geometry
-from wpimath.geometry import Pose2d, Translation2d
-
-from ntcore import NetworkTableInstance
-from photonlibpy import EstimatedRobotPose
 from subsystems.networkTablesMixin import NetworkTablesMixin
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
-from wpimath.units import inchesToMeters, radiansToDegrees, meters
-from wpilib import getTime
+from wpimath.geometry import (
+    Pose2d,
+    Rotation2d,
+    Rotation3d,
+    Transform3d,
+    Translation2d,
+    Translation3d,
+)
+from wpimath.units import inchesToMeters, radiansToDegrees
 
 
 class photonCameraClass(NetworkTablesMixin):
-
     def __init__(
         self,
         cameraName: str,
@@ -24,14 +26,15 @@ class photonCameraClass(NetworkTablesMixin):
         intCamX: float,
         intCamY: float,
         intCamZ: float,
-    ):
+    ) -> None:
         super().__init__()
+
         self.cameraNameReal = cameraName
 
         self.camera = PhotonCamera(cameraName)
-        kRobotToCam = wpimath.geometry.Transform3d(
-            wpimath.geometry.Translation3d(intCamX, intCamY, intCamZ),
-            wpimath.geometry.Rotation3d.fromDegrees(0.0, camPitch, camYaw),
+        kRobotToCam = Transform3d(
+            Translation3d(intCamX, intCamY, intCamZ),
+            Rotation3d.fromDegrees(0.0, camPitch, camYaw),
         )
         self.camPoseEst = PhotonPoseEstimator(
             AprilTagFieldLayout.loadField(AprilTagField.k2026RebuiltWelded),
@@ -53,7 +56,6 @@ class photonCameraClass(NetworkTablesMixin):
         self.timeStamp = -1
 
     def update(self):
-
         self.trustworthy = False
         self.camEstPose = None
         self.result = self.camera.getLatestResult()
@@ -77,17 +79,15 @@ class photonCameraClass(NetworkTablesMixin):
                     self.result
                 )
                 if self.camEstPose != None:
-                    self.camEstTrans = wpimath.geometry.Translation2d(
+                    self.camEstTrans = Translation2d(
                         self.camEstPose.estimatedPose.X(),
                         self.camEstPose.estimatedPose.Y(),
                     )
-                    self.camEstRot = wpimath.geometry.Rotation2d(
+                    self.camEstRot = Rotation2d(
                         self.camEstPose.estimatedPose.rotation().Z()
                     )
-                    self.camEstPose2d = wpimath.geometry.Pose2d(
-                        self.camEstTrans, self.camEstRot
-                    )
-
+                    self.camEstPose2d = Pose2d(self.camEstTrans, self.camEstRot)
+                    self.timeStamp = self.camEstPose.timestampSeconds
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
@@ -104,16 +104,14 @@ class photonCameraClass(NetworkTablesMixin):
                     self.result
                 )
                 if self.camEstPose != None:
-                    self.camEstTrans = wpimath.geometry.Translation2d(
+                    self.camEstTrans = Translation2d(
                         self.camEstPose.estimatedPose.X(),
                         self.camEstPose.estimatedPose.Y(),
                     )
-                    self.camEstRot = wpimath.geometry.Rotation2d(
+                    self.camEstRot = Rotation2d(
                         self.camEstPose.estimatedPose.rotation().Z()
                     )
-                    self.camEstPose2d = wpimath.geometry.Pose2d(
-                        self.camEstTrans, self.camEstRot
-                    )
+                    self.camEstPose2d = Pose2d(self.camEstTrans, self.camEstRot)
                     self.timeStamp = self.camEstPose.timestampSeconds
                     self.robotX = self.camEstPose.estimatedPose.X()
                     self.robotY = self.camEstPose.estimatedPose.Y()
@@ -128,9 +126,9 @@ class photonCameraClass(NetworkTablesMixin):
 
 
 class CameraManager(Subsystem):
-    def __init__(self):
-
+    def __init__(self) -> None:
         super().__init__()
+
         self.photonCameraRight = photonCameraClass(
             "Camera1",
             15,
@@ -163,11 +161,10 @@ class CameraManager(Subsystem):
         #     (10.5 + 26.5) * 0.0254,
         # )
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def phaseInit(self, robotState: RobotState) -> None:
+        pass
 
-    def periodic(self, robotState: RobotState) -> RobotState:
-
+    def periodic(self, robotState: RobotState) -> None:
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
         # self.publishBoolean("cam1 running", self.photonCameraRight.running)
@@ -177,66 +174,46 @@ class CameraManager(Subsystem):
         # self.photonCameraMiddle.update()
 
         # DJO CameraOverride
-        if self.getBoolean("CameraOverride Enable", default=False):
-            newPoseT = wpimath.geometry.Translation2d(
-                self.getFloat("CameraOverride X", default=5.0),
-                self.getFloat("CameraOverride Y", default=5.0),
+        # if self.getBoolean("CameraOverride Enable", default=False):
+        # newPoseT = Translation2d(
+        #     self.getFloat("CameraOverride X", default=5.0),
+        #     self.getFloat("CameraOverride Y", default=5.0),
+        # )
+        # newPoseR = Rotation2d(
+        #     self.getFloat("CameraOverride R", default=3.1415926 / 2),
+        # )
+        # newPose2d = Pose2d(newPoseT, newPoseR)
+        # robotState.odometry.resetPose(newPose2d)
+        # else:
+        if self.photonCameraLeft.trustworthy:
+
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraLeft.camEstPose2d,
+                self.photonCameraLeft.timeStamp,
             )
-            newPoseR = wpimath.geometry.Rotation2d(
-                self.getFloat("CameraOverride R", default=3.1415926 / 2),
+        # if self.photonCameraMiddle.trustworthy:
+
+        #     robotState.odometry.addVisionMeasurement(
+        #         self.photonCameraMiddle.camEstPose2d, getTime()
+        #     )
+
+        if self.photonCameraRight.trustworthy:
+            robotState.odometry.addVisionMeasurement(
+                self.photonCameraRight.camEstPose2d,
+                self.photonCameraRight.timeStamp,
             )
-            newPose2d = wpimath.geometry.Pose2d(newPoseT, newPoseR)
-            robotState.odometry.resetPose(newPose2d)
-        else:
-            if self.photonCameraLeft.trustworthy:
-                robotState.odometry.addVisionMeasurement(
-                    self.photonCameraLeft.camEstPose2d,
-                    self.photonCameraLeft.timeStamp,
-                )
-            # if self.photonCameraMiddle.trustworthy:
-
-            #     robotState.odometry.addVisionMeasurement(
-            #         self.photonCameraMiddle.camEstPose2d, getTime()
-            #     )
-
-            if self.photonCameraRight.trustworthy:
-                robotState.odometry.addVisionMeasurement(
-                    self.photonCameraRight.camEstPose2d,
-                    self.photonCameraRight.timeStamp,
-                )
-
-        self.test = self.test + 1
-        self.publishFloat(
-            "DJO Test Time", getTime()
-        )  ## DJO: This is the *wrong* time in sim
-        self.publishFloat("DJO Test Time2", self.test)
-        # self.a = wpimath.geometry.Pose2d(5, 5, 12039)
-        # robotState.odometry.addVisionMeasurement(self.a, getTime())
 
         #   robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
-        # resetPosition(
-        #         self._gyro.getRotation2d(),
-        #         self._modules.modulePositions,
-        #         Pose2d(
-        #             robotState.odometry.getEstimatedPosition().translation(),
-        #             Rotation2d(),
-        #         ),
-        #     )
-        # robotState.odometry.resetPosition
-        return robotState
-
-    def disabled(self):
+    def disabled(self) -> None:
         pass
 
-    def publish(self):
-
+    def publish(self) -> None:
         self.publishBoolean("rightCam trustworthy", self.photonCameraRight.trustworthy)
         # self.publishBoolean("midCam trustworthy", self.photonCameraMiddle.trustworthy)
         self.publishBoolean("leftCam trustworthy", self.photonCameraLeft.trustworthy)
         self.publishFloat("leftCamAmbiguity", self.photonCameraLeft.ambiguity)
         self.publishFloat("rightCamAmbiguity", self.photonCameraRight.ambiguity)
-
         # self.publishFloat("midCamX", self.photonCameraMiddle.robotX)
         # self.publishFloat("midCamY", self.photonCameraMiddle.robotY)
         # self.publishFloat("midCamRot", self.photonCameraMiddle.robotAngle)

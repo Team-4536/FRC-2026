@@ -5,11 +5,12 @@ from pathplannerlib.path import (  # pyright: ignore
     PathPlannerTrajectory,
 )
 from subsystems.robotState import RobotState
-from wpilib import getTime
+from subsystems.utils import matchData
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.units import (
     feetToMeters,
+    inchesToMeters,
     lbsToKilograms,  # pyright: ignore
     meters_per_second,
     radians_per_second,
@@ -17,7 +18,6 @@ from wpimath.units import (
 
 
 def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
-
     nominalVoltage = 12.0
     stallTorque = 2.6
     stallCurrent = 105.0
@@ -30,10 +30,10 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
     motor = DCMotor(nominalVoltage, stallTorque, stallCurrent, freeCurrent, freeSpeed)
     currentLimit = 40
 
-    topLeftWheelCords = Translation2d(-0.276225, 0.276225)
-    topRightWheelCords = Translation2d(0.276225, 0.276225)
-    bottomLeftWheelCords = Translation2d(-0.276225, -0.276225)
-    bottomRightWheelCords = Translation2d(0.276225, -0.276225)
+    topLeftWheelCords = Translation2d(-inchesToMeters(11), inchesToMeters(11))
+    topRightWheelCords = Translation2d(inchesToMeters(11), inchesToMeters(11))
+    bottomLeftWheelCords = Translation2d(-inchesToMeters(11), -inchesToMeters(11))
+    bottomRightWheelCords = Translation2d(inchesToMeters(11), -inchesToMeters(11))
 
     robotMassKG = lbsToKilograms(100)  # TODO: change later
     robotMOI = (1 / 12) * robotMassKG * 2 * feetToMeters(1) ** 2  # TODO: change later
@@ -63,17 +63,17 @@ def loadTrajectory(filename: str, isFlipped: bool) -> PathPlannerTrajectory:
 
 
 class AutoStages:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def autoInit(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def autoInit(self, robotState: RobotState) -> None:
+        pass
 
-    def run(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def run(self, robotState: RobotState) -> None:
+        pass
 
-    def end(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def end(self, robotState: RobotState) -> None:
+        pass
 
     def isDone(self) -> bool:
         return False
@@ -88,35 +88,32 @@ class FollowTrajectory(AutoStages):
     startTime: float
     pathTime: float
 
-    def __init__(self, pathName: str, isFlipped: bool):
+    def __init__(self, pathName: str, isFlipped: bool) -> None:
         self.trajectory = loadTrajectory(pathName, isFlipped)
         self.robotState = RobotState.empty()
 
         self.pathDone = False
 
-    def autoInit(self, robotState: RobotState) -> RobotState:
-        self.startTime = getTime()
+    def autoInit(self, robotState: RobotState) -> None:
+        self.startTime = matchData.getTime()
         robotState.autosGyroResetToggle = True
         robotState.autosGyroReset = (
             self.trajectory.getInitialPose().rotation().degrees()
         )
         robotState.autosInitPose = self.trajectory.getInitialPose()
-        return robotState
 
-    def run(self, robotState: RobotState):
-
+    def run(self, robotState: RobotState) -> None:
         self.robotState = robotState
 
-        self.pathTime = getTime() - self.startTime
+        self.pathTime = matchData.getTime() - self.startTime
 
         targetState = self.trajectory.sample(self.pathTime)
 
         self.robotState.fieldSpeeds = targetState.fieldSpeeds
 
-        return self.robotState
-
-    def end(self, robotState: RobotState) -> RobotState:
-        return robotState
+    def end(self, robotState: RobotState) -> None:
+        self.robotState = robotState
+        self.robotState.fieldSpeeds = self.trajectory.getEndState().fieldSpeeds
 
     def isDone(self) -> bool:
         currXPos = self.robotState.odometry.getEstimatedPosition().x
@@ -154,18 +151,16 @@ class OperateIntake(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, runTime: float = 0):
+    def __init__(self, runTime: float = 0) -> None:
         self.pathDone = False
         self.runTime = runTime
 
-    def autoInit(self, robotState: RobotState) -> RobotState:
-        self.startTime = getTime()
+    def autoInit(self, robotState: RobotState) -> None:
+        self.startTime = matchData.getTime()
 
-        return robotState
-
-    def run(self, robotState: RobotState) -> RobotState:
+    def run(self, robotState: RobotState) -> None:
         self.robotState = robotState
-        self.pathTime = getTime() - self.startTime
+        self.pathTime = matchData.getTime() - self.startTime
 
         if self.pathTime < 1.2:  # TODO: make this not work like this
             self.robotState.intakePosYAxis = 0.85
@@ -176,16 +171,11 @@ class OperateIntake(AutoStages):
             if self.pathTime > self.pathTime:
                 self.robotState.initialIntake = False
 
-        return self.robotState
-
-    def end(self, robotState: RobotState) -> RobotState:
+    def end(self, robotState: RobotState) -> None:
         robotState.intakePosYAxis = 0
         robotState.initialIntake = False
 
-        return self.robotState
-
     def isDone(self) -> bool:
-
         if self.pathTime < self.runTime or self.pathTime < 1.2:
             return False
 
@@ -200,37 +190,29 @@ class OperateTurret(AutoStages):
     runTime: float
     pathDone: bool
 
-    def __init__(self, unload: bool = False, runTime: float = 0):
+    def __init__(self, unload: bool = False, runTime: float = 0) -> None:
         self.pathDone = False
         self.runTime = runTime
         self.unload = unload
 
-    def autoInit(self, robotState: RobotState) -> RobotState:
-        self.startTime = getTime()
+    def autoInit(self, robotState: RobotState) -> None:
+        self.startTime = matchData.getTime()
 
-        return robotState
-
-    def run(self, robotState: RobotState) -> RobotState:
+    def run(self, robotState: RobotState) -> None:
         self.robotState = robotState
-        self.pathTime = getTime() - self.startTime
+        self.pathTime = matchData.getTime() - self.startTime
 
         self.robotState.revSpeed = 1
-        if not robotState.dontShoot:
+        if self.pathTime > 1:
             self.robotState.kickShooter = self.unload
             self.robotState.intakeIndexer = self.unload
 
-        return self.robotState
-
-    def end(self, robotState: RobotState) -> RobotState:
-
+    def end(self, robotState: RobotState) -> None:
         robotState.revSpeed = 0
         robotState.kickShooter = False
         robotState.intakeIndexer = False
 
-        return self.robotState
-
     def isDone(self) -> bool:
-
         if self.pathTime < self.runTime:
             return False
 

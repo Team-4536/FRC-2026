@@ -9,3 +9,5 @@ simgui*
 
 # misc
 .DS_STORE
+profile*
+.lprof
