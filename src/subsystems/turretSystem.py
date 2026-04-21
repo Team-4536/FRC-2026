@@ -40,10 +40,14 @@ MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
 TURRET_GAP: radians = TAU - MAX_ROTATION
 # if the robot is facing 0 and we want to go to 0, go to the zero offset in robot relative space
-ZERO_OFFSET: radians = MAX_ROTATION / 2  # offset to comp for shooting too far right
+ZERO_OFFSET: radians = MAX_ROTATION / 2
 # small gear rotations to big gear rotations
 YAW_GEARING: float = 100 / 3
-
+PITCH_RADIUS: inches = 9.342
+LIL_PITCH_GEAR_RADIUS: inches = 0.552
+ARC_RATIO = (
+    PITCH_RADIUS / LIL_PITCH_GEAR_RADIUS
+)  # how many rotations of the smol ladder gear is 1 rotation of the pitch
 # TODO make a sin func to change hieght of turret (Pitch_radius) * sin(theta) + turret_height
 # if angle is 0 this is the height of the turret
 TURRET_HEIGHT: meters = inchesToMeters(13.841)
@@ -58,7 +62,8 @@ HUB_RADIUS: inches = HUB_DIAM / 2
 HUB_DIST_X: meters = inchesToMeters(158.6) + inchesToMeters(HUB_RADIUS)
 HUB_DIST_Y: meters = FIELD_WIDTH / 2
 HUB_HEIGHT_Z: meters = inchesToMeters(73 - 15) - TURRET_HEIGHT
-Y_PASS_DIFF_HUB: meters = inchesToMeters(25 + BALL_RADIUS)
+# TODO TODO TODO continue code review here
+Y_PASS_DIFF_HUB: meters = inchesToMeters(17 + BALL_RADIUS)
 Y_PASS_HUB: meters = HUB_HEIGHT_Z + Y_PASS_DIFF_HUB
 X_PASS_DIFF_HUB: meters = inchesToMeters(HUB_RADIUS)
 
@@ -87,7 +92,7 @@ BLUE_BOTTOM_SHUTTLE_POS: Translation3d = Translation3d(
 )
 BLUE_SCORE_POS: Translation3d = Translation3d(
     HUB_DIST_X,
-    HUB_DIST_Y,  # + 0.254, #fudge factor move target to left by 10 inches
+    HUB_DIST_Y,
     HUB_HEIGHT_Z,
 )
 
@@ -475,10 +480,8 @@ class Turret(Subsystem):
 
         d = self.getTargetDist(pointPos, turretPose)
         h = pointPos.z
-
         self.publishFloat("xPass", self.getXPass(d), debug=True)
         self.publishFloat("distance", d, debug=True)
-
         self.pitchSetpoint = calculateAngle(d, h, self.getXPass(d), self.getYPass())
 
         if self.target != TurretTarget.HUB:

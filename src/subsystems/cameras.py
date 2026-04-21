@@ -55,8 +55,7 @@ class photonCameraClass(NetworkTablesMixin):
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.timeStamp = -1
 
-    def update(self) -> None:
-        self.hasTargetsRan = False
+    def update(self):
         self.trustworthy = False
         self.camEstPose = None
         self.result = self.camera.getLatestResult()
@@ -64,7 +63,7 @@ class photonCameraClass(NetworkTablesMixin):
 
         if self.hasTargets:
             self.running = True
-            self.hasTargetsRan = True
+
             self.target = self.result.getTargets()
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
@@ -204,7 +203,7 @@ class CameraManager(Subsystem):
                 self.photonCameraRight.timeStamp,
             )
 
-        robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
+        #   robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
     def disabled(self) -> None:
         pass

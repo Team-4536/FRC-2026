@@ -43,6 +43,7 @@ class Inputs(Subsystem):
 
     def periodic(self, robotState: RobotState) -> None:
         # Drive Controls
+        self.proxyControlMode = self.getBoolean("proxy control mode", default=False)
         maxSpeed = lerp(
             self.LOW_MAX_ABTAINABLE_SPEED,
             self.MAX_ABTAINABLE_SPEED,
@@ -87,6 +88,7 @@ class Inputs(Subsystem):
         pass
 
     def publish(self) -> None:
+        self.publishBoolean("proxy control mode", self.proxyControlMode)
         pass
 
     def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:

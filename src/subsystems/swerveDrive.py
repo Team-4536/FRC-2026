@@ -221,6 +221,8 @@ class SwerveDrive(Subsystem):
         for m in self._modules:
             m.resetAzimuthEncoder()
 
+        robotState.gyro = self._gyro.getRotation2d()
+
     def robotPeriodic(self, robotState: RobotState) -> None:
         robotState.odometry.update(
             self._gyro.getRotation2d(),
@@ -236,6 +238,11 @@ class SwerveDrive(Subsystem):
         if robotState.autosGyroResetToggle:
             self._gyro.setAngleAdjustment(robotState.autosGyroReset)
             robotState.autosGyroResetToggle = False
+
+        robotState.odometry.update(
+            self._gyro.getRotation2d(),
+            self._modules.modulePositions,
+        )
 
         self.drive(fieldSpeeds=robotState.fieldSpeeds)
 
