@@ -1,10 +1,10 @@
-from math import atan2, copysign, cos, hypot, pi, sin, tau
+from math import atan, atan2, copysign, cos, hypot, pi, sin, tau
 from numpy import sign
 from phoenix6.units import volt as voltage
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from typing import Optional, Tuple
-from wpilib import DriverStation, RobotBase, Timer
+from wpilib import DriverStation, getTime, RobotBase, Timer
 from wpimath.geometry import Translation2d
 from wpimath.units import (
     inchesToMeters,
@@ -15,9 +15,9 @@ from wpimath.units import (
     seconds,
 )
 
-FIELD_WIDTH: meters = inchesToMeters(317.7)
-FIELD_LEN: meters = inchesToMeters(651.2)
 BATTERY_VOLTS: float = 12
+FIELD_LEN: meters = inchesToMeters(651.2)
+FIELD_WIDTH: meters = inchesToMeters(317.7)
 
 
 class TimeData(Subsystem):
@@ -25,7 +25,7 @@ class TimeData(Subsystem):
     _phaseTime: Timer
 
     _prevTime: seconds = 0
-    _deltaTime: seconds = 0
+    _deltaTime: seconds = 0.2
     _isDisabled: bool = True
 
     def __init__(self) -> None:
@@ -37,17 +37,15 @@ class TimeData(Subsystem):
         self._matchTime.start()
         self._phaseTime.start()
 
-    def phaseInit(self, robotState: RobotState) -> RobotState:
+    def phaseInit(self, robotState: RobotState) -> None:
         self._phaseTime.reset()
         self._phaseTime.start()
         self._isDisabled = False
-        return robotState
 
-    def periodic(self, robotState: RobotState) -> RobotState:
+    def periodic(self, robotState: RobotState) -> None:
         time = self._matchTime.get()
         self._deltaTime = time - self._prevTime
         self._prevTime = time
-        return robotState
 
     def disabled(self) -> None:
         if not self._isDisabled:
@@ -79,9 +77,10 @@ class TimeData(Subsystem):
 timeData: TimeData = TimeData()
 
 
+# TODO: maybe make some of these properties that get set in __init__ and phaseInit so that there is no need to recall methods that don't need to be
 class _MatchData:
-    red: DriverStation.Alliance = DriverStation.Alliance.kRed
-    blue: DriverStation.Alliance = DriverStation.Alliance.kBlue
+    redAlliance: DriverStation.Alliance = DriverStation.Alliance.kRed
+    blueAlliance: DriverStation.Alliance = DriverStation.Alliance.kBlue
 
     @property
     def dt(self) -> seconds:
@@ -95,6 +94,9 @@ class _MatchData:
     def timeSincePhaseInit(self) -> seconds:
         return timeData.timeSincePhaseInit
 
+    def getTime(self) -> seconds:
+        return getTime()
+
     def isSimulation(self) -> bool:
         return RobotBase.isSimulation()
 
@@ -107,6 +109,9 @@ class _MatchData:
     def isTeleop(self) -> bool:
         return DriverStation.isTeleopEnabled()
 
+    def isTest(self) -> bool:
+        return DriverStation.isTestEnabled()
+
     def isDisabled(self) -> bool:
         return DriverStation.isDisabled()
 
@@ -115,10 +120,10 @@ class _MatchData:
         return DriverStation.getAlliance()
 
     def isRed(self) -> bool:
-        return self.allianceSide == self.red
+        return self.allianceSide == self.redAlliance
 
     def isBlue(self) -> bool:
-        return self.allianceSide == self.blue
+        return self.allianceSide == self.blueAlliance
 
 
 matchData: _MatchData = _MatchData()
@@ -236,36 +241,27 @@ def lerp(x: float, y: float, t: float) -> float:
     return x + t * (y - x)
 
 
-def getTangentAngle(posFromCenter: Translation2d) -> radians:
-    # TODO idk if this works
-    tangentAngle: radians = atan2(posFromCenter.y, posFromCenter.x) + pi / 2
-
-    return tangentAngle
+def getTangentAngle(translation: Translation2d) -> radians:
+    return realInverseTan(translation.y, translation.x) + pi / 2
 
 
 def getContributedRotation(
-    tangentAngle: radians, angle: radians, speed: meters_per_second
+    tangentAngle: radians, vector: Translation2d
 ) -> meters_per_second:
-    contributedVector: float = cos(tangentAngle - angle)
+    if vector.norm() < 1e-4:
+        return 0
 
-    return speed * contributedVector
+    contributedVector: float = cos(tangentAngle - vector.angle().radians())
 
-
-def RPMToMPS(speed: revolutions_per_minute, circ: meters) -> meters_per_second:
-    return speed / 60 * circ
-
-
-def MPSToRPM(speed: meters_per_second, circ: meters) -> revolutions_per_minute:
-    return speed / circ * 60
+    return vector.norm() * contributedVector
 
 
-def scaleTranslation2D(translation: Translation2d, scalar: float) -> Translation2d:
-    angle = translation.angle().radians()
-    hyp = translation.distance(Translation2d())
-    xScale = hyp * cos(angle)
-    yScale = hyp * sin(angle)
+def RPMToMPS(speed: revolutions_per_minute, circumference: meters) -> meters_per_second:
+    return speed / 60 * circumference
 
-    return Translation2d(xScale, yScale)
+
+def MPSToRPM(speed: meters_per_second, circumference: meters) -> revolutions_per_minute:
+    return speed / circumference * 60
 
 
 def wrapAngle(angle: radians) -> radians:
@@ -277,3 +273,15 @@ def wrapAngle(angle: radians) -> radians:
 
 def RPMToVolts(rpm: revolutions_per_minute, maxRPM: revolutions_per_minute) -> voltage:
     return rpm / (maxRPM / BATTERY_VOLTS)
+
+
+def realInverseTan(x: float, y: float) -> radians:
+    if x == 0:
+        return 0
+
+    angle: radians = atan(y / x)
+
+    if x < 0:
+        angle += pi
+
+    return angle

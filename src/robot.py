@@ -1,64 +1,83 @@
 from subsystemManager import SubsystemManager, Subsystems
+from subsystems.autoSubsystem import AutoSubsystem
 from subsystems.cameras import CameraManager
+from subsystems.climber import Climber
 from subsystems.inputs import Inputs
 from subsystems.intake import Intake
-from subsystems.LEDSignals import LEDSignals
+from subsystems.limelights import llCams
 from subsystems.subsystem import RobotState
 from subsystems.swerveDrive import SwerveDrive
+from subsystems.tester import Tester
 from subsystems.turretSystem import Shooter, Turret
 from subsystems.utils import timeData
-from subsystems.limelights import llCams
 from wpilib import TimedRobot
 from wpimath.units import inchesToMeters, meters
-from ntcore import NetworkTableInstance
 
 
 class Robot(TimedRobot):
-    subsystems: SubsystemManager
+    subsystemManager: SubsystemManager
 
     def robotInit(self) -> None:
         WHEEL_DISTANCE: meters = inchesToMeters(10.875)
 
-        self.subsystems = SubsystemManager(
+        self.subsystemManager = SubsystemManager(
             subsystems=Subsystems(
-                intake=Intake(10, 30, 9),
-                ledSignals=LEDSignals(deviceID=0),
+                intake=Intake(10, 17, 9),
                 shooter=Shooter(kickerID=18, revTopID=12, revBottomID=11),
                 swerveDrive=SwerveDrive.symmetricDrive(
-                    xPos=WHEEL_DISTANCE, yPos=WHEEL_DISTANCE
+                    FL_DriveID=2,
+                    FR_DriveID=4,
+                    BL_DriveID=6,
+                    BR_DriveID=8,
+                    FL_AzimuthID=1,
+                    FR_AzimuthID=3,
+                    BL_AzimuthID=5,
+                    BR_AzimuthID=7,
+                    FL_EncoderID=21,
+                    FR_EncoderID=22,
+                    BL_EncoderID=23,
+                    BR_EncoderID=24,
+                    xPos=WHEEL_DISTANCE,
+                    yPos=WHEEL_DISTANCE,
                 ),
                 turret=Turret(yawMotorID=14, pitchMotorID=13),
+                climb=Climber(motorID=15),
             ),
             inputs=Inputs(),
+            autos=AutoSubsystem(),
             cameras=CameraManager(),
             time=timeData,
+            tests=Tester(),
             llCam=llCams(),
             robotState=RobotState.empty(),
         )
 
     def robotPeriodic(self) -> None:
-        self.subsystems.robotPeriodic()
+        self.subsystemManager.robotPeriodic()
 
     def autonomousInit(self) -> None:
-        self.subsystems.init()
+        self.subsystemManager.init()
 
     def autonomousPeriodic(self) -> None:
-        self.subsystems.autonomousPeriodic()
+        self.subsystemManager.autonomousPeriodic()
 
     def teleopInit(self) -> None:
-        self.subsystems.init()
+        self.subsystemManager.init()
 
     def teleopPeriodic(self) -> None:
-        self.subsystems.teleopPeriodic()
+        self.subsystemManager.teleopPeriodic()
 
     def teleopExit(self) -> None:
         self.disabledInit()
+
+    def testInit(self) -> None:
+        self.subsystemManager.init()
+
+    def testPeriodic(self) -> None:
+        self.subsystemManager.testPeriodic()
 
     def disabledInit(self) -> None:
         self.disabledPeriodic()
 
     def disabledPeriodic(self) -> None:
-        self.subsystems.disabled()
-
-    def testInit(self) -> None:
-        llCams()
+        self.subsystemManager.disabled()

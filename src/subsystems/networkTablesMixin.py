@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import partial
 from ntcore import NetworkTable, NetworkTableInstance, Value
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
@@ -9,11 +10,20 @@ debugging: bool = True
 
 class NetworkTablesMixin:
     _table: NetworkTable
-    _ntPersist: Dict[str, object]
+    _tablePath: str
 
-    def __init__(self, *, table: str = "telemetry", inst: bool = True):
-        self._table = self._getTable(table, inst)
-        self._ntPersist = {}
+    _publishers: Dict[str, object] = {}
+    _tables: Dict[str, NetworkTable] = {}
+    _entries: Dict[str, object] = {}
+
+    _subIndex: int = 0
+
+    def __init__(self, *, table: str = "telemetry", inst: bool = False):
+        if inst:
+            table = f"{table}/{self.__class__.__name__}"
+        self._table = self._getTable(table)
+        self._tablePath = table
+        self._tables[table] = self._table
 
     def __publish(
         self,
@@ -23,19 +33,22 @@ class NetworkTablesMixin:
         *subtables: str,
         debug: bool,
     ) -> None:
-        if debug and not debugging:
+        if not debugging and debug:
             return
 
         if subtables:
             name = "/".join((*subtables, name))
 
-        pub = self._ntPersist.get(name)
+        pub = self._publishers.get(name)
         if pub is None:
             topic = topicFn(name)
             pub = topic.publish()
-            self._ntPersist[name] = pub
+            self._publishers[name] = pub
 
-        pub.set(value)  # type: ignore[attr-defined]
+        try:
+            pub.set(value)  # type: ignore
+        except TypeError:
+            pass
 
     def publishString(
         self, name: str, value: str, *subtables: str, debug: bool = False
@@ -110,73 +123,84 @@ class NetworkTablesMixin:
     ) -> None:
         self.publishStructArray(name, value, *subtables, debug=debug)
 
-    def publishGeneric(
+    def publishAny(
         self,
         name: str,
-        value: Optional[
-            Union[
-                int,
-                Sequence[int],
-                str,
-                Sequence[str],
-                float,
-                Sequence[float],
-                Struct,
-                Sequence[Struct],
-            ]
+        value: Union[
+            int,
+            Sequence[int],
+            bool,
+            Sequence[bool],
+            str,
+            Sequence[str],
+            float,
+            Sequence[float],
+            Struct,
+            Sequence[Struct],
         ],
         *subtables: str,
+        debug: bool = False,
     ) -> None:
-        if value is None:
-            return
-
         if hasattr(value, "WPIStruct"):
-            self.publishStruct(name, value)
+            self.publishStruct(name, value, *subtables, debug=debug)
             return
         elif isinstance(value, Sequence) and all(
-            v is not None and hasattr(v, "WPIStruct") for v in value  # pyright: ignore
+            hasattr(v, "WPIStruct") for v in value  # pyright: ignore
         ):
-            self.publishStructArray(name, value)  # pyright: ignore
+            self.publishStructArray(
+                name, value, *subtables, debug=debug  # pyright: ignore
+            )
+            return
+        elif isinstance(value, Enum):
+            self.publishString(name, value.name, *subtables, debug=debug)
+            return
+        elif isinstance(value, bool):
+            self.publishBoolean(name, value, *subtables, debug=debug)
+            return
         elif subtables:
             name = "/".join((*subtables, name))
 
-        if value is None:
-            self.publishString(name, "Null", *subtables)
-
         typeStr = type(value).__name__  # pyright: ignore
-        pub = self._ntPersist.get(name)
+        pub = self._publishers.get(name)
         if pub is None:
             topic = self._table.getTopic(name)
             pub = topic.genericPublish(typeStr)
-            self._ntPersist[name] = pub
+            self._publishers[name] = pub
 
         try:
             pub.set(Value.makeValue(value))  # type: ignore
-        except TypeError:
-            self.publishGeneric("test", "Null", *subtables)
+        except:
+            return
 
-    def __get(self, n: str, t: Callable[[str], Any], *s: str, d: Any) -> Any:
-        if s:
-            n = "/".join((*s, n))
-        return t(n).getEntry(d).get()
+    def __get(
+        self, name: str, topic: Callable[[str], Any], *subtables: str, default: Any
+    ) -> Any:
+        if subtables:
+            name = "/".join((*subtables, name))
 
-    def _getTable(self, table: Optional[str], inst: bool):
+        entry = self._entries.get(name)
+        if entry is None:
+            entry = topic(name).getEntry(default)
+            self._entries[name] = entry
+
+        return entry.get()  # type: ignore
+
+    def _getTable(self, tableStr: Optional[str]) -> NetworkTable:
+        if tableStr is None:
+            tableStr = self._tablePath
+
+        table = self._tables.get(tableStr)
         if table is None:
-            table = self._table.getPath()
-        if inst:
-            table = f"{table}/{self.__class__.__name__}"
-        return NetworkTableInstance.getDefault().getTable(table)
+            table = NetworkTableInstance.getDefault().getTable(tableStr)
+            self._tables[tableStr] = table
+
+        return table
 
     def getString(
-        self,
-        name: str,
-        table: Optional[str] = None,
-        *subtables: str,
-        inst: bool = True,
-        default: str,
+        self, name: str, table: Optional[str] = None, *subtables: str, default: str
     ) -> str:
         return self.__get(
-            name, self._getTable(table, inst).getStringTopic, *subtables, d=default
+            name, self._getTable(table).getStringTopic, *subtables, default=default
         )
 
     def getStringArray(
@@ -184,26 +208,17 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
         default: Sequence[str],
     ) -> Sequence[str]:
         return self.__get(
-            name,
-            self._getTable(table, inst).getStringArrayTopic,
-            *subtables,
-            d=default,
+            name, self._getTable(table).getStringArrayTopic, *subtables, default=default
         )
 
     def getInteger(
-        self,
-        name: str,
-        table: Optional[str] = None,
-        *subtables: str,
-        inst: bool = True,
-        default: int,
+        self, name: str, table: Optional[str] = None, *subtables: str, default: int
     ) -> int:
         return self.__get(
-            name, self._getTable(table, inst).getIntegerTopic, *subtables, d=default
+            name, self._getTable(table).getIntegerTopic, *subtables, default=default
         )
 
     def getIntegerArray(
@@ -211,26 +226,20 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
         default: Sequence[int],
     ) -> Sequence[int]:
         return self.__get(
             name,
-            self._getTable(table, inst).getIntegerArrayTopic,
+            self._getTable(table).getIntegerArrayTopic,
             *subtables,
-            d=default,
+            default=default,
         )
 
     def getFloat(
-        self,
-        name: str,
-        table: Optional[str] = None,
-        *subtables: str,
-        inst: bool = True,
-        default: float,
+        self, name: str, table: Optional[str] = None, *subtables: str, default: float
     ) -> float:
         return self.__get(
-            name, self._getTable(table, inst).getFloatTopic, *subtables, d=default
+            name, self._getTable(table).getFloatTopic, *subtables, default=default
         )
 
     def getFloatArray(
@@ -238,26 +247,17 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
         default: Sequence[float],
     ) -> Sequence[float]:
         return self.__get(
-            name,
-            self._getTable(table, inst).getFloatArrayTopic,
-            *subtables,
-            d=default,
+            name, self._getTable(table).getFloatArrayTopic, *subtables, default=default
         )
 
     def getBoolean(
-        self,
-        name: str,
-        table: Optional[str] = None,
-        *subtables: str,
-        inst: bool = True,
-        default: bool,
+        self, name: str, table: Optional[str] = None, *subtables: str, default: bool
     ) -> bool:
         return self.__get(
-            name, self._getTable(table, inst).getBooleanTopic, *subtables, d=default
+            name, self._getTable(table).getBooleanTopic, *subtables, default=default
         )
 
     def getBooleanArray(
@@ -265,12 +265,11 @@ class NetworkTablesMixin:
         name: str,
         table: Optional[str] = None,
         *subtables: str,
-        inst: bool = True,
         default: Sequence[bool],
     ) -> Sequence[bool]:
         return self.__get(
             name,
-            self._getTable(table, inst).getBooleanArrayTopic,
+            self._getTable(table).getBooleanArrayTopic,
             *subtables,
-            d=default,
+            default=default,
         )

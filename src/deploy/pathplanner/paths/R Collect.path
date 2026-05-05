@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.2,
+        "y": 0.65
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.759014084507042,
+        "y": 2.134771126760563
+      },
+      "isLocked": false,
+      "linkedName": "R Center"
+    },
+    {
+      "anchor": {
+        "x": 7.727077464788733,
+        "y": 2.0389612676056346
+      },
+      "prevControl": {
+        "x": 7.177994628973845,
+        "y": 0.5940064365138282
+      },
+      "nextControl": {
+        "x": 8.030475352112678,
+        "y": 2.8373767605633806
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.2,
+        "y": 0.65
+      },
+      "prevControl": {
+        "x": 7.743045774647888,
+        "y": 2.086866197183099
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -90.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": true
+}
