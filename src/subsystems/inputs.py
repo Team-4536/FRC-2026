@@ -24,15 +24,13 @@ class Inputs(Subsystem):
         self._driveCtrlr = XboxController(drivePort)
         self._mechCtrlr = XboxController(mechPort)
 
-        self.polarity = True
-
         self._linearDriveScalar = Scalar(magnitude=tau)
         self._circularDriveScalar = CircularScalar(
             magnitude=self.LOW_MAX_ABTAINABLE_SPEED
         )
         self._linearScalar = Scalar()
 
-        self.polarity: bool = True
+        self.forwardPolarity = True
 
         self.publishFloat("proxy_drive_x", 0)
         self.publishFloat("proxy_drive_y", 0)
@@ -76,7 +74,6 @@ class Inputs(Subsystem):
             self._mechCtrlr.getBButton() or self._mechCtrlr.getLeftTriggerAxis() > 0.3
         )
         robotState.initialIntake = self._mechCtrlr.getAButton()
-        robotState.intakeEject = self._mechCtrlr.getBButton()
         robotState.intakeEject = self._mechCtrlr.getLeftTriggerAxis() > 0.3
         robotState.intakeIndexer = self._mechCtrlr.getRightBumper()
         robotState.intakeModeLeftBumperPressed = self._mechCtrlr.getLeftBumperPressed()
@@ -93,9 +90,11 @@ class Inputs(Subsystem):
         self._circularDriveScalar.setMagnitude(maxSpeed)
 
         # if not self.getBoolean("proxy_control_mode", default=False):
-        vx, vy = self._circularDriveScalar(
+        vx, vy = self._circularDriveScalar.scale(
             x=-self._driveCtrlr.getLeftY(), y=-self._driveCtrlr.getLeftX()
         )
+        if not self.forwardPolarity:
+            vx, vy = -vx, vy
         # else:
         #     vx, vy = self._circularDriveScalar(
         #         x=self.getFloat("proxy_drive_x", default=0),
