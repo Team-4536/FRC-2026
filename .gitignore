@@ -11,3 +11,4 @@ simgui*
 .DS_STORE
 profile*
 .lprof
+Pipfile

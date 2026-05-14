@@ -115,7 +115,7 @@ class SwerveModule(NetworkTablesMixin):
     def resetAzimuthEncoder(self) -> None:
         absRot = self.absoluteAzimuthRotation.radians() / tau
         motorRot = absRot * self.AZIMUTH_GEARING
-        self._azimuthMotor.setPosition(motorRot)
+        self._azimuthMotor.setEncoder(motorRot)
 
 
 class SwerveModules(NamedTuple):
@@ -207,7 +207,7 @@ class SwerveDrive(Subsystem):
         self._gyro = Gyroscope(AHRS.NavXComType.kMXP_SPI)
         self._gyro.reset()
 
-        self._swerveStates = self._kinematics.desaturateWheelSpeeds(
+        self._swerveStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
 

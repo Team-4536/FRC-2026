@@ -92,14 +92,17 @@ class RevMotor:
             return self._simPosition
         return self._encoder.getPosition()
 
-    def setVoltage(self, volts: float) -> None:
-        self._ctrlr.setVoltage(volts)
+    def setVoltage(self, voltage: voltage) -> None:
+        self._ctrlr.setVoltage(voltage)
 
     def setThrottle(self, throttle: voltage) -> None:
         self.setVoltage(throttle * 12.0)
 
     def getEncoder(self) -> SparkRelativeEncoder:
         return self._encoder
+
+    def setEncoder(self, rotation: rotation):
+        self._encoder.setPosition(rotation)
 
     DRIVE_GEARING: float = 6.12
     AZIMUTH_GEARING: float = 21.4
