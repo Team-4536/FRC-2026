@@ -69,13 +69,16 @@ class RobotState(NetworkTablesMixin):
     autosGyroReset: float = 0.0
     autosGyroResetToggle: bool = False
     autosInitPose: Pose2d = default(Pose2d())
+    slowdown: float = 1
+    mode: str = "comp"
 
     # Other
     ejectAll: bool = False
 
     def __post_init__(self) -> None:
         super().__init__(table="RobotState")
-
+        self.publishFloat("slowdown", self.slowdown)
+        self.publishString("Mode", self.mode)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.odomField)
 

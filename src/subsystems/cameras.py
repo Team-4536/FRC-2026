@@ -26,12 +26,14 @@ class photonCameraClass(NetworkTablesMixin):
         intCamX: float,
         intCamY: float,
         intCamZ: float,
-    ) -> None:
+    ) -> (
+        None
+    ):  # All of those values are relative to the robot using the robot coordinate system, using meters and degrees
         super().__init__()
 
-        self.cameraNameReal = cameraName
-
-        self.camera = PhotonCamera(cameraName)
+        self.camera = PhotonCamera(
+            cameraName
+        )  # This has to exactly match with the name of the camera in the photon client
         kRobotToCam = Transform3d(
             Translation3d(intCamX, intCamY, intCamZ),
             Rotation3d.fromDegrees(0.0, camPitch, camYaw),
@@ -51,21 +53,24 @@ class photonCameraClass(NetworkTablesMixin):
         self.robotAngle: float = 0
         self.trustworthy = False
         self.camEstPose: EstimatedRobotPose | None = None
-        self.hasTargetsRan = False
+
         self.table = NetworkTableInstance.getDefault().getTable("telemetry")
         self.timeStamp = -1
 
     def update(self) -> None:
-        self.hasTargetsRan = False
+
         self.trustworthy = False
         self.camEstPose = None
         self.result = self.camera.getLatestResult()
-        self.hasTargets = self.result.hasTargets()
+        self.hasTargets = (
+            self.result.hasTargets()
+        )  # Checks if the latest camera result has an april tag in sight
 
         if self.hasTargets:
-            self.running = True
-            self.hasTargetsRan = True
-            self.target = self.result.getTargets()
+
+            self.target = (
+                self.result.getTargets()
+            )  # Gets list of all april tags in view
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
 
@@ -123,7 +128,6 @@ class photonCameraClass(NetworkTablesMixin):
         else:
             self.ambiguity = 1
             self.fiducialId = -1
-            self.running = False
 
 
 class CameraManager(Subsystem):
@@ -131,7 +135,7 @@ class CameraManager(Subsystem):
         super().__init__()
 
         self.photonCameraRight = photonCameraClass(
-            "Camera1",
+            "Camera1",  # Name the cameras better than this, minutes wasted checking camera names: 30 <- that is an underestimate
             15,
             -30,
             inchesToMeters(27 / 2) - (9 / 100),
@@ -147,56 +151,19 @@ class CameraManager(Subsystem):
             (25.4 + 3.9) / 100 + inchesToMeters(0.5),
         )
 
-        # DJO CameraOverride
-        self.publishBoolean("CameraOverride Enable", False)
-        self.publishFloat("CameraOverride X", 5.0)
-        self.publishFloat("CameraOverride Y", 5.0)
-        self.publishFloat("CameraOverride R", 3.1415926 / 2)
-        self.test = 0
-
-        # self.photonCameraMiddle = photonCameraClass(
-        #     "longCam", strip.show();
-        #     0,
-        #     ((27 / 2) - (4 + 3 / 8)) * 0.0254,
-        #     ((27 / 2) - 1 + 1 / 8) * 0.0254,
-        #     (10.5 + 26.5) * 0.0254,
-        # )
-
     def phaseInit(self, robotState: RobotState) -> None:
         pass
 
     def periodic(self, robotState: RobotState) -> None:
         self.photonCameraRight.update()
         self.photonCameraLeft.update()
-        # self.publishBoolean("cam1 running", self.photonCameraRight.running)
 
-        # self.publishBoolean("cam2 running", self.photonCameraLeft.running)
-
-        # self.photonCameraMiddle.update()
-
-        # DJO CameraOverride
-        # if self.getBoolean("CameraOverride Enable", default=False):
-        # newPoseT = Translation2d(
-        #     self.getFloat("CameraOverride X", default=5.0),
-        #     self.getFloat("CameraOverride Y", default=5.0),
-        # )
-        # newPoseR = Rotation2d(
-        #     self.getFloat("CameraOverride R", default=3.1415926 / 2),
-        # )
-        # newPose2d = Pose2d(newPoseT, newPoseR)
-        # robotState.odometry.resetPose(newPose2d)
-        # else:
         if self.photonCameraLeft.trustworthy:
 
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraLeft.camEstPose2d,
                 self.photonCameraLeft.timeStamp,
             )
-        # if self.photonCameraMiddle.trustworthy:
-
-        #     robotState.odometry.addVisionMeasurement(
-        #         self.photonCameraMiddle.camEstPose2d, getTime()
-        #     )
 
         if self.photonCameraRight.trustworthy:
             robotState.odometry.addVisionMeasurement(
@@ -204,20 +171,20 @@ class CameraManager(Subsystem):
                 self.photonCameraRight.timeStamp,
             )
 
-        robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
+        robotState.odometry.resetPose(
+            robotState.odometry.getEstimatedPosition()
+        )  # I have no idea why this line is necessary
 
     def disabled(self) -> None:
         pass
 
     def publish(self) -> None:
         self.publishBoolean("rightCam trustworthy", self.photonCameraRight.trustworthy)
-        # self.publishBoolean("midCam trustworthy", self.photonCameraMiddle.trustworthy)
+
         self.publishBoolean("leftCam trustworthy", self.photonCameraLeft.trustworthy)
         self.publishFloat("leftCamAmbiguity", self.photonCameraLeft.ambiguity)
         self.publishFloat("rightCamAmbiguity", self.photonCameraRight.ambiguity)
-        # self.publishFloat("midCamX", self.photonCameraMiddle.robotX)
-        # self.publishFloat("midCamY", self.photonCameraMiddle.robotY)
-        # self.publishFloat("midCamRot", self.photonCameraMiddle.robotAngle)
+
         self.publishFloat("rightCamX", self.photonCameraRight.robotX)
         self.publishFloat("rightCamY", self.photonCameraRight.robotY)
         self.publishFloat("rightCamRot", self.photonCameraRight.robotAngle)

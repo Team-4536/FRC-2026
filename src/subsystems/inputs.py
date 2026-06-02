@@ -43,11 +43,18 @@ class Inputs(Subsystem):
 
     def periodic(self, robotState: RobotState) -> None:
         # Drive Controls
-        maxSpeed = lerp(
-            self.LOW_MAX_ABTAINABLE_SPEED,
-            self.MAX_ABTAINABLE_SPEED,
-            min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
-        )
+        if robotState.mode == "ChildMode":
+            maxSpeed = lerp(
+                self.LOW_MAX_ABTAINABLE_SPEED,
+                self.MAX_ABTAINABLE_SPEED - 3,
+                min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
+            ) * min(robotState.slowdown, 1)
+        else:
+            maxSpeed = lerp(
+                self.LOW_MAX_ABTAINABLE_SPEED,
+                self.MAX_ABTAINABLE_SPEED,
+                min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
+            )
         robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
         robotState.resetGyro = (
             self._driveCtrlr.getStartButtonPressed() or self._driveCtrlr.getXButton()
@@ -66,7 +73,10 @@ class Inputs(Subsystem):
             self._mechCtrlr.getBButton() or self._mechCtrlr.getLeftTriggerAxis() > 0.3
         )
         robotState.kickShooter = self._mechCtrlr.getRightBumper()
-        robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis()
+        robotState.revSpeed = self._mechCtrlr.getRightTriggerAxis() * max(
+            robotState.slowdown, 0.4
+        )
+
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
         robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretSwitchTarget = self._mechCtrlr.getXButtonPressed()
