@@ -121,7 +121,6 @@ class SubsystemManager(NetworkTablesMixin):
         self.robotState.slowdown = self.robotState.getFloat("slowdown", default=1)
         self.robotState.mode = self.robotState.getString("Mode", default="comp")
         self.cameras.periodic(self.robotState)
-
         self.llCam.periodic(self.robotState)
         self.time.periodic(self.robotState)
 

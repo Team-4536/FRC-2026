@@ -32,7 +32,6 @@ def default(default: Any) -> Any:
 
 @dataclass
 class RobotState(NetworkTablesMixin):
-    limelightPose: Pose2d | None
     odometry: SwerveDrive4PoseEstimator
 
     # Drive
@@ -74,6 +73,7 @@ class RobotState(NetworkTablesMixin):
 
     # Other
     ejectAll: bool = False
+    limelightPose: Pose2d | None = default(None)
 
     def __post_init__(self) -> None:
         super().__init__(table="RobotState")
