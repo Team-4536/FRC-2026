@@ -4,7 +4,7 @@ from subsystems.subsystem import Subsystem
 from subsystems.utils import CircularScalar, lerp, Scalar
 from wpilib import XboxController
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.units import meters_per_second
+from wpimath.units import meters_per_second, radians_per_second
 
 
 class Inputs(Subsystem):
@@ -49,13 +49,15 @@ class Inputs(Subsystem):
                 self.MAX_ABTAINABLE_SPEED - 3,
                 min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
             ) * min(robotState.slowdown, 1)
+            maxRotationalSpeed = tau * min(robotState.slowdown, 1)
         else:
             maxSpeed = lerp(
                 self.LOW_MAX_ABTAINABLE_SPEED,
                 self.MAX_ABTAINABLE_SPEED,
                 min(1.0, self._driveCtrlr.getRightTriggerAxis() / 0.9),
             )
-        robotState.fieldSpeeds = self._calculateDrive(maxSpeed)
+            maxRotationalSpeed = tau
+        robotState.fieldSpeeds = self._calculateDrive(maxSpeed, maxRotationalSpeed)
         robotState.resetGyro = (
             self._driveCtrlr.getStartButtonPressed() or self._driveCtrlr.getXButton()
         )
@@ -99,8 +101,11 @@ class Inputs(Subsystem):
     def publish(self) -> None:
         pass
 
-    def _calculateDrive(self, maxSpeed: meters_per_second) -> ChassisSpeeds:
+    def _calculateDrive(
+        self, maxSpeed: meters_per_second, maxRotationalSpeed: radians_per_second
+    ) -> ChassisSpeeds:
         self._circularDriveScalar.setMagnitude(maxSpeed)
+        self._linearDriveScalar.setMagnitude(maxRotationalSpeed)
 
         # if not self.getBoolean("proxy_control_mode", default=False):
         vx, vy = self._circularDriveScalar(
