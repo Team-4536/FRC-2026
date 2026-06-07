@@ -78,7 +78,7 @@ class RobotState(NetworkTablesMixin):
     def __post_init__(self) -> None:
         super().__init__(table="RobotState")
         self.publishFloat("slowdown", self.slowdown)
-        self.publishString("Mode", self.mode)
+        self.publishString("DrivingMode", self.mode)
         self.odomField: Field2d = Field2d()
         SmartDashboard.putData("Field", self.odomField)
 
