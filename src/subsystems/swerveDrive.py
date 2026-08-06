@@ -115,7 +115,7 @@ class SwerveModule(NetworkTablesMixin):
     def resetAzimuthEncoder(self) -> None:
         absRot = self.absoluteAzimuthRotation.radians() / tau
         motorRot = absRot * self.AZIMUTH_GEARING
-        self._azimuthMotor.setPosition(motorRot)
+        self._azimuthMotor.getEncoder().setPosition(motorRot)
 
 
 class SwerveModules(NamedTuple):
@@ -143,7 +143,9 @@ class SwerveModules(NamedTuple):
         return tuple(m.position for m in self)  # type: ignore
 
     @property
-    def modulePositions(self) -> Tuple[
+    def modulePositions(
+        self,
+    ) -> Tuple[
         SwerveModulePosition,
         SwerveModulePosition,
         SwerveModulePosition,
@@ -340,7 +342,9 @@ class SwerveDrive(Subsystem):
         return self._kinematics
 
     @property
-    def modulePoses(self) -> Tuple[
+    def modulePoses(
+        self,
+    ) -> Tuple[
         SwerveModulePosition,
         SwerveModulePosition,
         SwerveModulePosition,
