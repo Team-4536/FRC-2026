@@ -285,3 +285,7 @@ def realInverseTan(x: float, y: float) -> radians:
         angle += pi
 
     return angle
+
+
+def clamp(x: float, low: float, high: float) -> float:
+    return max(min(x, high), low)

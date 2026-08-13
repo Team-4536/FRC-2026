@@ -17,6 +17,7 @@ from subsystems.utils import (
     RPMToMPS,
     RPMToVolts,
     wrapAngle,
+    clamp,
 )
 from wpilib import FieldObject2d
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Translation3d
@@ -140,7 +141,7 @@ class Turret(Subsystem):
 
         self.yawEncoderPos = rotationsToRadians(self.yawEncoder.getPosition())
         self.yawAngle = 0  # yaw angle relative to the field
-        self.pitchAngle = 0  # pitch angle relative to the field
+        self.pitchAngle = 0  # read pitch angle relative to the field
 
         self.odom = TurretOdometry()  # for visualizing turret on field
 
@@ -161,7 +162,7 @@ class Turret(Subsystem):
         self.targetLocked: bool = False
 
         self.target: TurretTarget = TurretTarget.HUB
-        self.mode: TurretMode = TurretMode.DYNAMIC
+        self.mode: TurretMode = TurretMode.MANUAL
 
         # these velocity values are only used when in DYNAMIC mode
         self.yawVelocity: RPM = 0
@@ -178,6 +179,8 @@ class Turret(Subsystem):
         self.publishFloat("add", -2.040249824)
         self.publishFloat("scale", 1.9)
         self.publishFloat("AM: Y Pass", 25)
+        self.publishFloat("PITCH_SETPOINT_OVERRIDE_(ROBOT_RELATIVE_DEGREES)", 0.0)
+        self.publishBoolean("PITCH_SETPOINT_OVERRIDE", False)
 
     def phaseInit(self, robotState: RobotState) -> None:
         self.fieldTargPos: FieldObject2d = robotState.odomField.getObject(
@@ -199,7 +202,7 @@ class Turret(Subsystem):
         self.targetLocked: bool = False
 
         self.target: TurretTarget = TurretTarget.HUB
-        self.mode: TurretMode = TurretMode.DYNAMIC
+        self.mode: TurretMode = TurretMode.MANUAL
 
         # these velocity values are only used when in manual mode
         self.yawVelocity: RPM = 0
@@ -315,7 +318,6 @@ class Turret(Subsystem):
         if self.yawVelocity != 0 and self.relativeYawSetpoint != self.dontOverdoItYaw(
             self.relativeYawSetpoint
         ):  # if we are manually moving interupt maintaining rotation in the turret gap
-
             self.yawSetPoint -= self.relativeYawSetpoint - self.dontOverdoItYaw(
                 self.relativeYawSetpoint
             )
@@ -341,7 +343,22 @@ class Turret(Subsystem):
         self.relativeYawSetpoint = wrapAngle(self.relativeYawSetpoint)
 
         self.limitedYawSetpoint = self.dontOverdoItYaw(self.relativeYawSetpoint)
-        self.relativePitchSetpoint = self.getRelativePitchSetpoint(self.pitchSetpoint)
+
+        self.relativePitchSetpoint = (
+            (
+                clamp(
+                    self.getFloat(
+                        "PITCH_SETPOINT_OVERRIDE_(ROBOT_RELATIVE_DEGREES)", default=0.0
+                    ),
+                    low=0,
+                    high=80,
+                )
+                / 180
+                * PI
+            )
+            if self.getBoolean("PITCH_SETPOINT_OVERRIDE", default=False)
+            else self.relativePitchSetpoint
+        )
 
         self.yawMotor.setPosition(self.limitedYawSetpoint / TAU * YAW_GEARING)
         self.pitchMotor.setPosition(self.relativePitchSetpoint / TAU * PITCH_GEARING)
@@ -353,16 +370,16 @@ class Turret(Subsystem):
         return dist
 
     def getMode(self, robotState: RobotState) -> TurretMode:
-        mode = self.mode
+        # mode = self.mode
 
-        if robotState.turretSwitchMode:
-            mode = (
-                TurretMode.DYNAMIC
-                if (self.mode == TurretMode.MANUAL)
-                else TurretMode.MANUAL
-            )
+        # if robotState.turretSwitchMode:
+        #     mode = (
+        #         TurretMode.DYNAMIC
+        #         if (self.mode == TurretMode.MANUAL)
+        #         else TurretMode.MANUAL
+        #     )
 
-        return mode
+        return TurretMode.MANUAL
 
     def getTarget(self, rs: RobotState) -> TurretTarget:
         target: TurretTarget = self.target
@@ -510,8 +527,7 @@ class Turret(Subsystem):
             - inchesToMeters(13.841)
             + inchesToMeters(
                 # self.getFloat("BAM:_Y_Pass", default=25)
-                25
-                + (5.91 / 2)
+                25 + (5.91 / 2)
             )
         )
 

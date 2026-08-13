@@ -80,7 +80,7 @@ class Inputs(Subsystem):
         )
 
         robotState.turretManualSetpoint = self._mechCtrlr.getPOV()
-        robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
+        # robotState.turretSwitchMode = self._mechCtrlr.getYButtonPressed()
         robotState.turretSwitchTarget = self._mechCtrlr.getXButtonPressed()
 
         # Intake Controls
