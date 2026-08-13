@@ -19,6 +19,7 @@ class Robot(TimedRobot):
 
     def robotInit(self) -> None:
         WHEEL_DISTANCE: meters = inchesToMeters(10.875)
+        robotState = RobotState.empty()
 
         self.subsystemManager = SubsystemManager(
             subsystems=Subsystems(
@@ -44,12 +45,12 @@ class Robot(TimedRobot):
                 climb=Climber(motorID=15),
             ),
             inputs=Inputs(),
-            autos=AutoSubsystem(),
+            autos=AutoSubsystem(robotState=robotState),
             cameras=CameraManager(),
             time=timeData,
             tests=Tester(),
             llCam=llCams(),
-            robotState=RobotState.empty(),
+            robotState=robotState,
         )
 
     def robotPeriodic(self) -> None:
