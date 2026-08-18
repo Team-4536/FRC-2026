@@ -1,15 +1,18 @@
+from commands2 import Subsystem as WPISubsystem
 from enum import Enum
-from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.controller import PPHolonomicDriveController
 from subsystems.robotState import RobotState
 from subsystems.subsystem import Subsystem
 from subsystems.utils import matchData
 from typing import List
 from wpilib import SendableChooser, SmartDashboard
+from wpimath.kinematics import ChassisSpeeds
+from wpimath.geometry import Rotation2d
 
 
-class AutoSubsystem:
+class AutoSubsystem(Subsystem):
     # Declare Variables
     autoRoutineChooser: SendableChooser = SendableChooser()
     routineFinished: bool = False
@@ -20,18 +23,18 @@ class AutoSubsystem:
         super().__init__()
 
         config: RobotConfig = RobotConfig.fromGUISettings()
-        pathFlipped: bool = matchData.isRed()
 
         AutoBuilder.configure(
-            robotState.odometry.getEstimatedPosition,
-            robotState.odometry.resetPose,
-            placeholder,
-            placeholder,
-            PPHolonomicDriveController(
+            pose_supplier=robotState.odometry.getEstimatedPosition,
+            reset_pose=robotState.odometry.resetPose,
+            robot_relative_speeds_supplier=lambda: robotState.robotRelChassisSpeeds,
+            output=lambda speeds, _: self.updateFieldSpeeds(speeds, robotState),
+            controller=PPHolonomicDriveController(
                 PIDConstants(0.00019, 0, 0), PIDConstants(0.15, 0, 0)
             ),
-            config,
-            pathFlipped,
+            robot_config=config,
+            should_flip_path=matchData.isRed,
+            drive_subsystem=WPISubsystem(),  # Pass in a dummy subsystem
         )
 
     def phaseInit(self, robotState: RobotState) -> None:
@@ -45,3 +48,6 @@ class AutoSubsystem:
 
     def publish(self) -> None:
         pass
+
+    def updateFieldSpeeds(self, speeds: ChassisSpeeds, robotState: RobotState) -> None:
+        robotState.fieldSpeeds = speeds.fromRobotRelativeSpeeds(speeds, robotState.gyro)

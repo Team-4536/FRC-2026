@@ -210,6 +210,7 @@ class SwerveDrive(Subsystem):
         self._swerveStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             self._kinematics.toSwerveModuleStates(ChassisSpeeds()), 0
         )
+        self._robotRelativeSpeeds = ChassisSpeeds()
 
         self._disableModules()
 
@@ -227,6 +228,7 @@ class SwerveDrive(Subsystem):
             self._modules.modulePositions,
         )
         robotState.gyro = self._gyro.getRotation2d()
+        robotState.robotRelChassisSpeeds = self._robotRelativeSpeeds
 
     def periodic(self, robotState: RobotState) -> None:
         if robotState.resetGyro:
@@ -251,6 +253,9 @@ class SwerveDrive(Subsystem):
         self._modules.stopModules()
         if not self._disabledModules and matchData.timeSincePhaseInit > 1.5:
             self._disableModules()
+        self._robotRelativeSpeeds = (
+            ChassisSpeeds()
+        )  # TODO: Use Connor's math in the future. Don't forget to rotate (;
 
     def getDriveVelocity(self, module: SwerveModule) -> Translation2d:
         speed = module.driveVelocity
@@ -292,6 +297,7 @@ class SwerveDrive(Subsystem):
             self._gyro.getRotation2d() - self._angleAdjustment,
         )
         moduleStates = self._kinematics.toSwerveModuleStates(chassisSpeeds)
+        self._robotRelativeSpeeds = chassisSpeeds
 
         self._swerveStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             moduleStates=moduleStates,

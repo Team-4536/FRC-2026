@@ -30,14 +30,23 @@ def default(default: Any) -> Any:
     return field(default_factory=lambda: default)
 
 
+class Dummy:  # Very temporary fix
+    def getEstimatedPosition(self) -> Pose2d:
+        return Pose2d()
+
+    def resetPose(self, _: Pose2d) -> None:
+        pass
+
+
 @dataclass
 class RobotState(NetworkTablesMixin):
-    odometry: SwerveDrive4PoseEstimator
+    odometry: SwerveDrive4PoseEstimator = default(Dummy)
 
     # Drive
     gyro: Rotation2d = default(Rotation2d())
     fieldSpeeds: ChassisSpeeds = default(ChassisSpeeds())
     robotVelocity: ChassisSpeeds = default(ChassisSpeeds())
+    robotRelChassisSpeeds: ChassisSpeeds = default(ChassisSpeeds())
     resetGyro: bool = False
 
     # Climb
