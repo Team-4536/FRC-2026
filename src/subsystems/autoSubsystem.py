@@ -1,6 +1,11 @@
 from commands2 import Subsystem as WPISubsystem
 from enum import Enum
-from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.auto import (
+    AutoBuilder,
+    PathPlannerAuto,
+    EventTrigger,
+    NamedCommands,
+)
 from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.controller import PPHolonomicDriveController
 from subsystems.robotState import RobotState
@@ -36,12 +41,21 @@ class AutoSubsystem(Subsystem):
             should_flip_path=matchData.isRed,
             drive_subsystem=WPISubsystem(),  # Pass in a dummy subsystem
         )
+        AUTO_FORWARD = PathPlannerAuto("Forward")
+        AUTO_BACKWARD = PathPlannerAuto("Backward")
+
+        self.autoRoutineChooser = AutoBuilder.buildAutoChooser("Forward")
+
+        SmartDashboard.putData("Auto Routine Chooser", self.autoRoutineChooser)
 
     def phaseInit(self, robotState: RobotState) -> None:
-        pass
+        self.selectedAuto = self.autoRoutineChooser.getSelected()
+        self.selectedAuto.initialize()
 
     def periodic(self, robotState: RobotState) -> None:
-        pass
+        self.selectedAuto.execute()
+        if self.selectedAuto.isFinished():
+            self.selectedAuto.end()
 
     def disabled(self) -> None:
         pass
