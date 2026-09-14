@@ -40,7 +40,7 @@ class Dummy:  # Very temporary fix
 
 @dataclass
 class RobotState(NetworkTablesMixin):
-    odometry: SwerveDrive4PoseEstimator = default(Dummy)
+    odometry: SwerveDrive4PoseEstimator = default(Dummy())
 
     # Drive
     gyro: Rotation2d = default(Rotation2d())

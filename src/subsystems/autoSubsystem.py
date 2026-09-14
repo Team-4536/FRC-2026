@@ -17,10 +17,6 @@ from wpimath.kinematics import ChassisSpeeds
 from wpimath.geometry import Rotation2d
 
 
-def isFlipped() -> bool:
-    return matchData.isRed()
-
-
 class AutoSubsystem(Subsystem):
     # Declare Variables
     autoRoutineChooser: SendableChooser = SendableChooser()
@@ -42,7 +38,7 @@ class AutoSubsystem(Subsystem):
                 PIDConstants(0.00019, 0, 0), PIDConstants(0.15, 0, 0)
             ),
             robot_config=config,
-            should_flip_path=isFlipped,
+            should_flip_path=matchData.isRed,
             drive_subsystem=WPISubsystem(),  # Pass in a dummy subsystem
         )
         AUTO_FORWARD = PathPlannerAuto("Forward")
@@ -59,7 +55,7 @@ class AutoSubsystem(Subsystem):
     def periodic(self, robotState: RobotState) -> None:
         self.selectedAuto.execute()
         if self.selectedAuto.isFinished():
-            self.selectedAuto.end()
+            self.selectedAuto.end(interrupted=False)
 
     def disabled(self) -> None:
         pass
