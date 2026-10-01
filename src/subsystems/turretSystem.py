@@ -35,6 +35,7 @@ from wpimath.units import (
     seconds,
 )
 
+ANGLE_OVERRIDE: radians = degreesToRadians(50)   #ANGLE OVERRIDE
 MAX_PITCH: radians = degreesToRadians(80)  # in relation to feild
 MIN_PITCH: radians = degreesToRadians(40)
 MAX_ROTATION: radians = PI
@@ -492,8 +493,8 @@ class Turret(Subsystem):
 
         # add = self.getFloat("add", default=-4.54025)
         # scale = self.getFloat("scale", default=2.75728)
-        add = -2.040249824
-        scale = 1.9
+        add = -1 # increase if shooting same distance short at diferent distances
+        scale = 1.9 # increase if shooting increasingly short at increasing distances
 
         robotState.turretVelocitySetpoint = Translation2d(
             distance=compensateSpeed(velocity, scale, add),
@@ -738,8 +739,9 @@ def calculateAngle(d: meters, h: meters, xPass: meters, yPass: meters) -> radian
 
 
 def calculateVelocity(turretAngle: radians, distance: meters, height: meters) -> MPS:
+    #ANGLE OVERRIDE
     numer = GRAVITY * (distance**2)
-    denom = 2 * (cos(turretAngle) ** 2) * (distance * tan(turretAngle) - height)
+    denom = 2 * (cos(ANGLE_OVERRIDE) ** 2) * (distance * tan(ANGLE_OVERRIDE) - height)
     velocityMps = sqrt(numer / denom)
     return velocityMps
 
