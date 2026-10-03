@@ -48,7 +48,7 @@ class RevMotor:
         self._ctrlr.configure(
             config=config,
             resetMode=ResetMode.kResetSafeParameters,
-            persistMode=PersistMode.kNoPersistParameters,
+            persistMode=PersistMode.kPersistParameters,
         )
 
     def stopMotor(self) -> None:
