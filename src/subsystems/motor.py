@@ -172,7 +172,7 @@ class RevMotor:
             LimitSwitchConfig()
             .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
             .forwardLimitSwitchEnabled(False)
-            .reverseLimitSwitchEnabled(True)
+            .reverseLimitSwitchEnabled(False)
             # .forwardLimitSwitchPosition(16.66)
             .reverseLimitSwitchPosition(0)
             .reverseLimitSwitchTriggerBehavior(

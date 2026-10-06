@@ -492,7 +492,7 @@ class Turret(Subsystem):
 
         # add = self.getFloat("add", default=-4.54025)
         # scale = self.getFloat("scale", default=2.75728)
-        add = 0
+        add = -1
         scale = 1.9
 
         robotState.turretVelocitySetpoint = Translation2d(
