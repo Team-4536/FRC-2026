@@ -19,6 +19,7 @@ class Climber(Subsystem):
         self.climberMotor.stopMotor()
 
     def periodic(self, robotState: RobotState) -> None:
+        return  # Disabling the climber for MRI
         match robotState.climbState:
             case ClimberState.CLIMB_UP:
                 self.climberMotor.setVoltage(self.CLIMB_SPEED)
