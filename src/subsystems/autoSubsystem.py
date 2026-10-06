@@ -23,9 +23,12 @@ class AutoSubsystem(Subsystem):
     routineFinished: bool = False
     routineKeys: List[str] = list()
     currentPath: int = 0
+    isDone: bool = False
 
     def __init__(self, robotState: RobotState):
         super().__init__()
+
+        isDone = False
 
         config: RobotConfig = RobotConfig.fromGUISettings()
 
@@ -53,9 +56,15 @@ class AutoSubsystem(Subsystem):
         self.selectedAuto.initialize()
 
     def periodic(self, robotState: RobotState) -> None:
-        self.selectedAuto.execute()
+
+        print(self.selectedAuto.isFinished())
+
         if self.selectedAuto.isFinished():
+            self.isDone = True
             self.selectedAuto.end(interrupted=False)
+
+        if not self.isDone:
+            self.selectedAuto.execute()
 
     def disabled(self) -> None:
         pass
