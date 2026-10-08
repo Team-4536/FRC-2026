@@ -6,7 +6,6 @@ from typing import Callable, Optional
 class SubsystemMethodError(Exception):
     pass
 
-
 class Subsystem(NetworkTablesMixin):
     def __init__(self, *, table: str = "telemetry", inst: bool = True):
         super().__init__(table=table, inst=inst)
