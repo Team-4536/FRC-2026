@@ -62,7 +62,6 @@ class photonCameraClass(NetworkTablesMixin):
         self.result = self.camera.getLatestResult()
         self.hasTargets = self.result.hasTargets()
 
-        
         if self.hasTargets:
             self.running = True
             self.hasTargetsRan = True
@@ -70,30 +69,30 @@ class photonCameraClass(NetworkTablesMixin):
             self.fiducialId = self.target[0].getFiducialId()
             self.ambiguity = self.target[0].getPoseAmbiguity()
             if (
-                    len(self.target) > 1
-                    and type(self.camPoseEst.estimateCoprocMultiTagPose(self.result))
-                    == EstimatedRobotPose
-                    and self.target[0].getPoseAmbiguity() < 0.16
-                    and self.target[1].getPoseAmbiguity() < 0.16
-                ):
-                    self.trustworthy = True
-                    self.camEstPose = self.camPoseEst.estimateCoprocMultiTagPose(
+                len(self.target) > 1
+                and type(self.camPoseEst.estimateCoprocMultiTagPose(self.result))
+                == EstimatedRobotPose
+                and self.target[0].getPoseAmbiguity() < 0.16
+                and self.target[1].getPoseAmbiguity() < 0.16
+            ):
+                self.trustworthy = True
+                self.camEstPose = self.camPoseEst.estimateCoprocMultiTagPose(
                     self.result
                 )
-                    if self.camEstPose != None:
-                        self.camEstTrans = Translation2d(
-                            self.camEstPose.estimatedPose.X(),
-                            self.camEstPose.estimatedPose.Y(),
-                        )
-                        self.camEstRot = Rotation2d(
-                            self.camEstPose.estimatedPose.rotation().Z()
-                        )
-                        self.camEstPose2d = Pose2d(self.camEstTrans, self.camEstRot)
-                        self.timeStamp = self.camEstPose.timestampSeconds
-                        self.robotX = self.camEstPose.estimatedPose.X()
-                        self.robotY = self.camEstPose.estimatedPose.Y()
+                if self.camEstPose != None:
+                    self.camEstTrans = Translation2d(
+                        self.camEstPose.estimatedPose.X(),
+                        self.camEstPose.estimatedPose.Y(),
+                    )
+                    self.camEstRot = Rotation2d(
+                        self.camEstPose.estimatedPose.rotation().Z()
+                    )
+                    self.camEstPose2d = Pose2d(self.camEstTrans, self.camEstRot)
+                    self.timeStamp = self.camEstPose.timestampSeconds
+                    self.robotX = self.camEstPose.estimatedPose.X()
+                    self.robotY = self.camEstPose.estimatedPose.Y()
 
-                        self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
+                    self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
             elif (
                 self.ambiguity < 0.15
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
@@ -118,7 +117,7 @@ class photonCameraClass(NetworkTablesMixin):
                     self.robotY = self.camEstPose.estimatedPose.Y()
 
                     self.robotAngle = self.camEstPose.estimatedPose.rotation().Z()
-                
+
             else:
                 pass
         else:
@@ -147,7 +146,6 @@ class CameraManager(Subsystem):
             -(inchesToMeters(27 / 2) - (12.5 / 100)),
             (25.4 + 3.9) / 100 + inchesToMeters(0.5),
         )
-
 
         # self.photonCameraMiddle = photonCameraClass(
         #     "longCam", strip.show();
