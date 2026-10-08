@@ -84,12 +84,15 @@ class SubsystemManager(NetworkTablesMixin):
         )
 
         self.robotState.fieldSpeeds = ChassisSpeeds()
-        self.robotState.odometry = SwerveDrive4PoseEstimator(
+
+        odom = SwerveDrive4PoseEstimator(
             drive.kinematics,
             self.robotState.gyro,
             drive.modulePoses,
             initPos,
         )
+        getattr(self.robotState.odometry, "setOdom")(odom)
+        self.robotState.odometry = odom
 
         self.publishBoolean("runPublish", self.RUN_PUBLISH)
         for s in self.subsystems:

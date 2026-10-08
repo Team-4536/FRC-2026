@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field, fields, MISSING
 from enum import Enum
 from subsystems.networkTablesMixin import NetworkTablesMixin
@@ -31,11 +32,18 @@ def default(default: Any) -> Any:
 
 
 class Dummy:  # Very temporary fix
-    def getEstimatedPosition(self) -> Pose2d:
-        return Pose2d()
+    gep: Callable[[], Pose2d] = lambda: Pose2d()
+    rp: Callable[[Pose2d], None] = lambda _: None
 
-    def resetPose(self, _: Pose2d) -> None:
-        pass
+    def getEstimatedPosition(self) -> Pose2d:
+        return self.gep()
+
+    def resetPose(self, pose: Pose2d) -> None:
+        return self.rp(pose)
+
+    def setOdom(self, odom: SwerveDrive4PoseEstimator) -> None:
+        self.gep = odom.getEstimatedPosition
+        self.rp = lambda pose: odom.resetPose(pose)
 
 
 @dataclass
