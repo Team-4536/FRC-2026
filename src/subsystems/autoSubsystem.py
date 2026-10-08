@@ -56,9 +56,6 @@ class AutoSubsystem(Subsystem):
         self.selectedAuto.initialize()
 
     def periodic(self, robotState: RobotState) -> None:
-
-        print(self.selectedAuto.isFinished())
-
         if self.selectedAuto.isFinished():
             self.isDone = True
             self.selectedAuto.end(interrupted=False)
