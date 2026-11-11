@@ -7,6 +7,12 @@
         {
           "type": "path",
           "data": {
+            "pathName": "under left trench from start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "left to balls"
           }
         }

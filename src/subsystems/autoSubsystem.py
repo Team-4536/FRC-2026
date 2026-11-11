@@ -1,4 +1,4 @@
-from commands2 import Subsystem as WPISubsystem
+from commands2 import Subsystem as WPISubsystem, cmd
 from enum import Enum
 from pathplannerlib.auto import (
     AutoBuilder,
@@ -15,6 +15,16 @@ from typing import List
 from wpilib import SendableChooser, SmartDashboard
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.geometry import Rotation2d
+
+# class AutoIntakeCommand(Command):
+#     def initialize(self):
+#         return super().initialize()
+
+#     def execute(self):
+#         return super().execute()
+
+#     def end(self, interrupted: bool):
+#         return super().end(interrupted)
 
 
 class AutoSubsystem(Subsystem):
@@ -62,6 +72,35 @@ class AutoSubsystem(Subsystem):
 
         if not self.isDone:
             self.selectedAuto.execute()
+            EventTrigger("rev_shooter").whileTrue(
+                cmd.runEnd(
+                    SubsystemUpdater(robotState, revShooter=True).update,
+                    SubsystemUpdater(robotState, revShooter=False).update,
+                )
+            )
+            EventTrigger("shoot_shooter").whileTrue(
+                cmd.runEnd(
+                    SubsystemUpdater(robotState, shootShooter=True).update,
+                    SubsystemUpdater(robotState, shootShooter=False).update,
+                )
+            )
+            EventTrigger("lower_intake").onTrue(
+                cmd.runOnce(
+                    SubsystemUpdater(robotState, lowerIntake=True).update
+                ).andThen(
+                    cmd.waitSeconds(1).andThen(
+                        cmd.runOnce(
+                            SubsystemUpdater(robotState, lowerIntake=False).update
+                        )
+                    )
+                )
+            )
+            EventTrigger("run_intake").whileTrue(
+                cmd.runEnd(
+                    SubsystemUpdater(robotState, runIntake=True).update,
+                    SubsystemUpdater(robotState, runIntake=False).update,
+                )
+            )
 
     def disabled(self) -> None:
         pass
@@ -71,3 +110,102 @@ class AutoSubsystem(Subsystem):
 
     def updateFieldSpeeds(self, speeds: ChassisSpeeds, robotState: RobotState) -> None:
         robotState.fieldSpeeds = speeds.fromRobotRelativeSpeeds(speeds, robotState.gyro)
+
+
+class SubsystemUpdater:
+    def __init__(
+        self,
+        robotState: RobotState,
+        runIntake: bool | None = None,
+        lowerIntake: bool | None = None,
+        revShooter: bool | None = None,
+        shootShooter: bool | None = None,
+    ) -> None:
+        self.robotState = robotState
+        self.runIntake = runIntake
+        self.lowerIntake = lowerIntake
+        self.shootShooter = shootShooter
+        self.revShooter = revShooter
+
+    def update(self) -> None:
+        if not self.runIntake == None:
+            self.robotState.initialIntake = self.runIntake
+            self.robotState.intakeIndexer = self.runIntake
+
+        if not self.lowerIntake == None:
+            self.robotState.intakePosYAxis = 0.85 * self.lowerIntake
+
+        if not self.revShooter == None:
+            self.robotState.revSpeed = self.revShooter
+
+        if not self.shootShooter == None:
+            self.robotState.kickShooter = self.shootShooter
+            self.robotState.intakeIndexer = self.shootShooter
+
+    # def updateSubsystems(
+    #     self,
+    #     robotState: RobotState,
+    #     runIntake: bool | None = None,
+    #     lowerIntake: bool | None = None,
+    #     revShooter: bool | None = None,
+    #     shootShooter: bool | None = None,
+    # ) -> None:
+    #     if not runIntake == None:
+    #         robotState.initialIntake = runIntake
+    #         robotState.intakeIndexer = runIntake
+
+    #     if not lowerIntake == None:
+    #         robotState.intakePosYAxis = 0.85 * lowerIntake
+
+    #     if not revShooter == None:
+    #         robotState.revSpeed = revShooter
+
+    #     if not shootShooter == None:
+    #         robotState.kickShooter = shootShooter
+    #         robotState.intakeIndexer = shootShooter
+
+
+# def runIntake(robotState: RobotState, runIntake: bool) -> None:
+#     robotState.initialIntake = runIntake
+#     robotState.intakeIndexer = runIntake
+
+
+# def lowerIntake(robotState: RobotState, lowerIntake: bool) -> None:
+#     robotState.intakePosYAxis = 0.85 * lowerIntake
+
+
+# def revShooter(robotState: RobotState, revShooter: bool) -> None:
+#     robotState.revSpeed = revShooter
+
+
+# def shootShooter(robotState: RobotState, shootShooter: bool) -> None:
+#     robotState.kickShooter = shootShooter
+#     robotState.intakeIndexer = shootShooter
+
+
+#     class IntakeUpdater:
+#     def __init__(
+#         self, robotState: RobotState, runIntake: bool = False, lowerIntake: bool = False
+#     ) -> None:
+#         self.robotState = robotState
+#         self.runIntake = runIntake
+#         self.lowerIntake = lowerIntake
+
+#     def execute(self) -> None:
+#         self.robotState.initialIntake = self.runIntake
+#         self.robotState.intakePosYAxis = 0.85 * self.lowerIntake
+
+# class ShooterUpdater:
+#     def __init__(
+#         self,
+#         robotState: RobotState,
+#         revShooter: bool = False,
+#         kickShooter: bool = False,
+#     ) -> None:
+#         self.robotState = robotState
+#         self.revShooter = revShooter
+#         self.kickShooter = kickShooter
+
+#     def execute(self) -> None:
+#         self.robotState.revSpeed = self.revShooter
+#         self.robotState.kickShooter = self.kickShooter
