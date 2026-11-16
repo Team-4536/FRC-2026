@@ -38,7 +38,7 @@ class AutoSubsystem(Subsystem):
     def __init__(self, robotState: RobotState):
         super().__init__()
 
-        isDone = False
+        self.isDone = False
 
         config: RobotConfig = RobotConfig.fromGUISettings()
 
@@ -54,8 +54,6 @@ class AutoSubsystem(Subsystem):
             should_flip_path=matchData.isRed,
             drive_subsystem=WPISubsystem(),  # Pass in a dummy subsystem
         )
-        AUTO_FORWARD = PathPlannerAuto("Forward")
-        AUTO_BACKWARD = PathPlannerAuto("Backward")
 
         self.autoRoutineChooser = AutoBuilder.buildAutoChooser("Forward")
 
@@ -69,6 +67,13 @@ class AutoSubsystem(Subsystem):
         if self.selectedAuto.isFinished():
             self.isDone = True
             self.selectedAuto.end(interrupted=False)
+            SubsystemUpdater(
+                robotState,
+                runIntake=False,
+                lowerIntake=False,
+                revShooter=False,
+                shootShooter=False,
+            ).update
 
         if not self.isDone:
             self.selectedAuto.execute()
