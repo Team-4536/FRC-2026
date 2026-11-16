@@ -1,4 +1,4 @@
-from commands2 import Subsystem as WPISubsystem, cmd
+from commands2 import Subsystem as WPISubsystem, cmd, Command
 from enum import Enum
 from pathplannerlib.auto import (
     AutoBuilder,
@@ -34,11 +34,10 @@ class AutoSubsystem(Subsystem):
     routineKeys: List[str] = list()
     currentPath: int = 0
     isDone: bool = False
+    selectedAuto: Command
 
     def __init__(self, robotState: RobotState):
         super().__init__()
-
-        self.isDone = False
 
         config: RobotConfig = RobotConfig.fromGUISettings()
 
@@ -55,7 +54,9 @@ class AutoSubsystem(Subsystem):
             drive_subsystem=WPISubsystem(),  # Pass in a dummy subsystem
         )
 
-        self.autoRoutineChooser = AutoBuilder.buildAutoChooser("Forward")
+        self.autoRoutineChooser: SendableChooser = AutoBuilder.buildAutoChooser(
+            "Forward"
+        )
 
         SmartDashboard.putData("Auto Routine Chooser", self.autoRoutineChooser)
 
@@ -133,17 +134,17 @@ class SubsystemUpdater:
         self.revShooter = revShooter
 
     def update(self) -> None:
-        if not self.runIntake == None:
+        if self.runIntake is not None:
             self.robotState.initialIntake = self.runIntake
             self.robotState.intakeIndexer = self.runIntake
 
-        if not self.lowerIntake == None:
+        if self.lowerIntake is not None:
             self.robotState.intakePosYAxis = 0.85 * self.lowerIntake
 
-        if not self.revShooter == None:
+        if self.revShooter is not None:
             self.robotState.revSpeed = self.revShooter
 
-        if not self.shootShooter == None:
+        if self.shootShooter is not None:
             self.robotState.kickShooter = self.shootShooter
             self.robotState.intakeIndexer = self.shootShooter
 
