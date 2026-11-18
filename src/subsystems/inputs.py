@@ -101,6 +101,6 @@ class Inputs(Subsystem):
         #         y=self.getFloat("proxy_drive_y", default=0),
         #     )
 
-        omega = self._linearDriveScalar(-self._driveCtrlr.getRightX())
+        omega = self._linearDriveScalar(self._driveCtrlr.getRightX())
 
         return ChassisSpeeds(vx, vy, omega)
