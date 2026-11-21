@@ -315,7 +315,6 @@ class Turret(Subsystem):
         if self.yawVelocity != 0 and self.relativeYawSetpoint != self.dontOverdoItYaw(
             self.relativeYawSetpoint
         ):  # if we are manually moving interupt maintaining rotation in the turret gap
-
             self.yawSetPoint -= self.relativeYawSetpoint - self.dontOverdoItYaw(
                 self.relativeYawSetpoint
             )
@@ -490,10 +489,8 @@ class Turret(Subsystem):
 
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
-        # add = self.getFloat("add", default=-4.54025)
-        # scale = self.getFloat("scale", default=2.75728)
-        add = -2.040249824
-        scale = 1.9
+        add = self.getFloat("add", default=-2.040249824)  # -4.54025
+        scale = self.getFloat("scale", default=1.9)  # 2.75728
 
         robotState.turretVelocitySetpoint = Translation2d(
             distance=compensateSpeed(velocity, scale, add),
@@ -510,8 +507,7 @@ class Turret(Subsystem):
             - inchesToMeters(13.841)
             + inchesToMeters(
                 # self.getFloat("BAM:_Y_Pass", default=25)
-                25
-                + (5.91 / 2)
+                25 + (5.91 / 2)
             )
         )
 
