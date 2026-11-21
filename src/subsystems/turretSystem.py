@@ -176,7 +176,7 @@ class Turret(Subsystem):
 
         self.publishFloat("YawTargetOffset", 0)
         self.publishFloat("add", -2.040249824)
-        self.publishFloat("scale", 1.9)
+        self.publishFloat("scale", 2.05)
         self.publishFloat("AM: Y Pass", 25)
 
     def phaseInit(self, robotState: RobotState) -> None:
@@ -490,7 +490,7 @@ class Turret(Subsystem):
         self.pitchSetpoint = self.dontOverDoItPitch(self.pitchSetpoint)
 
         add = self.getFloat("add", default=-2.040249824)  # -4.54025
-        scale = self.getFloat("scale", default=1.9)  # 2.75728
+        scale = self.getFloat("scale", default=2.05)  # 2.75728
 
         robotState.turretVelocitySetpoint = Translation2d(
             distance=compensateSpeed(velocity, scale, add),

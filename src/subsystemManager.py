@@ -70,7 +70,7 @@ class SubsystemManager(NetworkTablesMixin):
     subsystems: Subsystems
     robotState: RobotState
 
-    RUN_PUBLISH: bool = True
+    RUN_PUBLISH: bool = False
     DEBUGGING: bool = False
 
     def __post_init__(self) -> None:
