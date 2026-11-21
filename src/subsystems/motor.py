@@ -168,22 +168,22 @@ class RevMotor:
         .smartCurrentLimit(30, 30)
         .disableFollowerMode()
         .setIdleMode(SparkMaxConfig.IdleMode.kBrake)
-        .apply(
-            LimitSwitchConfig()
-            .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
-            .forwardLimitSwitchEnabled(False)
-            .reverseLimitSwitchEnabled(True)
-            # .forwardLimitSwitchPosition(16.66)
-            .reverseLimitSwitchPosition(0)
-            .reverseLimitSwitchTriggerBehavior(
-                LimitSwitchConfig.Behavior.kStopMovingMotor
-            )
-            # .forwardLimitSwitchTriggerBehavior(
-            #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
-            # )
-            # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-            .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-        )
+        # .apply(
+        #     LimitSwitchConfig()
+        #     .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+        #     .forwardLimitSwitchEnabled(False)
+        #     .reverseLimitSwitchEnabled(False)
+        #     # .forwardLimitSwitchPosition(16.66)
+        #     .reverseLimitSwitchPosition(0)
+        #     .reverseLimitSwitchTriggerBehavior(
+        #         LimitSwitchConfig.Behavior.kStopMovingMotor
+        #     )
+        #     # .forwardLimitSwitchTriggerBehavior(
+        #     #     LimitSwitchConfig.Behavior.kStopMovingMotorAndSetPosition
+        #     # )
+        #     # .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+        #     .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+        # )
     )
 
     INTAKE_MOTOR_CONFIG: SparkBaseConfig = (

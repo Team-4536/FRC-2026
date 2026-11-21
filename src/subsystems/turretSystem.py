@@ -507,7 +507,8 @@ class Turret(Subsystem):
             - inchesToMeters(13.841)
             + inchesToMeters(
                 # self.getFloat("BAM:_Y_Pass", default=25)
-                25 + (5.91 / 2)
+                25
+                + (5.91 / 2)
             )
         )
 
