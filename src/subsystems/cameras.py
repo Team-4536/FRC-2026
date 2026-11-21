@@ -37,7 +37,7 @@ class photonCameraClass(NetworkTablesMixin):
             Rotation3d.fromDegrees(0.0, camPitch, camYaw),
         )
         self.camPoseEst = PhotonPoseEstimator(
-            AprilTagFieldLayout.loadField(AprilTagField.k2026RebuiltWelded),
+            AprilTagFieldLayout.loadField(AprilTagField.k2026RebuiltAndyMark),
             kRobotToCam,
         )
 
@@ -98,7 +98,6 @@ class photonCameraClass(NetworkTablesMixin):
                 and type(self.camPoseEst.estimateLowestAmbiguityPose(self.result))
                 == EstimatedRobotPose
             ):
-
                 self.trustworthy = True
                 self.camEstPose = self.camPoseEst.estimateLowestAmbiguityPose(
                     self.result
@@ -180,7 +179,6 @@ class CameraManager(Subsystem):
         # robotState.odometry.resetPose(newPose2d)
         # else:
         if self.photonCameraLeft.trustworthy:
-
             robotState.odometry.addVisionMeasurement(
                 self.photonCameraLeft.camEstPose2d,
                 self.photonCameraLeft.timeStamp,
