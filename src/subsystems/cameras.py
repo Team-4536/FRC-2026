@@ -129,14 +129,14 @@ class CameraManager(Subsystem):
     def __init__(self) -> None:
         super().__init__()
 
-        self.photonCameraRight = photonCameraClass(
-            "Camera1",
-            15,
-            -30,
-            inchesToMeters(27 / 2) - (9 / 100),
-            -(inchesToMeters(27 / 2) - (6.6 / 100)),
-            (25.4 + 3.9) / 100 + inchesToMeters(0.5),
-        )
+        # self.photonCameraRight = photonCameraClass(
+        #     "Camera1",
+        #     15,
+        #     -30,
+        #     inchesToMeters(27 / 2) - (9 / 100),
+        #     -(inchesToMeters(27 / 2) - (6.6 / 100)),
+        #     (25.4 + 3.9) / 100 + inchesToMeters(0.5),
+        # )
         self.photonCameraLeft = photonCameraClass(
             "Camera2",
             15,
@@ -158,7 +158,7 @@ class CameraManager(Subsystem):
         pass
 
     def periodic(self, robotState: RobotState) -> None:
-        self.photonCameraRight.update()
+        # self.photonCameraRight.update()
         self.photonCameraLeft.update()
         # self.publishBoolean("cam1 running", self.photonCameraRight.running)
 
@@ -189,11 +189,11 @@ class CameraManager(Subsystem):
         #         self.photonCameraMiddle.camEstPose2d, getTime()
         #     )
 
-        if self.photonCameraRight.trustworthy:
-            robotState.odometry.addVisionMeasurement(
-                self.photonCameraRight.camEstPose2d,
-                self.photonCameraRight.timeStamp,
-            )
+        # if self.photonCameraRight.trustworthy:
+        #     robotState.odometry.addVisionMeasurement(
+        #         self.photonCameraRight.camEstPose2d,
+        #         self.photonCameraRight.timeStamp,
+        #     )
 
         robotState.odometry.resetPose(robotState.odometry.getEstimatedPosition())
 
@@ -201,17 +201,17 @@ class CameraManager(Subsystem):
         pass
 
     def publish(self) -> None:
-        self.publishBoolean("rightCam trustworthy", self.photonCameraRight.trustworthy)
+        # self.publishBoolean("rightCam trustworthy", self.photonCameraRight.trustworthy)
         # self.publishBoolean("midCam trustworthy", self.photonCameraMiddle.trustworthy)
         self.publishBoolean("leftCam trustworthy", self.photonCameraLeft.trustworthy)
         self.publishFloat("leftCamAmbiguity", self.photonCameraLeft.ambiguity)
-        self.publishFloat("rightCamAmbiguity", self.photonCameraRight.ambiguity)
+        # self.publishFloat("rightCamAmbiguity", self.photonCameraRight.ambiguity)
         # self.publishFloat("midCamX", self.photonCameraMiddle.robotX)
         # self.publishFloat("midCamY", self.photonCameraMiddle.robotY)
         # self.publishFloat("midCamRot", self.photonCameraMiddle.robotAngle)
-        self.publishFloat("rightCamX", self.photonCameraRight.robotX)
-        self.publishFloat("rightCamY", self.photonCameraRight.robotY)
-        self.publishFloat("rightCamRot", self.photonCameraRight.robotAngle)
+        # self.publishFloat("rightCamX", self.photonCameraRight.robotX)
+        # self.publishFloat("rightCamY", self.photonCameraRight.robotY)
+        # self.publishFloat("rightCamRot", self.photonCameraRight.robotAngle)
         self.publishFloat("leftCamX", self.photonCameraLeft.robotX)
         self.publishFloat("leftCamY", self.photonCameraLeft.robotY)
         self.publishFloat("leftCamRot", self.photonCameraLeft.robotAngle)
