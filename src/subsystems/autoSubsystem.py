@@ -27,6 +27,38 @@ from wpimath.geometry import Rotation2d
 #         return super().end(interrupted)
 
 
+class SubsystemUpdater:
+    def __init__(
+        self,
+        robotState: RobotState,
+        runIntake: bool | None = None,
+        lowerIntake: bool | None = None,
+        revShooter: bool | None = None,
+        shootShooter: bool | None = None,
+    ) -> None:
+        self.robotState = robotState
+        self.runIntake = runIntake
+        self.lowerIntake = lowerIntake
+        self.shootShooter = shootShooter
+        self.revShooter = revShooter
+
+    def update(self) -> None:
+        if self.runIntake is not None:
+            self.robotState.initialIntake = self.runIntake
+            self.robotState.intakeIndexer = self.runIntake
+
+        if self.lowerIntake is not None:
+            self.robotState.intakePosYAxis = 0.85 * self.lowerIntake
+
+        if self.revShooter is not None:
+            self.robotState.revSpeed = self.revShooter
+            print("revving")
+
+        if self.shootShooter is not None:
+            self.robotState.kickShooter = self.shootShooter
+            self.robotState.intakeIndexer = self.shootShooter
+
+
 class AutoSubsystem(Subsystem):
     # Declare Variables
     autoRoutineChooser: SendableChooser = SendableChooser()
@@ -60,6 +92,33 @@ class AutoSubsystem(Subsystem):
 
         SmartDashboard.putData("Auto Routine Chooser", self.autoRoutineChooser)
 
+        EventTrigger("rev_shooter").whileTrue(
+            cmd.print_("||| ")
+            # cmd.runEnd(
+            #     SubsystemUpdater(robotState, revShooter=True).update,
+            #     SubsystemUpdater(robotState, revShooter=False).update,
+            # )
+        )
+        EventTrigger("shoot_shooter").whileTrue(
+            cmd.runEnd(
+                SubsystemUpdater(robotState, shootShooter=True).update,
+                SubsystemUpdater(robotState, shootShooter=False).update,
+            )
+        )
+        EventTrigger("lower_intake").onTrue(
+            cmd.runOnce(SubsystemUpdater(robotState, lowerIntake=True).update).andThen(
+                cmd.waitSeconds(1).andThen(
+                    cmd.runOnce(SubsystemUpdater(robotState, lowerIntake=False).update)
+                )
+            )
+        )
+        EventTrigger("run_intake").whileTrue(
+            cmd.runEnd(
+                SubsystemUpdater(robotState, runIntake=True).update,
+                SubsystemUpdater(robotState, runIntake=False).update,
+            )
+        )
+
     def phaseInit(self, robotState: RobotState) -> None:
         self.selectedAuto = self.autoRoutineChooser.getSelected()
         self.selectedAuto.initialize()
@@ -78,35 +137,6 @@ class AutoSubsystem(Subsystem):
 
         if not self.isDone:
             self.selectedAuto.execute()
-            EventTrigger("rev_shooter").whileTrue(
-                cmd.runEnd(
-                    SubsystemUpdater(robotState, revShooter=True).update,
-                    SubsystemUpdater(robotState, revShooter=False).update,
-                )
-            )
-            EventTrigger("shoot_shooter").whileTrue(
-                cmd.runEnd(
-                    SubsystemUpdater(robotState, shootShooter=True).update,
-                    SubsystemUpdater(robotState, shootShooter=False).update,
-                )
-            )
-            EventTrigger("lower_intake").onTrue(
-                cmd.runOnce(
-                    SubsystemUpdater(robotState, lowerIntake=True).update
-                ).andThen(
-                    cmd.waitSeconds(1).andThen(
-                        cmd.runOnce(
-                            SubsystemUpdater(robotState, lowerIntake=False).update
-                        )
-                    )
-                )
-            )
-            EventTrigger("run_intake").whileTrue(
-                cmd.runEnd(
-                    SubsystemUpdater(robotState, runIntake=True).update,
-                    SubsystemUpdater(robotState, runIntake=False).update,
-                )
-            )
 
     def disabled(self) -> None:
         pass
@@ -116,37 +146,6 @@ class AutoSubsystem(Subsystem):
 
     def updateFieldSpeeds(self, speeds: ChassisSpeeds, robotState: RobotState) -> None:
         robotState.fieldSpeeds = speeds.fromRobotRelativeSpeeds(speeds, robotState.gyro)
-
-
-class SubsystemUpdater:
-    def __init__(
-        self,
-        robotState: RobotState,
-        runIntake: bool | None = None,
-        lowerIntake: bool | None = None,
-        revShooter: bool | None = None,
-        shootShooter: bool | None = None,
-    ) -> None:
-        self.robotState = robotState
-        self.runIntake = runIntake
-        self.lowerIntake = lowerIntake
-        self.shootShooter = shootShooter
-        self.revShooter = revShooter
-
-    def update(self) -> None:
-        if self.runIntake is not None:
-            self.robotState.initialIntake = self.runIntake
-            self.robotState.intakeIndexer = self.runIntake
-
-        if self.lowerIntake is not None:
-            self.robotState.intakePosYAxis = 0.85 * self.lowerIntake
-
-        if self.revShooter is not None:
-            self.robotState.revSpeed = self.revShooter
-
-        if self.shootShooter is not None:
-            self.robotState.kickShooter = self.shootShooter
-            self.robotState.intakeIndexer = self.shootShooter
 
     # def updateSubsystems(
     #     self,

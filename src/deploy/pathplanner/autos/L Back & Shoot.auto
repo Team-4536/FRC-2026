@@ -7,7 +7,20 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L Backward"
+            "pathName": "L Backward - Rev"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 20.0
+                }
+              }
+            ]
           }
         }
       ]
